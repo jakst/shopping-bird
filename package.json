@@ -1,16 +1,13 @@
 {
   "name": "shopping-list",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
-  "type": "module",
-  "dependencies": {
-    "dotenv": "^16.0.3",
-    "puppeteer": "^19.2.0",
-    "puppeteer-extra": "^3.3.4",
-    "puppeteer-extra-plugin-stealth": "^2.11.1"
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "server",
+      "app"
+    ]
   },
   "devDependencies": {
-    "typescript": "^4.8.4"
+    "turbo": "^1.6.3"
   }
 }
