@@ -1,9 +1,38 @@
+import { randomUUID } from 'node:crypto'
 import { getItems } from './bot/actions'
 
-const db: { name: string; checked: boolean }[] = []
+let db: Map<string, Item> | null = null
+let dbPromise: Promise<Map<string, Item>> | null = null
 
-console.log('Initing DB...')
-const items = await getItems()
-items.forEach((item) => db.push(item))
+interface Item {
+  id: string
+  name: string
+  checked: boolean
+}
 
-console.log('DB init finished!')
+async function fillDb() {
+  const items = await getItems()
+
+  const _db = new Map<string, Item>()
+  items.forEach(({ name, checked }) => {
+    const id = randomUUID()
+    _db.set(id, { id, name, checked })
+  })
+
+  return _db
+}
+
+export async function getDb() {
+  if (!dbPromise) {
+    console.log('Initing DB...')
+
+    dbPromise = fillDb()
+    db = await dbPromise
+
+    console.log('DB init finished!')
+  } else if (!db) {
+    db = await dbPromise
+  }
+
+  return db
+}

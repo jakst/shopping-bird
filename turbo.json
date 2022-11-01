@@ -4,6 +4,11 @@
     "build": {
       "outputs": ["dist/**"]
     },
+    "start": {
+      "outputs": [],
+      "cache": false,
+      "dependsOn": ["build"]
+    },
     "dev": {
       "outputs": [],
       "cache": false
