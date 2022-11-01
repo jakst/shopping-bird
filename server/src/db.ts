@@ -6,6 +6,7 @@ let dbPromise: Promise<Map<string, Item>> | null = null
 
 interface Item {
   id: string
+  index: number
   name: string
   checked: boolean
 }
@@ -14,9 +15,9 @@ async function fillDb() {
   const items = await getItems()
 
   const _db = new Map<string, Item>()
-  items.forEach(({ name, checked }) => {
+  items.forEach(({ index, name, checked }) => {
     const id = randomUUID()
-    _db.set(id, { id, name, checked })
+    _db.set(id, { id, index, name, checked })
   })
 
   return _db

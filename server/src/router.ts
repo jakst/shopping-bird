@@ -1,20 +1,20 @@
 import { initTRPC } from '@trpc/server'
 import { z } from 'zod'
 import { checkItem, uncheckItem } from './bot/actions'
-import { getDb } from './db'
+import { Context } from './context'
 
-const t = initTRPC.create()
+const t = initTRPC.context<Context>().create()
 
 export const router = t.router({
-  getShoppingList: t.procedure.query(async () => {
-    const db = await getDb()
+  getShoppingList: t.procedure.query(async (req) => {
+    const { db } = req.ctx
     return Array.from(db.values())
   }),
   setChecked: t.procedure
     .input(z.object({ id: z.string(), checked: z.boolean() }))
     .mutation(async (req) => {
+      const { db } = req.ctx
       const { id, checked } = req.input
-      const db = await getDb()
       const item = db.get(id)
 
       if (item) {
@@ -24,6 +24,8 @@ export const router = t.router({
       } else {
         // Error ?
       }
+
+      return item
     }),
 
   // addItem: t.procedure.input(z.string()).mutation(() => {
