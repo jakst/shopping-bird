@@ -2,6 +2,8 @@ import { createSignal, For, Show } from 'solid-js'
 import { useRouteData } from 'solid-start'
 import { createServerAction$, createServerData$ } from 'solid-start/server'
 import { client } from '~/trpc'
+import IconCaretRight from '~icons/radix-icons/caret-right'
+import IconCross from '~icons/radix-icons/cross-2'
 
 export function routeData() {
   return createServerData$(() => client.getShoppingList.query(), {
@@ -43,15 +45,15 @@ export default function Home() {
       </ul>
 
       <Show when={checkedList().length > 0}>
-        <button class="mt-6" onClick={() => setShowChecked((v) => !v)}>
+        <button
+          class="mt-6 flex items-center"
+          onClick={() => setShowChecked((v) => !v)}
+        >
+          <IconCaretRight
+            class={`transition-all ${showChecked() ? 'rotate-90' : 'rotate-0'}`}
+          />
+
           <h2>
-            <span
-              class={`inline-block transition-all ${
-                showChecked() ? 'rotate-90' : 'rotate-0'
-              }`}
-            >
-              {'>'}
-            </span>{' '}
             {checkedList().length === 1
               ? '1 ticked item'
               : `${checkedList().length} ticked items`}
@@ -69,6 +71,8 @@ export default function Home() {
 }
 
 function ItemC(props: { item: Item }) {
+  const [showingActions, showActions] = createSignal()
+
   const [, setChecked] = createServerAction$(
     async (input: { id: string; checked: boolean }) => {
       return client.setChecked.mutate(input)
@@ -76,7 +80,11 @@ function ItemC(props: { item: Item }) {
   )
 
   return (
-    <li class="flex">
+    <li
+      class="flex"
+      onFocusIn={() => showActions(true)}
+      onFocusOut={() => setTimeout(() => showActions(false), 100)}
+    >
       <div class="flex items-center h-5 rounded-lg">
         <input
           class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300"
@@ -106,6 +114,14 @@ function ItemC(props: { item: Item }) {
           </p>
         </Show>
       </div>
+
+      <Show when={showingActions()}>
+        <div>
+          <button onClick={() => alert('hej')}>
+            <IconCross />
+          </button>
+        </div>
+      </Show>
     </li>
   )
 }
