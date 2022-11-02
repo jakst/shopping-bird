@@ -92,17 +92,18 @@ function ItemC(props: { item: Item }) {
       </div>
 
       <div class="ml-2 text-sm">
-        <label
+        <input
+          value={props.item.name}
           class={
-            'capitalize font-medium text-gray-900' +
+            'capitalize font-medium text-gray-900 focus:outline-none focus:border-none' +
             (props.item.checked ? ' line-through' : '')
           }
-        >
-          {props.item.name}
-        </label>
+        />
 
-        <Show when={false}>
-          <p class="text-xs font-normal text-gray-500">NOTE_PLACEHOLDER</p>
+        <Show when={true}>
+          <p class="text-xs font-normal text-gray-500">
+            For orders shipped from $25 in books or $29 in other categories
+          </p>
         </Show>
       </div>
     </li>
