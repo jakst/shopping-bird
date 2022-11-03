@@ -1,6 +1,5 @@
-import { type Page } from 'puppeteer'
-import { saveCookie } from './cookies'
 import * as dotenv from 'dotenv'
+import { type Page } from 'puppeteer'
 
 dotenv.config()
 const { EMAIL, PASSWORD } = process.env as Record<string, string>
@@ -15,6 +14,4 @@ export async function login(page: Page) {
   await page.keyboard.press('Enter')
 
   await page.waitForNavigation({ waitUntil: 'networkidle2' })
-
-  await saveCookie(page)
 }

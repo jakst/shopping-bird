@@ -2,9 +2,10 @@ import { createSignal, For, JSX, Show } from 'solid-js'
 import { useRouteData } from 'solid-start'
 import { createServerAction$, createServerData$ } from 'solid-start/server'
 import { client } from '~/trpc'
-import IconCaretRight from '~icons/ci/caret-right'
 import IconCheck from '~icons/ci/check'
-import IconCross from '~icons/ci/trash-full'
+import IconPlus from '~icons/ci/plus'
+import IconTrash from '~icons/ci/trash-full'
+import IconCaretRight from '~icons/radix-icons/caret-right'
 
 export function routeData() {
   return createServerData$(() => client.getShoppingList.query(), {
@@ -43,6 +44,8 @@ export default function Home() {
       </h1>
       <ul class="flex flex-col gap-2">
         <For each={sortedList()}>{(item) => <ItemC item={item} />}</For>
+
+        <NewItem />
       </ul>
 
       <Show when={checkedList().length > 0}>
@@ -52,7 +55,7 @@ export default function Home() {
             onClick={() => setShowChecked((v) => !v)}
           >
             <IconCaretRight
-              class={`transition-all ${
+              class={`transition-all duration-300 ${
                 showChecked() ? 'rotate-90' : 'rotate-0'
               }`}
             />
@@ -83,15 +86,15 @@ function ItemC(props: { item: Item }) {
   }
 
   const [, setChecked] = createServerAction$(
-    async (input: { id: string; checked: boolean }) => {
-      return client.setChecked.mutate(input)
-    }
+    (input: { id: string; checked: boolean }) => client.setChecked.mutate(input)
+  )
+
+  const [, removeItem] = createServerAction$((id: string) =>
+    client.removeItem.mutate(id)
   )
 
   const [, rename] = createServerAction$(
-    async (input: { id: string; name: string }) => {
-      return client.rename.mutate(input)
-    }
+    (input: { id: string; name: string }) => client.rename.mutate(input)
   )
 
   const [newName, setNewName] = createSignal(props.item.name)
@@ -150,8 +153,8 @@ function ItemC(props: { item: Item }) {
             <IconCheck height="100%" />
           </Button>
 
-          <Button>
-            <IconCross height="100%" />
+          <Button onClick={() => removeItem(props.item.id)}>
+            <IconTrash height="100%" />
           </Button>
         </div>
       </Show>
@@ -166,11 +169,43 @@ function Button(props: {
 }) {
   return (
     <button
-      class="aspect-square h-7 flex items-center justify-center rounded-full enabled:hover:bg-slate-100 disabled:opacity-60"
+      class="aspect-square h-7 flex items-center justify-center rounded-full enabled:hover:bg-slate-100 disabled:opacity-0"
       onClick={props.onClick}
       disabled={props.disabled}
     >
       {props.children}
     </button>
+  )
+}
+
+function NewItem() {
+  const [value, setValue] = createSignal('')
+
+  const [, addItem] = createServerAction$(async (name: string) => {
+    return client.addItem.mutate(name)
+  })
+
+  function submit() {
+    addItem(value())
+    setValue('')
+  }
+
+  return (
+    <li class="text-sm h-7 flex items-center -mt-2">
+      <IconPlus />
+
+      <input
+        class="ml-2 outline-none"
+        placeholder="New item"
+        value={value()}
+        onInput={(event) => setValue(event.currentTarget.value)}
+      />
+
+      <Show when={value().length > 0}>
+        <Button onClick={submit}>
+          <IconCheck />
+        </Button>
+      </Show>
+    </li>
   )
 }

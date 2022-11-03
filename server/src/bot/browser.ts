@@ -1,7 +1,7 @@
 import { executablePath } from 'puppeteer'
 import puppeteer from 'puppeteer-extra'
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
-import { loadCookie } from './cookies'
+import { loadCookie, saveCookie } from './cookies'
 import { login } from './login'
 
 puppeteer.use(StealthPlugin())
@@ -32,6 +32,8 @@ export async function loadShoppingListPage() {
   if (!isLoggedIn) await login(page)
 
   await page.waitForXPath('//*[contains(text(), "Min inköpslista")]')
+
+  await saveCookie(page)
 
   return page
 }

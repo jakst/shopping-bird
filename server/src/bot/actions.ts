@@ -72,6 +72,24 @@ export const checkItem = createAction(async (name: string) => {
   )
 })
 
+export const uncheckItem = createAction(async (name: string) => {
+  const page = await getPage()
+
+  const liElements = await page.$$('ul[aria-label="Min inköpslista"] > li')
+
+  await Promise.all(
+    liElements.map(async (liElement) => {
+      const text = await liElement.evaluate((el) => el.textContent)
+
+      if (text === name) {
+        const input = await liElement.$('input')
+        const checked = await input?.evaluate((el) => el.checked)
+        if (checked) await input?.click()
+      }
+    })
+  )
+})
+
 export const rename = createAction(async (oldName: string, newName: string) => {
   const page = await getPage()
 
@@ -97,7 +115,7 @@ export const rename = createAction(async (oldName: string, newName: string) => {
     })
   )
 })
-export const uncheckItem = createAction(async (name: string) => {
+export const removeItem = createAction(async (name: string) => {
   const page = await getPage()
 
   const liElements = await page.$$('ul[aria-label="Min inköpslista"] > li')
@@ -107,12 +125,24 @@ export const uncheckItem = createAction(async (name: string) => {
       const text = await liElement.evaluate((el) => el.textContent)
 
       if (text === name) {
-        const input = await liElement.$('input')
-        const checked = await input?.evaluate((el) => el.checked)
-        if (checked) await input?.click()
+        const nameDisplay = (await liElement.$('div[role="button"'))!
+        await nameDisplay.click()
+
+        const trashButton = (await liElement.$('button[aria-label="Radera"]'))!
+
+        await trashButton.click()
       }
     })
   )
+})
+
+export const addItem = createAction(async (name: string) => {
+  const page = await getPage()
+
+  const newItemInput = (await page.$('input[aria-label="Lägg till objekt"]'))!
+
+  await newItemInput.type(name)
+  await newItemInput.press('Enter')
 })
 
 const pause = (time = 2000) =>
