@@ -1,9 +1,10 @@
-import { createSignal, For, Show } from 'solid-js'
+import { createSignal, For, JSX, Show } from 'solid-js'
 import { useRouteData } from 'solid-start'
 import { createServerAction$, createServerData$ } from 'solid-start/server'
 import { client } from '~/trpc'
-import IconCaretRight from '~icons/radix-icons/caret-right'
-import IconCross from '~icons/radix-icons/cross-2'
+import IconCaretRight from '~icons/ci/caret-right'
+import IconCheck from '~icons/ci/check'
+import IconCross from '~icons/ci/trash-full'
 
 export function routeData() {
   return createServerData$(() => client.getShoppingList.query(), {
@@ -45,23 +46,27 @@ export default function Home() {
       </ul>
 
       <Show when={checkedList().length > 0}>
-        <button
-          class="mt-6 flex items-center"
-          onClick={() => setShowChecked((v) => !v)}
-        >
-          <IconCaretRight
-            class={`transition-all ${showChecked() ? 'rotate-90' : 'rotate-0'}`}
-          />
+        <div class="mt-4 mb-2 ml-[-24px] opacity-60">
+          <button
+            class="flex items-center"
+            onClick={() => setShowChecked((v) => !v)}
+          >
+            <IconCaretRight
+              class={`transition-all ${
+                showChecked() ? 'rotate-90' : 'rotate-0'
+              }`}
+            />
 
-          <h2>
-            {checkedList().length === 1
-              ? '1 ticked item'
-              : `${checkedList().length} ticked items`}
-          </h2>
-        </button>
+            <h2 class="ml-1 ">
+              {checkedList().length === 1
+                ? '1 ticked item'
+                : `${checkedList().length} ticked items`}
+            </h2>
+          </button>
+        </div>
 
         <Show when={showChecked()}>
-          <ul class="flex flex-col gap-2 cur">
+          <ul class="flex flex-col gap-2 opacity-60">
             <For each={checkedList()}>{(item) => <ItemC item={item} />}</For>
           </ul>
         </Show>
@@ -71,7 +76,11 @@ export default function Home() {
 }
 
 function ItemC(props: { item: Item }) {
-  const [showingActions, showActions] = createSignal()
+  const [hovering, setHovering] = createSignal(false)
+  const [focusing, setFocusing] = createSignal(false)
+  const showingActions = () => {
+    return hovering() || focusing()
+  }
 
   const [, setChecked] = createServerAction$(
     async (input: { id: string; checked: boolean }) => {
@@ -79,15 +88,38 @@ function ItemC(props: { item: Item }) {
     }
   )
 
+  const [, rename] = createServerAction$(
+    async (input: { id: string; name: string }) => {
+      return client.rename.mutate(input)
+    }
+  )
+
+  const [newName, setNewName] = createSignal(props.item.name)
+
+  const nameHasChanged = () => newName() !== props.item.name
+
+  function submitNameChange() {
+    rename({ id: props.item.id, name: newName() })
+    setFocusing(false)
+  }
+
   return (
     <li
-      class="flex"
-      onFocusIn={() => showActions(true)}
-      onFocusOut={() => setTimeout(() => showActions(false), 100)}
+      class="flex text-sm h-7"
+      onMouseOver={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
+      onFocusIn={() => setFocusing(true)}
+      onFocusOut={(event) => {
+        if (
+          !event.relatedTarget ||
+          !event.currentTarget.contains(event.relatedTarget as any)
+        )
+          setFocusing(false)
+      }}
     >
-      <div class="flex items-center h-5 rounded-lg">
+      <div class="flex items-center h-5">
         <input
-          class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300"
+          class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 "
           type="checkbox"
           checked={props.item.checked}
           onChange={(event) => {
@@ -99,29 +131,46 @@ function ItemC(props: { item: Item }) {
         />
       </div>
 
-      <div class="ml-2 text-sm">
+      <div class="ml-2">
         <input
           value={props.item.name}
           class={
-            'capitalize font-medium text-gray-900 focus:outline-none focus:border-none' +
-            (props.item.checked ? ' line-through' : '')
+            'capitalize font-medium focus:outline-none focus:border-b-[1px] border-slate-800' +
+            (props.item.checked
+              ? ' line-through text-gray-500'
+              : ' text-gray-900')
           }
+          onInput={(event) => setNewName(event.currentTarget.value)}
         />
-
-        <Show when={true}>
-          <p class="text-xs font-normal text-gray-500">
-            For orders shipped from $25 in books or $29 in other categories
-          </p>
-        </Show>
       </div>
 
       <Show when={showingActions()}>
-        <div>
-          <button onClick={() => alert('hej')}>
-            <IconCross />
-          </button>
+        <div class="ml-6 flex items-center">
+          <Button disabled={!nameHasChanged()} onClick={submitNameChange}>
+            <IconCheck height="100%" />
+          </Button>
+
+          <Button>
+            <IconCross height="100%" />
+          </Button>
         </div>
       </Show>
     </li>
+  )
+}
+
+function Button(props: {
+  onClick?: () => void
+  disabled?: boolean
+  children: JSX.Element
+}) {
+  return (
+    <button
+      class="aspect-square h-7 flex items-center justify-center rounded-full enabled:hover:bg-slate-100 disabled:opacity-60"
+      onClick={props.onClick}
+      disabled={props.disabled}
+    >
+      {props.children}
+    </button>
   )
 }

@@ -8,7 +8,7 @@ puppeteer.use(StealthPlugin())
 
 export const browser = await puppeteer.launch({
   // args: ['--no-sandbox'],
-  headless: true,
+  headless: false,
   ignoreHTTPSErrors: true,
   executablePath: executablePath(),
 })

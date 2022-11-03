@@ -1,6 +1,6 @@
 import { initTRPC } from '@trpc/server'
 import { z } from 'zod'
-import { checkItem, uncheckItem } from './bot/actions'
+import { checkItem, rename, uncheckItem } from './bot/actions'
 import { Context } from './context'
 
 const t = initTRPC.context<Context>().create()
@@ -26,6 +26,22 @@ export const router = t.router({
       }
 
       return item
+    }),
+  rename: t.procedure
+    .input(z.object({ id: z.string(), name: z.string() }))
+    .mutation(async (req) => {
+      const { db } = req.ctx
+      const { id, name } = req.input
+      const item = db.get(id)
+
+      if (item) {
+        const oldName = item.name
+        item.name = name
+
+        rename(oldName, name)
+      } else {
+        // Error ?
+      }
     }),
 
   // addItem: t.procedure.input(z.string()).mutation(() => {

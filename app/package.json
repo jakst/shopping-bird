@@ -8,6 +8,8 @@
   },
   "type": "module",
   "devDependencies": {
+    "@iconify-json/bi": "^1.1.10",
+    "@iconify-json/ci": "^1.1.4",
     "@iconify-json/radix-icons": "^1.1.5",
     "autoprefixer": "^10.4.12",
     "postcss": "^8.4.18",

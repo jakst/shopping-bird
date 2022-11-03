@@ -1034,6 +1034,20 @@
   dependencies:
     "@hapi/hoek" "^9.0.0"
 
+"@iconify-json/bi@^1.1.10":
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/@iconify-json/bi/-/bi-1.1.10.tgz#45896eff2ab25d3cc349ad247641464a1f7c46cd"
+  integrity sha512-RRfto++s1L5IMgadRwDIRz9gI+y9Oh0ffyplbBSo/FRTsuY0acgykbsJyzyW9z+os7jXIdPReslHL2VC7YTFng==
+  dependencies:
+    "@iconify/types" "*"
+
+"@iconify-json/ci@^1.1.4":
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/@iconify-json/ci/-/ci-1.1.4.tgz#402380148622cdce4ae32c2fadde4b90fd1b0dad"
+  integrity sha512-ySNRExlFnDGaE+p3YJdoJGS+2ORONjnIT+94FY6LgB2FZ+eWRY+TNdH+EZoJofJTYV/9OoWr9rAVYWVEVCHWfw==
+  dependencies:
+    "@iconify/types" "*"
+
 "@iconify-json/radix-icons@^1.1.5":
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/@iconify-json/radix-icons/-/radix-icons-1.1.5.tgz#81235aa42f658e29fc90607bf6ee97e8f0fe9898"

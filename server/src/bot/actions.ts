@@ -72,6 +72,31 @@ export const checkItem = createAction(async (name: string) => {
   )
 })
 
+export const rename = createAction(async (oldName: string, newName: string) => {
+  const page = await getPage()
+
+  const liElements = await page.$$('ul[aria-label="Min inköpslista"] > li')
+
+  await Promise.all(
+    liElements.map(async (liElement) => {
+      const text = await liElement.evaluate((el) => el.textContent)
+
+      if (text === oldName) {
+        const nameDisplay = (await liElement.$('div[role="button"'))!
+        await nameDisplay.click()
+
+        await Promise.all(
+          [...oldName].map(() => nameDisplay.press('Backspace'))
+        )
+
+        await nameDisplay.type(newName)
+
+        const submitButton = (await liElement.$('button[aria-label="Klart"'))!
+        await submitButton.click()
+      }
+    })
+  )
+})
 export const uncheckItem = createAction(async (name: string) => {
   const page = await getPage()
 
@@ -89,3 +114,6 @@ export const uncheckItem = createAction(async (name: string) => {
     })
   )
 })
+
+const pause = (time = 2000) =>
+  new Promise((resolve) => setTimeout(resolve, time))
