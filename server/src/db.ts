@@ -11,7 +11,7 @@ interface Item {
   checked: boolean
 }
 
-async function fillDb() {
+export async function fillDb() {
   const items = await getItems()
 
   const _db = new Map<string, Item>()

@@ -6,6 +6,7 @@ import IconCheck from '~icons/ci/check'
 import IconPlus from '~icons/ci/plus'
 import IconTrash from '~icons/ci/trash-full'
 import IconCaretRight from '~icons/radix-icons/caret-right'
+import IconSync from '~icons/radix-icons/symbol'
 
 export function routeData() {
   return createServerData$(() => client.getShoppingList.query(), {
@@ -37,11 +38,20 @@ export default function Home() {
 
   const [showChecked, setShowChecked] = createSignal(false)
 
+  const [, sync] = createServerAction$(() => client.sync.mutate())
+
   return (
-    <main class="mx-auto text-gray-700 p-4 max-w-prose">
+    <main class="mx-auto text-gray-700 p-4 max-w-lg">
       <h1 class="text-center text-6xl text-sky-700 font-thin uppercase my-16">
-        Hello world!
+        Hello bird!
       </h1>
+
+      <div class="flex justify-end">
+        <Button onClick={() => sync()}>
+          <IconSync />
+        </Button>
+      </div>
+
       <ul class="flex flex-col gap-2">
         <For each={sortedList()}>{(item) => <ItemC item={item} />}</For>
 

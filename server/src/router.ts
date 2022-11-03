@@ -4,6 +4,8 @@ import { z } from 'zod'
 import {
   addItem,
   checkItem,
+  getItems,
+  refreshPage,
   removeItem,
   rename,
   uncheckItem,
@@ -16,6 +18,18 @@ export const router = t.router({
   getShoppingList: t.procedure.query(async (req) => {
     const { db } = req.ctx
     return Array.from(db.values())
+  }),
+  sync: t.procedure.mutation(async (req) => {
+    const { db } = req.ctx
+
+    await refreshPage()
+    const items = await getItems()
+
+    db.clear()
+    items.forEach(({ index, name, checked }) => {
+      const id = randomUUID()
+      db.set(id, { id, index, name, checked })
+    })
   }),
   setChecked: t.procedure
     .input(z.object({ id: z.string(), checked: z.boolean() }))

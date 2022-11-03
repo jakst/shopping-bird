@@ -23,14 +23,18 @@ let pageRefreshedAt = 0
 let _page: Awaited<ReturnType<typeof loadShoppingListPage>>
 const REFRESH_INTERVAL = 15 * 60 * 1000 // 15 minutes
 
-async function getPage() {
+async function getPage(force = false) {
   const now = Date.now()
-  if (now - pageRefreshedAt > REFRESH_INTERVAL) {
+  if (force || now - pageRefreshedAt > REFRESH_INTERVAL) {
     _page = await loadShoppingListPage()
     pageRefreshedAt = now
   }
 
   return _page
+}
+
+export async function refreshPage() {
+  await getPage(true)
 }
 
 export async function getItems() {
