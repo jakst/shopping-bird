@@ -43,7 +43,7 @@ export default function Home() {
   return (
     <main class="mx-auto text-gray-700 p-4 max-w-lg">
       <h1 class="text-center text-6xl text-sky-700 font-thin uppercase my-16">
-        Hello bird!
+        Hello Bird!
       </h1>
 
       <div class="flex justify-end">

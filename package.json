@@ -1,5 +1,5 @@
 {
-  "name": "shopping-list",
+  "name": "hello-bird",
   "private": true,
   "workspaces": {
     "packages": [
@@ -8,8 +8,8 @@
     ]
   },
   "scripts": {
-    "app": "yarn workspace happy-bird-app",
-    "server": "yarn workspace happy-bird-server"
+    "app": "yarn workspace hello-bird-app",
+    "server": "yarn workspace hello-bird-server"
   },
   "devDependencies": {
     "turbo": "^1.6.3"

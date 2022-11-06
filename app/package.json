@@ -1,5 +1,5 @@
 {
-  "name": "happy-bird-app",
+  "name": "hello-bird-app",
   "version": "1.0.0",
   "scripts": {
     "dev": "solid-start dev --port 3400",
@@ -25,7 +25,7 @@
     "@trpc/client": "^10.0.0-rc.4",
     "@trpc/server": "^10.0.0-rc.4",
     "dotenv": "^16.0.3",
-    "happy-bird-server": "1.0.0",
+    "hello-bird-server": "1.0.0",
     "solid-js": "^1.6.0",
     "solid-start": "^0.2.0",
     "undici": "^5.11.0",
