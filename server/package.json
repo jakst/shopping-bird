@@ -1,24 +1,24 @@
 {
-  "name": "server",
+  "name": "happy-bird-server",
   "version": "1.0.0",
   "license": "MIT",
-  "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "tsx --watch src/run.ts",
-    "start": "tsx src/run.ts"
+    "dev": "NODE_ENV=development tsx --watch src/run.ts",
+    "build": "tsc --outDir dist",
+    "start": "NODE_ENV=production node dist/run.js"
   },
   "dependencies": {
-    "@trpc/server": "^10.0.0-proxy-beta.26",
+    "@trpc/server": "^10.0.0-rc.4",
     "dotenv": "^16.0.3",
     "fastify": "^4.9.2",
-    "puppeteer": "^19.2.0",
+    "puppeteer": "^19.2.2",
     "puppeteer-extra": "^3.3.4",
     "puppeteer-extra-plugin-stealth": "^2.11.1",
+    "typescript": "^4.8.4",
     "zod": "^3.19.1"
   },
   "devDependencies": {
-    "tsx": "^3.11.0",
-    "typescript": "^4.8.4"
+    "tsx": "^3.11.0"
   }
 }

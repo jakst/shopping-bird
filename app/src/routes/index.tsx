@@ -20,7 +20,7 @@ export default function Home() {
   const shoppingList = useRouteData<typeof routeData>()
 
   const sortedList = () => {
-    return shoppingList()
+    return shoppingList()!
       .filter((item) => !item.checked)
       .sort((a, b) => {
         if (a.checked && !b.checked) return 1
@@ -31,7 +31,7 @@ export default function Home() {
   }
 
   const checkedList = () => {
-    return shoppingList()
+    return shoppingList()!
       .filter((item) => item.checked)
       .sort((a, b) => a.index - b.index)
   }

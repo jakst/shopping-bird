@@ -1,6 +1,7 @@
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
-import { type AppRouter } from 'server'
+import { type AppRouter } from 'happy-bird-server'
+import { env } from './env'
 
 export const client = createTRPCProxyClient<AppRouter>({
-  links: [httpBatchLink({ url: 'http://localhost:3500/trpc' })],
+  links: [httpBatchLink({ url: env.WORKER_TRPC_URL })],
 })

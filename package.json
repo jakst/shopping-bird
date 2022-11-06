@@ -7,6 +7,10 @@
       "app"
     ]
   },
+  "scripts": {
+    "app": "yarn workspace happy-bird-app",
+    "server": "yarn workspace happy-bird-server"
+  },
   "devDependencies": {
     "turbo": "^1.6.3"
   }
