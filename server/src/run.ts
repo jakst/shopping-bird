@@ -1,5 +1,6 @@
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify'
 import fastify from 'fastify'
+import { saveCookies } from './bot/cookies'
 import { createContext } from './context'
 import { env } from './env'
 import { router } from './router'
@@ -9,6 +10,11 @@ const server = fastify({
 })
 
 server.get('/ping', () => `pong (git commit: ${env.GIT_REVISION})`)
+
+server.post('/auth', async (req, res) => {
+  await saveCookies((req.body as { cookies: any[] }).cookies)
+  res.status(200)
+})
 
 server.register(fastifyTRPCPlugin, {
   prefix: '/trpc',

@@ -3,8 +3,7 @@ import { type Page } from 'puppeteer'
 
 const COOKIE_STORE = 'cookies.json'
 
-export async function saveCookie(page: Page) {
-  const cookies = await page.cookies()
+export async function saveCookies(cookies: any[]) {
   console.log(`Saving ${cookies.length} cookies`)
   const cookieJson = JSON.stringify(cookies, null, 2)
   await fs.writeFile(COOKIE_STORE, cookieJson)

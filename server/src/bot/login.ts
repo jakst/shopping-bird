@@ -1,6 +1,6 @@
 import { type Page } from 'puppeteer'
 import { env } from '../env'
-import { saveCookie } from './cookies'
+import { saveCookies } from './cookies'
 
 export async function login(page: Page) {
   await page.type('input[type="email"]', env.EMAIL)
@@ -14,5 +14,6 @@ export async function login(page: Page) {
   await page.waitForNavigation({ waitUntil: 'networkidle2' })
   await page.waitForXPath('//*[contains(text(), "Min inköpslista")]')
 
-  await saveCookie(page)
+  const cookies = await page.cookies()
+  await saveCookies(cookies)
 }
