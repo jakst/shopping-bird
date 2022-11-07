@@ -8,7 +8,7 @@ const server = fastify({
   maxParamLength: 5000,
 })
 
-server.get('/ping', () => 'pong')
+server.get('/ping', () => `pong (git commit: ${env.GIT_REVISION})`)
 
 server.register(fastifyTRPCPlugin, {
   prefix: '/trpc',
@@ -20,6 +20,9 @@ server.register(fastifyTRPCPlugin, {
 
 async function run() {
   try {
+    console.log('[app] Starting web server', {
+      GIT_REVISION: env.GIT_REVISION,
+    })
     await server.listen({
       port: 3500,
       host: env.isLocalDev ? 'localhost' : '0.0.0.0',
