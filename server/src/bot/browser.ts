@@ -12,7 +12,9 @@ let _page: Page | null = null
 let hasLoadedCookies = false
 async function getPage() {
   if (!_browser) {
-    console.log('[setup] Setting up browser...')
+    console.log('[setup] Setting up browser...', {
+      GIT_REVISION: env.GIT_REVISION,
+    })
     _browser = await puppeteer.launch({
       args: ['--no-sandbox'],
       headless: true,

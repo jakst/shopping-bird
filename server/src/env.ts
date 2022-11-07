@@ -8,6 +8,7 @@ const envSchema = z
     EMAIL: z.string().email(),
     PASSWORD: z.string().min(1),
     NODE_ENV: z.enum(['development', 'production']),
+    GIT_REVISION: z.string().min(1),
   })
   .transform((value) => {
     const { NODE_ENV, ...rest } = value
