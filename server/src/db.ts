@@ -23,8 +23,6 @@ export async function fillDb() {
   return _db
 }
 
-fillDb()
-
 export async function getDb() {
   if (!dbPromise) {
     console.log('Initing DB...')
