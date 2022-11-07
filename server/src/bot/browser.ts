@@ -1,4 +1,4 @@
-import { Browser, executablePath } from 'puppeteer'
+import { Browser, executablePath, Page } from 'puppeteer'
 import puppeteer from 'puppeteer-extra'
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 import { env } from '../env'
@@ -7,11 +7,12 @@ import { login } from './login'
 
 puppeteer.use(StealthPlugin())
 
-let browser: Browser | null = null
+let _browser: Browser | null = null
+let _page: Page | null = null
 let hasLoadedCookies = false
-export async function loadShoppingListPage() {
-  if (!browser) {
-    browser = await puppeteer.launch({
+async function getPage() {
+  if (!_browser) {
+    _browser = await puppeteer.launch({
       args: ['--no-sandbox'],
       headless: true,
       ignoreHTTPSErrors: true,
@@ -22,12 +23,18 @@ export async function loadShoppingListPage() {
     })
   }
 
-  const page = await browser.newPage()
+  _page ??= await _browser.newPage()
 
   if (!hasLoadedCookies) {
-    await loadCookie(page)
+    await loadCookie(_page)
     hasLoadedCookies = true
   }
+
+  return _page
+}
+
+export async function loadShoppingListPage() {
+  const page = await getPage()
 
   await page.goto('https://shoppinglist.google.com/', {
     waitUntil: 'networkidle2',
