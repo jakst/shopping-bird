@@ -5,4 +5,7 @@ const envSchema = z.object({
   AUTH_INFO: z.string().min(3),
 })
 
-export const env = envSchema.parse(process.env)
+export const env = envSchema.parse({
+  AUTH_INFO: process.env.AUTH_INFO,
+  WORKER_TRPC_URL: process.env.WORKER_TRPC_URL,
+})
