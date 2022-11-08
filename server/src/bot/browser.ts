@@ -64,8 +64,6 @@ export async function loadShoppingListPage(forceRefresh = false) {
   const page = await getPage()
   const cookies = await getCookies()
 
-  console.log('loadShoppingListPage', cookies?.length ?? 'no cookies')
-
   if (!cookies) throw new Error('NO_COOKIES')
 
   await page.setCookie(...cookies)
