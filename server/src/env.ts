@@ -10,6 +10,7 @@ const envSchema = z
     NODE_ENV: z.enum(['development', 'production']),
     GIT_REVISION: z.string().min(1).default('none'),
     PUPPETEER_EXECUTABLE_PATH: z.string().optional(),
+    AUTH_INFO: z.string().min(3),
   })
   .transform((value) => {
     const { NODE_ENV, ...rest } = value

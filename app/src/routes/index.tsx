@@ -1,6 +1,13 @@
 import { createSignal, For, JSX, Show } from 'solid-js'
 import { useRouteData } from 'solid-start'
-import { createServerAction$, createServerData$ } from 'solid-start/server'
+import {
+  createServerAction$,
+  createServerData$,
+  HttpHeader,
+  HttpStatusCode,
+  redirect,
+} from 'solid-start/server'
+import { REQUIRED_AUTH_HEADER } from '~/auth'
 import { client } from '~/trpc'
 import IconCheck from '~icons/ci/check'
 import IconPlus from '~icons/ci/plus'
@@ -9,9 +16,17 @@ import IconCaretRight from '~icons/radix-icons/caret-right'
 import IconSync from '~icons/radix-icons/symbol'
 
 export function routeData() {
-  return createServerData$(() => client.getShoppingList.query(), {
-    initialValue: [],
-  })
+  return createServerData$(
+    (_, event) => {
+      if (event.request.headers.get('authorization') !== REQUIRED_AUTH_HEADER)
+        throw redirect('/login')
+
+      return client.getShoppingList.query()
+    },
+    {
+      initialValue: [],
+    }
+  )
 }
 
 type Item = Awaited<ReturnType<typeof client.getShoppingList.query>>[number]
@@ -42,6 +57,11 @@ export default function Home() {
 
   return (
     <main class="mx-auto text-gray-700 p-4 max-w-lg">
+      <Show when={false}>
+        <HttpHeader name="WWW-Authenticate" value="Basic" />
+        <HttpStatusCode code={401} />
+      </Show>
+
       <h1 class="text-center text-6xl text-sky-700 font-thin uppercase my-16">
         Hello Bird!
       </h1>

@@ -16,11 +16,13 @@ import { Context } from './context'
 const t = initTRPC.context<Context>().create()
 
 const requiresAuth = t.middleware(async ({ ctx, next }) => {
-  const { db } = ctx
+  if (!ctx.authed)
+    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Wrong auth header' })
 
   const cookies = await getCookies()
   if (!cookies || !cookies.length) throw new TRPCError({ code: 'UNAUTHORIZED' })
 
+  const { db } = ctx
   if (!db) {
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
