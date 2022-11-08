@@ -54,49 +54,51 @@ export default function Home() {
   const [, sync] = createServerAction$(() => client.sync.mutate())
 
   return (
-    <main class="mx-auto text-gray-700 p-4 max-w-lg">
-      <h1 class="text-center text-6xl text-sky-700 font-thin uppercase my-16">
-        Hello Bird!
-      </h1>
+    <main class="mx-auto text-gray-700 max-w-lg">
+      <div class="flex px-4 justify-between items-center content-center">
+        <h1 class="text-4xl py-4 text-sky-700 font-thin uppercase">
+          Hello Bird!
+        </h1>
 
-      <div class="flex justify-end">
         <Button onClick={() => sync()}>
-          <IconSync />
+          <IconSync height="100%" width="100%" />
         </Button>
       </div>
 
-      <ul class="flex flex-col gap-2">
-        <For each={sortedList()}>{(item) => <ItemC item={item} />}</For>
+      <div class="text-lg">
+        <ul class="flex flex-col gap-2">
+          <For each={sortedList()}>{(item) => <ItemC item={item} />}</For>
 
-        <NewItem />
-      </ul>
+          <NewItem />
+        </ul>
 
-      <Show when={checkedList().length > 0}>
-        <div class="mt-4 mb-2 ml-[-24px] opacity-60">
-          <button
-            class="flex items-center"
-            onClick={() => setShowChecked((v) => !v)}
-          >
-            <IconCaretRight
-              class={`transition-all duration-300 ${
-                showChecked() ? 'rotate-90' : 'rotate-0'
-              }`}
-            />
+        <Show when={checkedList().length > 0}>
+          <div class="mt-4 mb-2 ml-2 opacity-60">
+            <button
+              class="flex items-center"
+              onClick={() => setShowChecked((v) => !v)}
+            >
+              <IconCaretRight
+                class={`transition-all duration-300 ${
+                  showChecked() ? 'rotate-90' : 'rotate-0'
+                }`}
+              />
 
-            <h2 class="ml-1 ">
-              {checkedList().length === 1
-                ? '1 ticked item'
-                : `${checkedList().length} ticked items`}
-            </h2>
-          </button>
-        </div>
+              <h2 class="ml-1">
+                {checkedList().length === 1
+                  ? '1 ticked item'
+                  : `${checkedList().length} ticked items`}
+              </h2>
+            </button>
+          </div>
 
-        <Show when={showChecked()}>
-          <ul class="flex flex-col gap-2 opacity-60">
-            <For each={checkedList()}>{(item) => <ItemC item={item} />}</For>
-          </ul>
+          <Show when={showChecked()}>
+            <ul class="flex flex-col gap-2 opacity-60">
+              <For each={checkedList()}>{(item) => <ItemC item={item} />}</For>
+            </ul>
+          </Show>
         </Show>
-      </Show>
+      </div>
     </main>
   )
 }
@@ -131,7 +133,7 @@ function ItemC(props: { item: Item }) {
 
   return (
     <li
-      class="flex text-sm h-7"
+      class="flex px-1 items-center justify-between"
       onMouseOver={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
       onFocusIn={() => setFocusing(true)}
@@ -143,25 +145,25 @@ function ItemC(props: { item: Item }) {
           setFocusing(false)
       }}
     >
-      <div class="flex items-center h-5">
-        <input
-          class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 "
-          type="checkbox"
-          checked={props.item.checked}
-          onChange={(event) => {
-            setChecked({
-              id: props.item.id,
-              checked: event.currentTarget.checked,
-            })
-          }}
-        />
-      </div>
+      <div class="flex">
+        <label class="p-3 h-10 aspect-square flex items-center justify-center">
+          <input
+            class="w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300 "
+            type="checkbox"
+            checked={props.item.checked}
+            onChange={(event) => {
+              setChecked({
+                id: props.item.id,
+                checked: event.currentTarget.checked,
+              })
+            }}
+          />
+        </label>
 
-      <div class="ml-2">
         <input
           value={props.item.name}
           class={
-            'capitalize font-medium focus:outline-none focus:border-b-[1px] border-slate-800' +
+            'capitalize focus:outline-none focus:underline border-slate-800' +
             (props.item.checked
               ? ' line-through text-gray-500'
               : ' text-gray-900')
@@ -171,7 +173,7 @@ function ItemC(props: { item: Item }) {
       </div>
 
       <Show when={showingActions()}>
-        <div class="ml-6 flex items-center">
+        <div class="ml-6 mr-2 flex items-center">
           <Button disabled={!nameHasChanged()} onClick={submitNameChange}>
             <IconCheck height="100%" />
           </Button>
@@ -214,11 +216,11 @@ function NewItem() {
   }
 
   return (
-    <li class="text-sm h-7 flex items-center -mt-2">
+    <li class="h-7 ml-3 flex items-center">
       <IconPlus />
 
       <input
-        class="ml-2 outline-none"
+        class="ml-2 outline-none text"
         placeholder="New item"
         value={value()}
         onInput={(event) => setValue(event.currentTarget.value)}
