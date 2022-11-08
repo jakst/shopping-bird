@@ -48,4 +48,5 @@ COPY --from=installer /app/server/package.json server/package.json
 COPY --from=installer /app/server/dist server/dist
 LABEL fly_launch_runtime="nodejs"
 
+ENV PUPPETEER_EXECUTABLE_PATH /usr/bin/google-chrome
 CMD ["yarn", "server", "start"]

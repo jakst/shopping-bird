@@ -21,9 +21,7 @@ const getBrowser = cache(() => {
     headless: true,
     ignoreHTTPSErrors: true,
     timeout: 30000,
-    executablePath: env.isLocalDev
-      ? executablePath()
-      : '/usr/bin/google-chrome',
+    executablePath: env.PUPPETEER_EXECUTABLE_PATH ?? executablePath(),
   })
 })
 
