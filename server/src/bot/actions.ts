@@ -29,6 +29,7 @@ export async function getItems() {
 
   const liElements = await page.$$('ul[aria-label="Min inköpslista"] > li')
 
+  let i = liElements.length - 1
   const items = await Promise.all(
     liElements.map(async (liElement, index) => {
       const [name, checked] = await Promise.all([
@@ -38,7 +39,7 @@ export async function getItems() {
           .then((input) => input!.evaluate((el) => el.checked)),
       ])
 
-      return { index, name, checked }
+      return { index: i - index, name, checked }
     })
   )
 
