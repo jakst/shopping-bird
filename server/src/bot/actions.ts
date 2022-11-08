@@ -1,3 +1,4 @@
+import { type ElementHandle } from 'puppeteer'
 import { loadShoppingListPage } from './browser'
 
 const queue: (() => Promise<void>)[] = []
@@ -47,83 +48,57 @@ export async function getItems() {
 export const checkItem = createAction(async (name: string) => {
   const page = await loadShoppingListPage()
 
-  const liElements = await page.$$('ul[aria-label="Min inköpslista"] > li')
+  const checkbox = (await page.$(
+    `ul[aria-label="Min inköpslista"] > li input[aria-label=${name}]`
+  )) as ElementHandle<HTMLInputElement> | null
 
-  await Promise.all(
-    liElements.map(async (liElement) => {
-      const text = await liElement.evaluate((el) => el.textContent)
+  if (checkbox) {
+    const checked = await checkbox.evaluate((el) => el.checked)
 
-      if (text === name) {
-        const input = await liElement.$('input')
-        const checked = await input?.evaluate((el) => el.checked)
-        if (!checked) await input?.click()
-      }
-    })
-  )
+    if (!checked) await checkbox.click()
+  }
 })
 
 export const uncheckItem = createAction(async (name: string) => {
   const page = await loadShoppingListPage()
 
-  const liElements = await page.$$('ul[aria-label="Min inköpslista"] > li')
+  const checkbox = (await page.$(
+    `ul[aria-label="Min inköpslista"] > li input[aria-label=${name}]`
+  )) as ElementHandle<HTMLInputElement> | null
 
-  await Promise.all(
-    liElements.map(async (liElement) => {
-      const text = await liElement.evaluate((el) => el.textContent)
+  if (checkbox) {
+    const checked = await checkbox.evaluate((el) => el.checked)
 
-      if (text === name) {
-        const input = await liElement.$('input')
-        const checked = await input?.evaluate((el) => el.checked)
-        if (checked) await input?.click()
-      }
-    })
-  )
+    if (checked) await checkbox.click()
+  }
 })
 
 export const rename = createAction(async (oldName: string, newName: string) => {
   const page = await loadShoppingListPage()
 
-  const liElements = await page.$$('ul[aria-label="Min inköpslista"] > li')
+  const [nameDisplay] = (await page.$x(
+    `//ul/li//div[@role="button" and text()="${oldName}"]`
+  )) as [ElementHandle<HTMLDivElement>]
+  await nameDisplay.click()
 
-  await Promise.all(
-    liElements.map(async (liElement) => {
-      const text = await liElement.evaluate((el) => el.textContent)
+  await Promise.all([...oldName].map(() => nameDisplay.press('Backspace')))
+  await nameDisplay.type(newName)
 
-      if (text === oldName) {
-        const nameDisplay = (await liElement.$('div[role="button"'))!
-        await nameDisplay.click()
-
-        await Promise.all(
-          [...oldName].map(() => nameDisplay.press('Backspace'))
-        )
-
-        await nameDisplay.type(newName)
-
-        const submitButton = (await liElement.$('button[aria-label="Klart"'))!
-        await submitButton.click()
-      }
-    })
-  )
+  const submitButton = (await page.$('ul > li button[aria-label="Klart"]'))!
+  await submitButton.click()
 })
+
 export const removeItem = createAction(async (name: string) => {
   const page = await loadShoppingListPage()
 
-  const liElements = await page.$$('ul[aria-label="Min inköpslista"] > li')
+  const [nameDisplay] = (await page.$x(
+    `//ul/li//div[@role="button" and text()="${name}"]`
+  )) as [ElementHandle<HTMLDivElement>]
+  await nameDisplay.click()
 
-  await Promise.all(
-    liElements.map(async (liElement) => {
-      const text = await liElement.evaluate((el) => el.textContent)
+  const trashButton = (await page.$('ul > li button[aria-label="Radera"]'))!
 
-      if (text === name) {
-        const nameDisplay = (await liElement.$('div[role="button"'))!
-        await nameDisplay.click()
-
-        const trashButton = (await liElement.$('button[aria-label="Radera"]'))!
-
-        await trashButton.click()
-      }
-    })
-  )
+  await trashButton.click()
 })
 
 export const addItem = createAction(async (name: string) => {
