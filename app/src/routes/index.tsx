@@ -63,7 +63,7 @@ export default function Home() {
       </Show>
 
       <h1 class="text-center text-6xl text-sky-700 font-thin uppercase my-16">
-        Hello Bird!1
+        Hello Bird!
       </h1>
 
       <div class="flex justify-end">
