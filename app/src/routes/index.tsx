@@ -3,8 +3,6 @@ import { useRouteData } from 'solid-start'
 import {
   createServerAction$,
   createServerData$,
-  HttpHeader,
-  HttpStatusCode,
   redirect,
 } from 'solid-start/server'
 import { REQUIRED_AUTH_HEADER } from '~/auth'
@@ -57,11 +55,6 @@ export default function Home() {
 
   return (
     <main class="mx-auto text-gray-700 p-4 max-w-lg">
-      <Show when={false}>
-        <HttpHeader name="WWW-Authenticate" value="Basic" />
-        <HttpStatusCode code={401} />
-      </Show>
-
       <h1 class="text-center text-6xl text-sky-700 font-thin uppercase my-16">
         Hello Bird!
       </h1>
