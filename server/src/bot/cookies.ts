@@ -1,5 +1,4 @@
 import fs from 'node:fs/promises'
-import { type Page } from 'puppeteer'
 
 const COOKIE_STORE = 'cookies.json'
 
@@ -9,13 +8,13 @@ export async function saveCookies(cookies: any[]) {
   await fs.writeFile(COOKIE_STORE, cookieJson)
 }
 
-export async function loadCookie(page: Page) {
-  try {
-    const cookieJson = await fs.readFile(COOKIE_STORE, { encoding: 'utf-8' })
-    const cookies = JSON.parse(cookieJson)
-    console.log(`Restoring ${cookies.length} cookies`)
-    await page.setCookie(...cookies)
-  } catch (error) {
-    console.log('Failed to load cookies')
-  }
+export async function deleteCookies() {
+  await fs.unlink(COOKIE_STORE)
+}
+
+export async function loadCookies(): Promise<any[]> {
+  const cookieJson = await fs.readFile(COOKIE_STORE, { encoding: 'utf-8' })
+  const cookies = JSON.parse(cookieJson)
+  console.log(`Restoring ${cookies.length} cookies`)
+  return cookies
 }

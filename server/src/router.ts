@@ -1,4 +1,4 @@
-import { initTRPC } from '@trpc/server'
+import { initTRPC, TRPCError } from '@trpc/server'
 import { randomUUID } from 'node:crypto'
 import { z } from 'zod'
 import {
@@ -10,16 +10,35 @@ import {
   rename,
   uncheckItem,
 } from './bot/actions'
+import { getCookies } from './bot/browser'
 import { Context } from './context'
 
 const t = initTRPC.context<Context>().create()
 
+const requiresAuth = t.middleware(async ({ ctx, next }) => {
+  const { db } = ctx
+
+  const cookies = await getCookies()
+  if (!cookies || !cookies.length) throw new TRPCError({ code: 'UNAUTHORIZED' })
+
+  if (!db) {
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'DB not initialized',
+    })
+  }
+
+  return next({ ctx: { db } })
+})
+
+const authedProcedure = t.procedure.use(requiresAuth)
+
 export const router = t.router({
-  getShoppingList: t.procedure.query(async (req) => {
+  getShoppingList: authedProcedure.query(async (req) => {
     const { db } = req.ctx
     return Array.from(db.values())
   }),
-  sync: t.procedure.mutation(async (req) => {
+  sync: authedProcedure.mutation(async (req) => {
     const { db } = req.ctx
 
     await refreshPage()
@@ -31,7 +50,7 @@ export const router = t.router({
       db.set(id, { id, index, name, checked })
     })
   }),
-  setChecked: t.procedure
+  setChecked: authedProcedure
     .input(z.object({ id: z.string(), checked: z.boolean() }))
     .mutation(async (req) => {
       const { db } = req.ctx
@@ -48,7 +67,7 @@ export const router = t.router({
 
       return item
     }),
-  rename: t.procedure
+  rename: authedProcedure
     .input(z.object({ id: z.string(), name: z.string() }))
     .mutation(async (req) => {
       const { db } = req.ctx
@@ -65,7 +84,7 @@ export const router = t.router({
       }
     }),
 
-  addItem: t.procedure.input(z.string()).mutation((req) => {
+  addItem: authedProcedure.input(z.string()).mutation((req) => {
     const { db } = req.ctx
     const name = req.input
 
@@ -80,7 +99,7 @@ export const router = t.router({
 
     addItem(name)
   }),
-  removeItem: t.procedure.input(z.string()).mutation((req) => {
+  removeItem: authedProcedure.input(z.string()).mutation((req) => {
     const { db } = req.ctx
     const id = req.input
     const item = db.get(id)

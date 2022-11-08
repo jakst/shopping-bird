@@ -4,7 +4,7 @@
   "license": "MIT",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "NODE_ENV=development tsx --watch src/run.ts",
+    "dev": "NODE_ENV=development tsx watch src/run.ts",
     "auth": "NODE_ENV=production tsx src/bot/auth.ts",
     "build": "tsc --outDir dist",
     "start": "NODE_ENV=production node dist/run.js"

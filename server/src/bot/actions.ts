@@ -19,26 +19,12 @@ function createAction<T extends (...args: any[]) => Promise<void>>(
   }
 }
 
-let pageRefreshedAt = 0
-let _page: Awaited<ReturnType<typeof loadShoppingListPage>>
-const REFRESH_INTERVAL = 15 * 60 * 1000 // 15 minutes
-
-async function getPage(force = false) {
-  const now = Date.now()
-  if (force || now - pageRefreshedAt > REFRESH_INTERVAL) {
-    _page = await loadShoppingListPage()
-    pageRefreshedAt = now
-  }
-
-  return _page
-}
-
 export async function refreshPage() {
-  await getPage(true)
+  await loadShoppingListPage(true)
 }
 
 export async function getItems() {
-  const page = await getPage()
+  const page = await loadShoppingListPage()
 
   const liElements = await page.$$('ul[aria-label="Min inköpslista"] > li')
 
@@ -59,7 +45,7 @@ export async function getItems() {
 }
 
 export const checkItem = createAction(async (name: string) => {
-  const page = await getPage()
+  const page = await loadShoppingListPage()
 
   const liElements = await page.$$('ul[aria-label="Min inköpslista"] > li')
 
@@ -77,7 +63,7 @@ export const checkItem = createAction(async (name: string) => {
 })
 
 export const uncheckItem = createAction(async (name: string) => {
-  const page = await getPage()
+  const page = await loadShoppingListPage()
 
   const liElements = await page.$$('ul[aria-label="Min inköpslista"] > li')
 
@@ -95,7 +81,7 @@ export const uncheckItem = createAction(async (name: string) => {
 })
 
 export const rename = createAction(async (oldName: string, newName: string) => {
-  const page = await getPage()
+  const page = await loadShoppingListPage()
 
   const liElements = await page.$$('ul[aria-label="Min inköpslista"] > li')
 
@@ -120,7 +106,7 @@ export const rename = createAction(async (oldName: string, newName: string) => {
   )
 })
 export const removeItem = createAction(async (name: string) => {
-  const page = await getPage()
+  const page = await loadShoppingListPage()
 
   const liElements = await page.$$('ul[aria-label="Min inköpslista"] > li')
 
@@ -141,7 +127,7 @@ export const removeItem = createAction(async (name: string) => {
 })
 
 export const addItem = createAction(async (name: string) => {
-  const page = await getPage()
+  const page = await loadShoppingListPage()
 
   const newItemInput = (await page.$('input[aria-label="Lägg till objekt"]'))!
 

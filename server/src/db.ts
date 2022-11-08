@@ -24,15 +24,21 @@ export async function fillDb() {
 }
 
 export async function getDb() {
-  if (!dbPromise) {
-    console.log('Initing DB...')
+  try {
+    if (!dbPromise) {
+      console.log('Initing DB...')
 
-    dbPromise = fillDb()
-    db = await dbPromise
+      dbPromise = fillDb()
+      db = await dbPromise
 
-    console.log('DB init finished!')
-  } else if (!db) {
-    db = await dbPromise
+      console.log('DB init finished!')
+    } else if (!db) {
+      db = await dbPromise
+    }
+  } catch {
+    console.log('FAILED DB INIT', typeof dbPromise, typeof db)
+    dbPromise = null
+    db = null
   }
 
   return db
