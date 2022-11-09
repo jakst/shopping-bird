@@ -1,7 +1,7 @@
-import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
-import { type AppRouter } from 'hello-bird-server'
-import { REQUIRED_AUTH_HEADER } from './auth'
-import { env } from './env'
+import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
+import { type AppRouter } from "hello-bird-server";
+import { REQUIRED_AUTH_HEADER } from "./auth";
+import { env } from "./env";
 
 export const client = createTRPCProxyClient<AppRouter>({
   links: [
@@ -12,4 +12,4 @@ export const client = createTRPCProxyClient<AppRouter>({
       },
     }),
   ],
-})
+});

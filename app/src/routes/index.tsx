@@ -1,57 +1,57 @@
-import { createSignal, For, JSX, Show } from 'solid-js'
-import { useRouteData } from 'solid-start'
+import { createSignal, For, JSX, Show } from "solid-js";
+import { useRouteData } from "solid-start";
 import {
   createServerAction$,
   createServerData$,
   redirect,
-} from 'solid-start/server'
-import { REQUIRED_AUTH_HEADER } from '~/auth'
-import { client } from '~/trpc'
-import IconCheck from '~icons/ci/check'
-import IconPlus from '~icons/ci/plus'
-import IconTrash from '~icons/ci/trash-full'
-import IconCaretRight from '~icons/radix-icons/caret-right'
-import IconSync from '~icons/radix-icons/symbol'
+} from "solid-start/server";
+import { REQUIRED_AUTH_HEADER } from "~/auth";
+import { client } from "~/trpc";
+import IconCheck from "~icons/ci/check";
+import IconPlus from "~icons/ci/plus";
+import IconTrash from "~icons/ci/trash-full";
+import IconCaretRight from "~icons/radix-icons/caret-right";
+import IconSync from "~icons/radix-icons/symbol";
 
 export function routeData() {
   return createServerData$(
     (_, event) => {
-      if (event.request.headers.get('authorization') !== REQUIRED_AUTH_HEADER)
-        throw redirect('/login')
+      if (event.request.headers.get("authorization") !== REQUIRED_AUTH_HEADER)
+        throw redirect("/login");
 
-      return client.getShoppingList.query()
+      return client.getShoppingList.query();
     },
     {
       initialValue: [],
-    }
-  )
+    },
+  );
 }
 
-type Item = Awaited<ReturnType<typeof client.getShoppingList.query>>[number]
+type Item = Awaited<ReturnType<typeof client.getShoppingList.query>>[number];
 
 export default function Home() {
-  const shoppingList = useRouteData<typeof routeData>()
+  const shoppingList = useRouteData<typeof routeData>();
 
   const sortedList = () => {
     return shoppingList()!
       .filter((item) => !item.checked)
       .sort((a, b) => {
-        if (a.checked && !b.checked) return 1
-        else if (!a.checked && b.checked) return -1
+        if (a.checked && !b.checked) return 1;
+        else if (!a.checked && b.checked) return -1;
 
-        return a.index - b.index
-      })
-  }
+        return a.index - b.index;
+      });
+  };
 
   const checkedList = () => {
     return shoppingList()!
       .filter((item) => item.checked)
-      .sort((a, b) => a.index - b.index)
-  }
+      .sort((a, b) => a.index - b.index);
+  };
 
-  const [showChecked, setShowChecked] = createSignal(false)
+  const [showChecked, setShowChecked] = createSignal(false);
 
-  const [, sync] = createServerAction$(() => client.sync.mutate())
+  const [, sync] = createServerAction$(() => client.sync.mutate());
 
   return (
     <main class="mx-auto text-gray-700 max-w-lg">
@@ -80,13 +80,13 @@ export default function Home() {
             >
               <IconCaretRight
                 class={`transition-all duration-300 ${
-                  showChecked() ? 'rotate-90' : 'rotate-0'
+                  showChecked() ? "rotate-90" : "rotate-0"
                 }`}
               />
 
               <h2 class="ml-1">
                 {checkedList().length === 1
-                  ? '1 ticked item'
+                  ? "1 ticked item"
                   : `${checkedList().length} ticked items`}
               </h2>
             </button>
@@ -100,35 +100,36 @@ export default function Home() {
         </Show>
       </div>
     </main>
-  )
+  );
 }
 
 function ItemC(props: { item: Item }) {
-  const [hovering, setHovering] = createSignal(false)
-  const [focusing, setFocusing] = createSignal(false)
+  const [hovering, setHovering] = createSignal(false);
+  const [focusing, setFocusing] = createSignal(false);
   const showingActions = () => {
-    return hovering() || focusing()
-  }
+    return hovering() || focusing();
+  };
 
   const [, setChecked] = createServerAction$(
-    (input: { id: string; checked: boolean }) => client.setChecked.mutate(input)
-  )
+    (input: { id: string; checked: boolean }) =>
+      client.setChecked.mutate(input),
+  );
 
   const [, removeItem] = createServerAction$((id: string) =>
-    client.removeItem.mutate(id)
-  )
+    client.removeItem.mutate(id),
+  );
 
   const [, rename] = createServerAction$(
-    (input: { id: string; name: string }) => client.rename.mutate(input)
-  )
+    (input: { id: string; name: string }) => client.rename.mutate(input),
+  );
 
-  const [newName, setNewName] = createSignal(props.item.name)
+  const [newName, setNewName] = createSignal(props.item.name);
 
-  const nameHasChanged = () => newName() !== props.item.name
+  const nameHasChanged = () => newName() !== props.item.name;
 
   function submitNameChange() {
-    rename({ id: props.item.id, name: newName() })
-    setFocusing(false)
+    rename({ id: props.item.id, name: newName() });
+    setFocusing(false);
   }
 
   return (
@@ -142,7 +143,7 @@ function ItemC(props: { item: Item }) {
           !event.relatedTarget ||
           !event.currentTarget.contains(event.relatedTarget as any)
         )
-          setFocusing(false)
+          setFocusing(false);
       }}
     >
       <div class="flex">
@@ -155,7 +156,7 @@ function ItemC(props: { item: Item }) {
               setChecked({
                 id: props.item.id,
                 checked: event.currentTarget.checked,
-              })
+              });
             }}
           />
         </label>
@@ -163,10 +164,10 @@ function ItemC(props: { item: Item }) {
         <input
           value={props.item.name}
           class={
-            'capitalize focus:outline-none focus:underline border-slate-800' +
+            "capitalize focus:outline-none focus:underline border-slate-800" +
             (props.item.checked
-              ? ' line-through text-gray-500'
-              : ' text-gray-900')
+              ? " line-through text-gray-500"
+              : " text-gray-900")
           }
           onInput={(event) => setNewName(event.currentTarget.value)}
         />
@@ -184,13 +185,13 @@ function ItemC(props: { item: Item }) {
         </div>
       </Show>
     </li>
-  )
+  );
 }
 
 function Button(props: {
-  onClick?: () => void
-  disabled?: boolean
-  children: JSX.Element
+  onClick?: () => void;
+  disabled?: boolean;
+  children: JSX.Element;
 }) {
   return (
     <button
@@ -200,19 +201,19 @@ function Button(props: {
     >
       {props.children}
     </button>
-  )
+  );
 }
 
 function NewItem() {
-  const [value, setValue] = createSignal('')
+  const [value, setValue] = createSignal("");
 
   const [, addItem] = createServerAction$(async (name: string) => {
-    return client.addItem.mutate(name)
-  })
+    return client.addItem.mutate(name);
+  });
 
   function submit() {
-    addItem(value())
-    setValue('')
+    addItem(value());
+    setValue("");
   }
 
   return (
@@ -232,5 +233,5 @@ function NewItem() {
         </Button>
       </Show>
     </li>
-  )
+  );
 }

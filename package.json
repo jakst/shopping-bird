@@ -12,6 +12,8 @@
     "server": "yarn workspace hello-bird-server"
   },
   "devDependencies": {
+    "prettier": "^2.7.1",
+    "rome": "^10.0.0",
     "turbo": "^1.6.3"
   }
 }

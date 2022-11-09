@@ -1,3 +1,3 @@
-import { env } from './env'
+import { env } from "./env";
 
-export const REQUIRED_AUTH_HEADER = `Basic ${btoa(env.AUTH_INFO)}`
+export const REQUIRED_AUTH_HEADER = `Basic ${btoa(env.AUTH_INFO)}`;

@@ -1,0 +1,13 @@
+{
+  "formatter": {
+    "ignore": [".solid", ".vercel", "dist"],
+    "indentStyle": "space"
+  },
+  "linter": {
+    "ignore": [".solid", ".vercel", "dist"],
+    "enabled": true,
+    "rules": {
+      "recommended": true
+    }
+  }
+}
