@@ -211,6 +211,7 @@ function Button(props: {
 }
 
 function NewItem() {
+  let inputField: HTMLInputElement | undefined;
   const [value, setValue] = createSignal("");
 
   const [, addItem] = createServerAction$(async (name: string) => {
@@ -220,6 +221,7 @@ function NewItem() {
   function submit() {
     addItem(value());
     setValue("");
+    inputField?.focus();
   }
 
   return (
@@ -227,6 +229,7 @@ function NewItem() {
       <IconPlus />
 
       <input
+        ref={inputField}
         class="ml-2 outline-none text"
         placeholder="New item"
         value={value()}
