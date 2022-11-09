@@ -79,7 +79,7 @@ export default function Home() {
         <Show when={checkedList().length > 0}>
           <div class="mt-4 mb-2 ml-2 opacity-60">
             <button
-              class="flex items-center"
+              class="flex items-center overflow-hidden"
               onClick={() => setShowChecked((v) => !v)}
             >
               <IconCaretRight
