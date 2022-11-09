@@ -243,13 +243,20 @@ function NewItem() {
     <li class="h-7 ml-3 flex items-center">
       <IconPlus />
 
-      <input
-        ref={inputField}
-        class="ml-2 outline-none text"
-        placeholder="New item"
-        value={value()}
-        onInput={(event) => setValue(event.currentTarget.value)}
-      />
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          submit();
+        }}
+      >
+        <input
+          ref={inputField}
+          class="ml-2 outline-none text"
+          placeholder="New item"
+          value={value()}
+          onInput={(event) => setValue(event.currentTarget.value)}
+        />
+      </form>
 
       <Show when={value().length > 0}>
         <Button onClick={submit}>
