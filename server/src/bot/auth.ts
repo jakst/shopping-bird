@@ -36,8 +36,11 @@ async function run() {
     body: JSON.stringify({ cookies }),
   });
 
-  if (res.ok) console.log(res.status, "Uploaded auth credentials successfully");
-  else console.log("Failed to upload credentials", await res.text());
+  if (res.ok) {
+    console.log(res.status, "Uploaded auth credentials successfully");
+  } else {
+    console.log("Failed to upload credentials", await res.text());
+  }
 
   await browser.close();
 }

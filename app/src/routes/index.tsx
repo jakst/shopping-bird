@@ -16,8 +16,9 @@ import IconSync from "~icons/radix-icons/symbol";
 export function routeData() {
   return createServerData$(
     (_, event) => {
-      if (event.request.headers.get("authorization") !== REQUIRED_AUTH_HEADER)
+      if (event.request.headers.get("authorization") !== REQUIRED_AUTH_HEADER) {
         throw redirect("/login");
+      }
 
       return client.getShoppingList.query();
     },
@@ -36,8 +37,11 @@ export default function Home() {
     return shoppingList()!
       .filter((item) => !item.checked)
       .sort((a, b) => {
-        if (a.checked && !b.checked) return 1;
-        else if (!a.checked && b.checked) return -1;
+        if (a.checked && !b.checked) {
+          return 1;
+        } else if (!a.checked && b.checked) {
+          return -1;
+        }
 
         return a.index - b.index;
       });
@@ -140,10 +144,13 @@ function ItemC(props: { item: Item }) {
       onFocusIn={() => setFocusing(true)}
       onFocusOut={(event) => {
         if (
-          !event.relatedTarget ||
-          !event.currentTarget.contains(event.relatedTarget as any)
-        )
+          !(
+            event.relatedTarget &&
+            event.currentTarget.contains(event.relatedTarget as any)
+          )
+        ) {
           setFocusing(false);
+        }
       }}
     >
       <div class="flex">
@@ -163,12 +170,11 @@ function ItemC(props: { item: Item }) {
 
         <input
           value={props.item.name}
-          class={
-            "capitalize focus:outline-none focus:underline border-slate-800" +
-            (props.item.checked
+          class={`capitalize focus:outline-none focus:underline border-slate-800${
+            props.item.checked
               ? " line-through text-gray-500"
-              : " text-gray-900")
-          }
+              : " text-gray-900"
+          }`}
           onInput={(event) => setNewName(event.currentTarget.value)}
         />
       </div>

@@ -16,12 +16,14 @@ import { Context } from "./context";
 const t = initTRPC.context<Context>().create();
 
 const requiresAuth = t.middleware(async ({ ctx, next }) => {
-  if (!ctx.authed)
+  if (!ctx.authed) {
     throw new TRPCError({ code: "UNAUTHORIZED", message: "Wrong auth header" });
+  }
 
   const cookies = await getCookies();
-  if (!cookies || !cookies.length)
+  if (!cookies?.length) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
 
   const { db } = ctx;
   if (!db) {
@@ -62,8 +64,11 @@ export const router = t.router({
 
       if (item) {
         item.checked = checked;
-        if (checked) checkItem(item.name);
-        else uncheckItem(item.name);
+        if (checked) {
+          checkItem(item.name);
+        } else {
+          uncheckItem(item.name);
+        }
       } else {
         // Error ?
       }

@@ -8,8 +8,9 @@ import { REQUIRED_AUTH_HEADER } from "~/auth";
 
 export function routeData() {
   return createServerData$((_, event) => {
-    if (event.request.headers.get("authorization") === REQUIRED_AUTH_HEADER) 
+    if (event.request.headers.get("authorization") === REQUIRED_AUTH_HEADER) {
       throw redirect("/");
+    }
   });
 }
 

@@ -11,9 +11,13 @@ function createAction<T extends (...args: any[]) => Promise<void>>(
     if (queue.length === 1) {
       do {
         const action = queue[0];
-        console.time("Action completed in");
-        if (action) await action();
-        console.timeEnd("Action completed in");
+
+        if (action) {
+          console.time("Action completed in");
+          await action();
+          console.timeEnd("Action completed in");
+        }
+
         queue.shift();
       } while (queue.length > 0);
     }
@@ -56,7 +60,9 @@ export const checkItem = createAction(async (name: string) => {
   if (checkbox) {
     const checked = await checkbox.evaluate((el) => el.checked);
 
-    if (!checked) await checkbox.click();
+    if (!checked) {
+      await checkbox.click();
+    }
   }
 });
 
@@ -70,7 +76,9 @@ export const uncheckItem = createAction(async (name: string) => {
   if (checkbox) {
     const checked = await checkbox.evaluate((el) => el.checked);
 
-    if (checked) await checkbox.click();
+    if (checked) {
+      await checkbox.click();
+    }
   }
 });
 

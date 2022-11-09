@@ -13,14 +13,17 @@ export function compare(oldList: Item[], newList: Item[]) {
 
   newList.forEach((newItem) => {
     const oldItem = oldList.find((oldItem) => oldItem.name === newItem.name);
-    if (!oldItem) add.push(newItem.name);
-    else if (newItem.checked !== oldItem.checked)
+    if (!oldItem) {
+      add.push(newItem.name);
+    } else if (newItem.checked !== oldItem.checked) {
       newItem.checked ? check.push(newItem.name) : uncheck.push(newItem.name);
+    }
   });
 
   oldList.forEach((oldItem) => {
-    if (!newList.some((newItem) => newItem.name === oldItem.name))
+    if (!newList.some((newItem) => newItem.name === oldItem.name)) {
       remove.push(oldItem.name);
+    }
   });
 
   return { add, remove, check, uncheck };
@@ -30,7 +33,9 @@ function assertEqual<T>(a: T, b: T) {
   const aJson = JSON.stringify(a);
   const bJson = JSON.stringify(b);
 
-  if (aJson !== bJson) throw new Error(`"${aJson}" is not equal to "${bJson}"`);
+  if (aJson !== bJson) {
+    throw new Error(`"${aJson}" is not equal to "${bJson}"`);
+  }
 }
 
 test("Adds unchecked items", () => {
