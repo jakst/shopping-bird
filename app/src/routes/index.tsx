@@ -1,3 +1,4 @@
+import { Motion, Presence } from "@motionone/solid";
 import { createSignal, For, JSX, Show } from "solid-js";
 import { useRouteData } from "solid-start";
 import {
@@ -108,6 +109,7 @@ export default function Home() {
 }
 
 function ItemC(props: { item: Item }) {
+  const [isDisappearing, setIsDisappearing] = createSignal(false);
   const [hovering, setHovering] = createSignal(false);
   const [focusing, setFocusing] = createSignal(false);
   const showingActions = () => {
@@ -137,60 +139,73 @@ function ItemC(props: { item: Item }) {
   }
 
   return (
-    <li
-      class="flex px-1 items-center justify-between"
-      onMouseOver={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
-      onFocusIn={() => setFocusing(true)}
-      onFocusOut={(event) => {
-        if (
-          !(
-            event.relatedTarget &&
-            event.currentTarget.contains(event.relatedTarget as any)
-          )
-        ) {
-          setFocusing(false);
-        }
-      }}
-    >
-      <div class="flex">
-        <label class="p-3 h-10 aspect-square flex items-center justify-center">
-          <input
-            class="w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300 "
-            type="checkbox"
-            checked={props.item.checked}
-            onChange={(event) => {
-              setChecked({
-                id: props.item.id,
-                checked: event.currentTarget.checked,
-              });
-            }}
-          />
-        </label>
+    <Presence initial={false}>
+      <Show when={!isDisappearing()}>
+        <Motion.li
+          exit={{ opacity: 0, transition: { duration: 0.4 } }}
+          class="flex px-1 items-center justify-between"
+          onMouseOver={() => setHovering(true)}
+          onMouseLeave={() => setHovering(false)}
+          onFocusIn={() => setFocusing(true)}
+          onFocusOut={(event) => {
+            if (
+              !(
+                event.relatedTarget &&
+                event.currentTarget.contains(event.relatedTarget as any)
+              )
+            ) {
+              setFocusing(false);
+            }
+          }}
+        >
+          <div class="flex">
+            <label class="p-3 h-10 aspect-square flex items-center justify-center">
+              <input
+                class="w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300 "
+                type="checkbox"
+                checked={props.item.checked}
+                onChange={(event) => {
+                  const { id } = props.item;
+                  const { checked } = event.currentTarget;
 
-        <input
-          value={props.item.name}
-          class={`capitalize focus:outline-none focus:underline border-slate-800${
-            props.item.checked
-              ? " line-through text-gray-500"
-              : " text-gray-900"
-          }`}
-          onInput={(event) => setNewName(event.currentTarget.value)}
-        />
-      </div>
+                  setIsDisappearing(true);
+                  setTimeout(() => setChecked({ id, checked }), 500);
+                }}
+              />
+            </label>
 
-      <Show when={showingActions()}>
-        <div class="ml-6 mr-2 flex items-center">
-          <Button disabled={!nameHasChanged()} onClick={submitNameChange}>
-            <IconCheck height="100%" />
-          </Button>
+            <input
+              value={props.item.name}
+              class={`capitalize focus:outline-none focus:underline border-slate-800${
+                props.item.checked
+                  ? " line-through text-gray-500"
+                  : " text-gray-900"
+              }`}
+              onInput={(event) => setNewName(event.currentTarget.value)}
+            />
+          </div>
 
-          <Button onClick={() => removeItem(props.item.id)}>
-            <IconTrash height="100%" />
-          </Button>
-        </div>
+          <Show when={showingActions()}>
+            <div class="ml-6 mr-2 flex items-center">
+              <Button disabled={!nameHasChanged()} onClick={submitNameChange}>
+                <IconCheck height="100%" />
+              </Button>
+
+              <Button
+                onClick={() => {
+                  const { id } = props.item;
+
+                  setIsDisappearing(true);
+                  setTimeout(() => removeItem(id), 500);
+                }}
+              >
+                <IconTrash height="100%" />
+              </Button>
+            </div>
+          </Show>
+        </Motion.li>
       </Show>
-    </li>
+    </Presence>
   );
 }
 
