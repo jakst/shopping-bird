@@ -34,11 +34,18 @@ export default function Shell() {
 }
 
 function SyncButton() {
-  const [, sync] = createServerAction$(() => client.sync.mutate());
+  const [syncInProgress, sync] = createServerAction$(() =>
+    client.sync.mutate(),
+  );
 
   return (
-    <Button onClick={() => sync()}>
-      <IconSync height="100%" width="100%" />
+    <Button onClick={sync}>
+      <Motion.span
+        animate={syncInProgress.pending ? { rotate: [0, 120, 360] } : {}}
+        transition={{ duration: 1, repeat: Infinity }}
+      >
+        <IconSync height="100%" width="100%" />
+      </Motion.span>
     </Button>
   );
 }
