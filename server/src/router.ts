@@ -46,8 +46,12 @@ export const router = t.router({
   sync: authedProcedure.mutation(async (req) => {
     const { db } = req.ctx;
 
+    console.time("[controller] refreshPage");
     await refreshPage();
+    console.timeEnd("[controller] refreshPage");
+    console.time("[controller] getItems");
     const items = await getItems();
+    console.timeEnd("[controller] getItems");
 
     db.clear();
     items.forEach(({ index, name, checked }) => {

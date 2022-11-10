@@ -61,14 +61,20 @@ let pageRefreshedAt = 0;
 const REFRESH_INTERVAL = 15 * 60 * 1000; // 15 minutes
 
 export async function loadShoppingListPage(forceRefresh = false) {
+  console.time("[loadShoppingListPage] getPage");
   const page = await getPage();
+  console.timeEnd("[loadShoppingListPage] getPage");
+  console.time("[loadShoppingListPage] getCookies");
   const cookies = await getCookies();
 
   if (!cookies) {
     throw new Error("NO_COOKIES");
   }
 
+  console.timeEnd("[loadShoppingListPage] getCookies");
+  console.time("[loadShoppingListPage] setCookies");
   await page.setCookie(...cookies);
+  console.timeEnd("[loadShoppingListPage] setCookies");
 
   const now = Date.now();
   const shouldRefresh =
@@ -78,14 +84,23 @@ export async function loadShoppingListPage(forceRefresh = false) {
     console.log("Loading/refreshing page...");
     pageRefreshedAt = now;
 
-    console.log("[app] Navigating to https://shoppinglist.google.com/");
-    await page.goto("https://shoppinglist.google.com/", {
-      waitUntil: "networkidle2",
-    });
+    console.time("[loadShoppingListPage] page.goto/refresh");
+    if (forceRefresh) {
+      console.log("[app] Refreshing page..");
+      await page.reload({ waitUntil: "networkidle2" });
+    } else {
+      console.log("[app] Navigating to https://shoppinglist.google.com/");
+      await page.goto("https://shoppinglist.google.com/", {
+        waitUntil: "networkidle2",
+      });
+    }
+    console.timeEnd("[loadShoppingListPage] page.goto");
 
     console.log("[app] Checking if logged in...");
+    console.time("[loadShoppingListPage] check logged in");
     const isLoggedIn =
       (await page.$x('//*[contains(text(), "Min inköpslista")]')).length > 0;
+    console.timeEnd("[loadShoppingListPage] check logged in");
 
     if (!isLoggedIn) {
       await clearCookies();
