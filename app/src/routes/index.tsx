@@ -14,6 +14,35 @@ import IconTrash from "~icons/ci/trash-full";
 import IconCaretRight from "~icons/radix-icons/caret-right";
 import IconSync from "~icons/radix-icons/symbol";
 
+export default function Shell() {
+  return (
+    <main class="mx-auto text-gray-700 max-w-lg">
+      <div class="flex px-4 justify-between items-center content-center">
+        <h1
+          class="text-4xl py-4 text-sky-700 uppercase"
+          style={{ "font-stretch": "condensed" }}
+        >
+          Hello Bird!
+        </h1>
+
+        <SyncButton />
+      </div>
+
+      <Home />
+    </main>
+  );
+}
+
+function SyncButton() {
+  const [, sync] = createServerAction$(() => client.sync.mutate());
+
+  return (
+    <Button onClick={() => sync()}>
+      <IconSync height="100%" width="100%" />
+    </Button>
+  );
+}
+
 export function routeData() {
   return createServerData$(
     (_, event) => {
@@ -31,7 +60,7 @@ export function routeData() {
 
 type Item = Awaited<ReturnType<typeof client.getShoppingList.query>>[number];
 
-export default function Home() {
+function Home() {
   const shoppingList = useRouteData<typeof routeData>();
 
   const sortedList = () => {
@@ -56,64 +85,48 @@ export default function Home() {
 
   const [showChecked, setShowChecked] = createSignal(false);
 
-  const [, sync] = createServerAction$(() => client.sync.mutate());
-
   return (
-    <main class="mx-auto text-gray-700 max-w-lg">
-      <div class="flex px-4 justify-between items-center content-center">
-        <h1 class="text-4xl py-4 text-sky-700 font-thin uppercase">
-          Hello Bird!
-        </h1>
+    <div class="text-lg">
+      <ul class="flex flex-col gap-2">
+        <For each={sortedList()}>{(item) => <ItemC item={item} />}</For>
 
-        <Button onClick={() => sync()}>
-          <IconSync height="100%" width="100%" />
-        </Button>
-      </div>
+        <NewItem />
+      </ul>
 
-      <div class="text-lg">
-        <ul class="flex flex-col gap-2">
-          <For each={sortedList()}>{(item) => <ItemC item={item} />}</For>
+      <Show when={checkedList().length > 0}>
+        <div class="mt-4 mb-2 ml-2 opacity-60">
+          <button
+            class="flex items-center overflow-hidden"
+            onClick={() => setShowChecked((v) => !v)}
+          >
+            <IconCaretRight
+              class={`transition-all duration-300 ${
+                showChecked() ? "rotate-90" : "rotate-0"
+              }`}
+            />
 
-          <NewItem />
-        </ul>
+            <h2 class="ml-1">
+              {checkedList().length === 1
+                ? "1 ticked item"
+                : `${checkedList().length} ticked items`}
+            </h2>
+          </button>
+        </div>
 
-        <Show when={checkedList().length > 0}>
-          <div class="mt-4 mb-2 ml-2 opacity-60">
-            <button
-              class="flex items-center overflow-hidden"
-              onClick={() => setShowChecked((v) => !v)}
+        <Presence>
+          <Show when={showChecked()}>
+            <Motion.ul
+              class="flex flex-col gap-2 opacity-60 overflow-hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1, transition: { duration: 0.4 } }}
+              exit={{ opacity: 0, transition: { duration: 0.1 } }}
             >
-              <IconCaretRight
-                class={`transition-all duration-300 ${
-                  showChecked() ? "rotate-90" : "rotate-0"
-                }`}
-              />
-
-              <h2 class="ml-1">
-                {checkedList().length === 1
-                  ? "1 ticked item"
-                  : `${checkedList().length} ticked items`}
-              </h2>
-            </button>
-          </div>
-
-          <Presence>
-            <Show when={showChecked()}>
-              <Motion.ul
-                class="flex flex-col gap-2 opacity-60 overflow-hidden"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1, transition: { duration: 0.4 } }}
-                exit={{ opacity: 0, transition: { duration: 0.1 } }}
-              >
-                <For each={checkedList()}>
-                  {(item) => <ItemC item={item} />}
-                </For>
-              </Motion.ul>
-            </Show>
-          </Presence>
-        </Show>
-      </div>
-    </main>
+              <For each={checkedList()}>{(item) => <ItemC item={item} />}</For>
+            </Motion.ul>
+          </Show>
+        </Presence>
+      </Show>
+    </div>
   );
 }
 
