@@ -94,7 +94,7 @@ export async function loadShoppingListPage(forceRefresh = false) {
         waitUntil: "networkidle2",
       });
     }
-    console.timeEnd("[loadShoppingListPage] page.goto");
+    console.timeEnd("[loadShoppingListPage] page.goto/refresh");
 
     console.log("[app] Checking if logged in...");
     console.time("[loadShoppingListPage] check logged in");
