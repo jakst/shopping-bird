@@ -37,7 +37,7 @@ async function run() {
       GIT_REVISION: env.GIT_REVISION,
     });
     await server.listen({
-      port: 3500,
+      port: env.PORT,
       host: env.isLocalDev ? "localhost" : "0.0.0.0",
     });
   } catch (err) {

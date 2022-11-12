@@ -23,4 +23,5 @@ RUN yarn build
 LABEL fly_launch_runtime="nodejs"
 
 ENV PUPPETEER_EXECUTABLE_PATH /usr/bin/google-chrome
+ENV HOST 0.0.0.0
 CMD ["yarn", "start"]
