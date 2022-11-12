@@ -11,7 +11,10 @@ const envSchema = z
     GIT_REVISION: z.string().min(1).default("none"),
     PUPPETEER_EXECUTABLE_PATH: z.string().optional(),
     AUTH_INFO: z.string().min(3),
-    PORT: z.number().positive().int().default(3500),
+    PORT: z
+      .string()
+      .default("3500")
+      .transform((val) => parseInt(val)),
     HOST: z.string().default("localhost"),
   })
   .transform((value) => {

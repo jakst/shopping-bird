@@ -40,7 +40,7 @@ async function run() {
     });
     await server.listen({
       port: env.PORT,
-      host: env.isLocalDev ? "localhost" : "0.0.0.0",
+      host: env.HOST,
     });
   } catch (err) {
     server.log.error(err);
