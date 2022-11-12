@@ -2,35 +2,46 @@ import { executablePath } from "puppeteer";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import { env } from "../env";
-
-puppeteer.use(StealthPlugin());
+import { loadCookies, saveCookies } from "./cookies";
 
 async function run() {
-  const browser = await puppeteer.launch({
-    headless: false,
-    executablePath: executablePath(),
-  });
+  let cookies = [];
 
-  const page = await browser.newPage();
+  try {
+    cookies = await loadCookies();
+  } catch {}
 
-  await page.goto("https://shoppinglist.google.com/", {
-    waitUntil: "networkidle2",
-  });
+  if (!cookies.length) {
+    puppeteer.use(StealthPlugin());
 
-  await page.type('input[type="email"]', env.EMAIL);
-  await page.keyboard.press("Enter");
+    const browser = await puppeteer.launch({
+      headless: false,
+      executablePath: executablePath(),
+    });
 
-  await page.waitForSelector('input[type="password"]', { visible: true });
+    const page = await browser.newPage();
 
-  await page.type('input[type="password"]', env.PASSWORD);
-  await page.keyboard.press("Enter");
+    await page.goto("https://shoppinglist.google.com/", {
+      waitUntil: "networkidle2",
+    });
 
-  await page.waitForNavigation({ waitUntil: "networkidle2" });
-  await page.waitForXPath('//*[contains(text(), "Min inköpslista")]');
+    await page.type('input[type="email"]', env.EMAIL);
+    await page.keyboard.press("Enter");
 
-  const cookies = await page.cookies();
+    await page.waitForSelector('input[type="password"]', { visible: true });
 
-  const res = await fetch("https://hello-bird.fly.dev/auth", {
+    await page.type('input[type="password"]', env.PASSWORD);
+    await page.keyboard.press("Enter");
+
+    await page.waitForNavigation({ waitUntil: "networkidle2" });
+    await page.waitForXPath('//*[contains(text(), "Min inköpslista")]');
+
+    cookies = await page.cookies();
+    await saveCookies(cookies);
+    await browser.close();
+  }
+
+  const res = await fetch("https://hello-bird-production.up.railway.app/auth", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ cookies }),
@@ -41,8 +52,6 @@ async function run() {
   } else {
     console.log("Failed to upload credentials", await res.text());
   }
-
-  await browser.close();
 }
 
 run();
