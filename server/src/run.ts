@@ -35,6 +35,8 @@ async function run() {
   try {
     console.log("[app] Starting web server", {
       GIT_REVISION: env.GIT_REVISION,
+      PORT: env.PORT,
+      HOST: env.HOST,
     });
     await server.listen({
       port: env.PORT,
