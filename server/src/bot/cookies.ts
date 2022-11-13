@@ -1,20 +1,20 @@
-import fs from "node:fs/promises";
+import { cache } from "../cache";
 
-const COOKIE_STORE = "cookies.json";
+const COOKIE_STORE = "AUTH_COOKIES";
 
 export async function saveCookies(cookies: any[]) {
   console.log(`Saving ${cookies.length} cookies`);
   const cookieJson = JSON.stringify(cookies, null, 2);
-  await fs.writeFile(COOKIE_STORE, cookieJson);
+  await cache.set(COOKIE_STORE, cookieJson);
 }
 
 export async function deleteCookies() {
-  await fs.unlink(COOKIE_STORE);
+  await cache.del(COOKIE_STORE)
 }
 
 export async function loadCookies(): Promise<any[]> {
-  const cookieJson = await fs.readFile(COOKIE_STORE, { encoding: "utf-8" });
-  const cookies = JSON.parse(cookieJson);
+  const cookieString = await cache.get(COOKIE_STORE);
+  const cookies = JSON.parse(cookieString ?? '[]');
   console.log(`Restoring ${cookies.length} cookies`);
   return cookies;
 }

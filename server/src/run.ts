@@ -1,6 +1,7 @@
 import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import fastify from "fastify";
 import { getCookies, setCookies } from "./bot/browser";
+import { cache } from "./cache";
 import { createContext } from "./context";
 import { env } from "./env";
 import { router } from "./router";
@@ -38,6 +39,8 @@ async function run() {
       PORT: env.PORT,
       HOST: env.HOST,
     });
+
+    await cache.connect()
     await server.listen({
       port: env.PORT,
       host: env.HOST,

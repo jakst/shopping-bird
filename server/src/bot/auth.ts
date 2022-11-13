@@ -1,11 +1,14 @@
 import { executablePath } from "puppeteer";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
+import { cache } from "../cache";
 import { env } from "../env";
 import { loadCookies, saveCookies } from "./cookies";
 
 async function run() {
   let cookies = [];
+
+  await cache.connect()
 
   try {
     cookies = await loadCookies();
@@ -46,6 +49,8 @@ async function run() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ cookies }),
   });
+
+  await cache.disconnect()
 
   if (res.ok) {
     console.log(res.status, "Uploaded auth credentials successfully");

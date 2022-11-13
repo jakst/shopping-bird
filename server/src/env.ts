@@ -16,6 +16,7 @@ const envSchema = z
       .default("3500")
       .transform((val) => parseInt(val)),
     HOST: z.string().default("localhost"),
+    REDIS_URL: z.string(),
   })
   .transform((value) => {
     const { NODE_ENV, ...rest } = value;
