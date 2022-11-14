@@ -125,7 +125,7 @@ function Home() {
             <Motion.ul
               class="flex flex-col gap-2 opacity-60 overflow-hidden"
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1, transition: { duration: 0.4 } }}
+              animate={{ opacity: 0.6, transition: { duration: 0.4 } }}
               exit={{ opacity: 0, transition: { duration: 0.1 } }}
             >
               <For each={checkedList()}>{(item) => <ItemC item={item} />}</For>
