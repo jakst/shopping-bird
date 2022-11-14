@@ -1,5 +1,6 @@
 import { Motion, Presence } from "@motionone/solid";
-import { createSignal, For, JSX, Show } from "solid-js";
+import { usePageVisibility } from "@solid-primitives/page-visibility";
+import { createEffect, createSignal, For, JSX, Show } from "solid-js";
 import { useRouteData } from "solid-start";
 import {
   createServerAction$,
@@ -34,6 +35,7 @@ export default function Shell() {
 }
 
 function SyncButton() {
+  const visible = usePageVisibility();
   const [isLoading, setIsLoading] = createSignal(false);
   const [, _sync] = createServerAction$(() => client.sync.mutate());
 
@@ -45,6 +47,12 @@ function SyncButton() {
     await _sync();
     setIsLoading(false);
   }
+
+  createEffect(() => {
+    if (visible()) {
+      sync();
+    }
+  });
 
   return (
     <Button onClick={sync}>

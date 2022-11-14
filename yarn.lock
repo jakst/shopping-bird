@@ -1339,6 +1339,13 @@
   resolved "https://registry.yarnpkg.com/@sideway/pinpoint/-/pinpoint-2.0.0.tgz#cff8ffadc372ad29fd3f78277aeb29e632cc70df"
   integrity sha512-RNiOoTPkptFtSVzQevY/yWtZwf/RxyVnPy/OcA9HBM3MlGDnBEYL5B41H0MTn0Uec8Hi+2qUtTfG2WWZBmMejQ==
 
+"@solid-primitives/page-visibility@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@solid-primitives/page-visibility/-/page-visibility-2.0.2.tgz#82f0f276b4c79edc1bf3c4691efa72746c017005"
+  integrity sha512-fQXKXHfMYv/ycB9w2dYlPy6R4nBevba7r8rrIDlYzKsINMX98BPseeiANg+Jet0j3X9O25Gt3TUimBJ2Z/BgWg==
+  dependencies:
+    "@solid-primitives/rootless" "^1.2.0"
+
 "@solid-primitives/props@^2.1.1":
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/@solid-primitives/props/-/props-2.2.2.tgz#fe58739eb7a7ed67358a483b52059119f6524b64"
@@ -1346,10 +1353,22 @@
   dependencies:
     "@solid-primitives/utils" "^3.0.2"
 
+"@solid-primitives/rootless@^1.2.0":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@solid-primitives/rootless/-/rootless-1.2.1.tgz#17d3a7428ebc3d2c7fbf2ec96093edad3b7ad217"
+  integrity sha512-8RpdyS1e58PQbDjgjpyCh+IGoX3QEs/2LauMfl94eXJ5d/o1y/c6P61z9XqQm+Bx1Otdgx4nbFCoF7HPqa0mwg==
+  dependencies:
+    "@solid-primitives/utils" "^4.0.0"
+
 "@solid-primitives/utils@^3.0.2":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@solid-primitives/utils/-/utils-3.1.0.tgz#52edf36dabe62eba94f8356c3b9b788234d088a8"
   integrity sha512-/rerChcwgFtHEgVCCBY7BXGHh7a83HcIAzR8QhXJ789geIVbBs2YxHF4UUZlG7ec00NKSfvO3+sQquN/xKQLMw==
+
+"@solid-primitives/utils@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@solid-primitives/utils/-/utils-4.0.0.tgz#3c592287519dc885290d134f8aff3f0f6f4b4720"
+  integrity sha512-fGsJy8Z8YiwogpiezD7TWjI62UCb0JAHJWdoXWGrggrn4bfToZotKkabiB0IVFMkWVE1ZcrkvZT3bkmqGnK0ng==
 
 "@solidjs/meta@^0.28.0":
   version "0.28.2"

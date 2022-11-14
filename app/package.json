@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@motionone/solid": "^10.14.3",
+    "@solid-primitives/page-visibility": "^2.0.2",
     "@solidjs/meta": "^0.28.0",
     "@solidjs/router": "^0.5.0",
     "@trpc/client": "^10.0.0-rc.6",
