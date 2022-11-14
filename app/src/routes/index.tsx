@@ -107,7 +107,11 @@ function Home() {
             onClick={() => setShowChecked((v) => !v)}
           >
             <IconCaretRight
-              class={`duration-300 ${showChecked() ? "rotate-90" : "rotate-0"}`}
+              class={
+                showChecked()
+                  ? "duration-300 rotate-90"
+                  : "duration-300 rotate-0"
+              }
             />
 
             <h2 class="ml-1">
