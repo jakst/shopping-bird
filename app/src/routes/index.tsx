@@ -34,14 +34,22 @@ export default function Shell() {
 }
 
 function SyncButton() {
-  const [syncInProgress, sync] = createServerAction$(() =>
-    client.sync.mutate(),
-  );
+  const [isLoading, setIsLoading] = createSignal(false);
+  const [, _sync] = createServerAction$(() => client.sync.mutate());
+
+  async function sync() {
+    // Work around the fact that the pending state of a serverAction
+    // does not seem to change when triggered from an effect.
+
+    setIsLoading(true);
+    await _sync();
+    setIsLoading(false);
+  }
 
   return (
     <Button onClick={sync}>
       <Motion.span
-        animate={syncInProgress.pending ? { rotate: [0, 120, 360] } : {}}
+        animate={isLoading() ? { rotate: [0, 120, 360] } : {}}
         transition={{ duration: 1, repeat: Infinity }}
       >
         <IconSync height="100%" width="100%" />
