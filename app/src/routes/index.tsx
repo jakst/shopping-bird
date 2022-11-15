@@ -270,7 +270,6 @@ function Button(props: {
   );
 }
 
-// TMP
 function NewItem() {
   let inputField: HTMLInputElement | undefined;
   const [value, setValue] = createSignal("");
