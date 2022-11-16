@@ -25,15 +25,14 @@ const requiresAuth = t.middleware(async ({ ctx, next }) => {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 
-  const { db } = ctx;
-  if (!db) {
+  if (!ctx.db) {
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
       message: "DB not initialized",
     });
   }
 
-  return next({ ctx: { db } });
+  return next({ ctx: { db: ctx.db } });
 });
 
 const authedProcedure = t.procedure.use(requiresAuth);
