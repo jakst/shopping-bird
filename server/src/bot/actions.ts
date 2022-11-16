@@ -54,7 +54,7 @@ export const checkItem = createAction(async (name: string) => {
   const page = await loadShoppingListPage();
 
   const checkbox = (await page.$(
-    `ul[aria-label="Min inköpslista"] > li input[aria-label=${name}]`,
+    `ul[aria-label="Min inköpslista"] > li input[aria-label="${name}"]`,
   )) as ElementHandle<HTMLInputElement> | null;
 
   if (checkbox) {
@@ -70,7 +70,7 @@ export const uncheckItem = createAction(async (name: string) => {
   const page = await loadShoppingListPage();
 
   const checkbox = (await page.$(
-    `ul[aria-label="Min inköpslista"] > li input[aria-label=${name}]`,
+    `ul[aria-label="Min inköpslista"] > li input[aria-label="${name}"]`,
   )) as ElementHandle<HTMLInputElement> | null;
 
   if (checkbox) {
