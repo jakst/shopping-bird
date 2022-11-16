@@ -28,7 +28,15 @@ const getBrowser = cache(() => {
 const getPage = cache(async () => {
   const browser = await getBrowser();
   console.log("[setup] Creating browser page...");
-  return browser.newPage();
+  const page = await browser.newPage();
+
+  const cookies = await getCookies();
+
+  if (cookies) {
+    page.setCookie(...cookies);
+  }
+
+  return page;
 });
 
 let _cookies: any[] | null = null;
@@ -64,17 +72,6 @@ export async function loadShoppingListPage(forceRefresh = false) {
   console.time("[loadShoppingListPage] getPage");
   const page = await getPage();
   console.timeEnd("[loadShoppingListPage] getPage");
-  console.time("[loadShoppingListPage] getCookies");
-  const cookies = await getCookies();
-
-  if (!cookies) {
-    throw new Error("NO_COOKIES");
-  }
-
-  console.timeEnd("[loadShoppingListPage] getCookies");
-  console.time("[loadShoppingListPage] setCookies");
-  await page.setCookie(...cookies);
-  console.timeEnd("[loadShoppingListPage] setCookies");
 
   const now = Date.now();
   const shouldRefresh =
