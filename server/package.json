@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "NODE_ENV=development tsx src/run.ts",
     "auth": "NODE_ENV=production tsx src/bot/auth.ts",
-    "build": "sed -I '' 's|src/lib.ts|dist/lib.js|' ../lib/package.json && etsc",
+    "build": "sed -i 's|src/lib.ts|dist/lib.js|' ../lib/package.json && etsc",
     "start": "NODE_ENV=production node dist/run.js"
   },
   "dependencies": {
