@@ -7,6 +7,7 @@ import {
   type GetActionData,
 } from "hello-bird-lib";
 import { createEffect, createSignal } from "solid-js";
+import { env } from "./env";
 import { getStoredActions, persistActions } from "./storage";
 
 export function createActionSynchronizer(
@@ -16,7 +17,7 @@ export function createActionSynchronizer(
 
   const [sseId, setSseId] = createSignal<string | null>(null);
 
-  const eventSource = new EventSource("http://localhost:3500/sse");
+  const eventSource = new EventSource(`${env.BACKEND_URL}/sse`);
 
   eventSource.addEventListener("sse-id", (event: MessageEvent<string>) => {
     setSseId(event.data);

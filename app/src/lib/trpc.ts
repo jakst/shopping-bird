@@ -6,7 +6,7 @@ import { env } from "./env";
 export const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: env.WORKER_TRPC_URL,
+      url: `${env.BACKEND_URL}/trpc`,
       headers: {
         Authorization: REQUIRED_AUTH_HEADER,
       },
