@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "NODE_ENV=development tsx src/run.ts",
     "auth": "NODE_ENV=production tsx src/bot/auth.ts",
-    "build": "sed -i 's|src/lib.ts|dist/lib.js|' ../lib/package.json && etsc",
+    "pre-build": "if [ -z ${NO_DIST_REPLACE+x} ]; then sed -i '' 's|src/lib.ts|dist/lib.js|' ../lib/package.json; fi",
+    "build": "yarn pre-build && etsc",
     "start": "NODE_ENV=production node dist/run.js"
   },
   "dependencies": {
