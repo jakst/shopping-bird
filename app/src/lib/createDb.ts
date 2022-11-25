@@ -1,5 +1,5 @@
 import { Action, Item } from "hello-bird-lib";
-import { nanoid } from "nanoid";
+import { nanoid } from "nanoid/non-secure";
 import { createEffect } from "solid-js";
 import { createStore } from "solid-js/store";
 import { getStoredDb } from "./storage";
