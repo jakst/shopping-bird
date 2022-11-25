@@ -16,7 +16,7 @@ const server = fastify({
 });
 
 server.register(cors, {
-  origin: "http://localhost:3400",
+  origin: env.FRONTEND_URL,
 });
 
 server.get(
