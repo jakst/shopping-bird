@@ -1,3 +1,4 @@
+import { executablePath } from "puppeteer";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import { deleteCookies, loadCookies, saveCookies } from "./cookies";
@@ -15,7 +16,7 @@ function cache<T extends () => Promise<any>>(fn: T) {
 const getBrowser = cache(() => {
   console.log("[setup] Setting up browser...");
   return puppeteer.launch({
-    channel: "chrome",
+    executablePath: executablePath(),
     timeout: 5_000,
   });
 });
