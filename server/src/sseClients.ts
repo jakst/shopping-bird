@@ -17,7 +17,7 @@ export function createClient(id: Client["id"], reply: Client["reply"]) {
   clients.push({ id, reply });
 
   if (clients.length === 1) {
-    syncInterval = setInterval(runSyncWorker, 30_000);
+    syncInterval = setInterval(runSyncWorker, 60_000);
   }
 }
 
