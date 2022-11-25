@@ -2,7 +2,7 @@
   "name": "hello-bird-lib",
   "version": "1.0.0",
   "license": "MIT",
-  "main": "dist/lib.js",
+  "main": "src/lib.ts",
   "types": "src/lib.ts",
   "private": true,
   "scripts": {
