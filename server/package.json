@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "NODE_ENV=development tsx src/run.ts",
     "auth": "NODE_ENV=production tsx src/bot/auth.ts",
-    "build": "tsc --outDir dist",
+    "build": "etsc",
     "start": "NODE_ENV=production node dist/run.js"
   },
   "dependencies": {
@@ -22,10 +22,12 @@
     "puppeteer-extra": "^3.3.4",
     "puppeteer-extra-plugin-stealth": "^2.11.1",
     "redis": "^4.5.0",
-    "typescript": "^4.8.4",
     "zod": "^3.19.1"
   },
   "devDependencies": {
-    "tsx": "^3.11.0"
+    "esbuild": "^0.15.15",
+    "esbuild-node-tsc": "^2.0.4",
+    "tsx": "^3.11.0",
+    "typescript": "^4.9.3"
   }
 }

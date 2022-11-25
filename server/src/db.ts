@@ -1,13 +1,14 @@
 import { GoogleItem, itemSchema, type Action, type Item } from "hello-bird-lib";
-import { nanoid } from "nanoid";
 import { z } from "zod";
 import { cache } from "./cache";
 
+let nanoid: () => string;
 let db = createDb([]);
 
 export type Db = typeof db;
 
 export async function initDb() {
+  await import("nanoid").then((module) => (nanoid = module.nanoid));
   console.time("[DB init]");
 
   const storedData = await cache.get("DB");

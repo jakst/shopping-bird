@@ -2233,6 +2233,13 @@ esbuild-netbsd-64@0.15.15:
   resolved "https://registry.yarnpkg.com/esbuild-netbsd-64/-/esbuild-netbsd-64-0.15.15.tgz#d72c7155686c938c1aff126209b689c22823347c"
   integrity sha512-aOvmF/UkjFuW6F36HbIlImJTTx45KUCHJndtKo+KdP8Dhq3mgLRKW9+6Ircpm8bX/RcS3zZMMmaBLkvGY06Gvw==
 
+esbuild-node-tsc@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/esbuild-node-tsc/-/esbuild-node-tsc-2.0.4.tgz#7e2d370e9ceb9daca6768ab5e28dada5d7fd1bc9"
+  integrity sha512-wrBY0CaqdC/ZdR7bIJur8T9DV3Zoc5RtxoWI4vj7ZOTh15i/7/2uxWysgA/OQvDYoWh9SI44tNIk8l3bxStEmg==
+  dependencies:
+    yargs "^17.5.1"
+
 esbuild-openbsd-64@0.14.54:
   version "0.14.54"
   resolved "https://registry.yarnpkg.com/esbuild-openbsd-64/-/esbuild-openbsd-64-0.14.54.tgz#db4c8495287a350a6790de22edea247a57c5d47b"
@@ -2319,7 +2326,7 @@ esbuild@^0.14.54:
     esbuild-windows-64 "0.14.54"
     esbuild-windows-arm64 "0.14.54"
 
-esbuild@^0.15.9, esbuild@~0.15.10:
+esbuild@^0.15.15, esbuild@^0.15.9, esbuild@~0.15.10:
   version "0.15.15"
   resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.15.15.tgz#503b70bdc18d72d8fc2962ed3ab9219249e58bbe"
   integrity sha512-TEw/lwK4Zzld9x3FedV6jy8onOUHqcEX3ADFk4k+gzPUwrxn8nWV62tH0udo8jOtjFodlEfc4ypsqX3e+WWO6w==
