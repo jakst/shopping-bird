@@ -1,0 +1,13 @@
+{
+  "name": "hello-bird-lib",
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "src/lib.ts",
+  "private": true,
+  "dependencies": {
+    "zod": "^3.19.1"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.3"
+  }
+}

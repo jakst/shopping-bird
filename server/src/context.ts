@@ -12,7 +12,7 @@ export async function createContext({ req }: CreateFastifyContextOptions) {
     return { authed: false, db: null } as const;
   }
 
-  const db = await getDb();
+  const db = getDb();
   return { authed: true, db } as const;
 }
 

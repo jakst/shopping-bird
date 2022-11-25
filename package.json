@@ -4,12 +4,14 @@
   "workspaces": {
     "packages": [
       "server",
-      "app"
+      "app",
+      "lib"
     ]
   },
   "scripts": {
     "app": "yarn workspace hello-bird-app",
-    "server": "yarn workspace hello-bird-server"
+    "server": "yarn workspace hello-bird-server",
+    "lib": "yarn workspace hello-bird-lib"
   },
   "devDependencies": {
     "prettier": "^2.7.1",

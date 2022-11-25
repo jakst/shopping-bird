@@ -6,6 +6,6 @@ const envSchema = z.object({
 });
 
 export const env = envSchema.parse({
-  AUTH_INFO: process.env.AUTH_INFO,
-  WORKER_TRPC_URL: process.env.WORKER_TRPC_URL,
+  AUTH_INFO: import.meta.env.VITE_AUTH_INFO,
+  WORKER_TRPC_URL: import.meta.env.VITE_WORKER_TRPC_URL,
 });

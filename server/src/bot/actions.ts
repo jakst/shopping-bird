@@ -1,5 +1,5 @@
 import { type ElementHandle } from "puppeteer";
-import { loadShoppingListPage } from "./browser";
+import { getPage, loadShoppingListPage } from "./browser";
 
 const queue: (() => Promise<void>)[] = [];
 
@@ -33,9 +33,8 @@ export async function getItems() {
 
   const liElements = await page.$$('ul[aria-label="Min inköpslista"] > li');
 
-  let i = liElements.length - 1;
   const items = await Promise.all(
-    liElements.map(async (liElement, index) => {
+    liElements.map(async (liElement) => {
       const [name, checked] = await Promise.all([
         liElement.evaluate((el) => el.textContent ?? ""),
         liElement
@@ -43,31 +42,32 @@ export async function getItems() {
           .then((input) => input!.evaluate((el) => el.checked)),
       ]);
 
-      return { index: i - index, name, checked };
+      return { name, checked };
     }),
   );
 
   return items;
 }
 
-export const checkItem = createAction(async (name: string) => {
-  const page = await loadShoppingListPage();
+export const setChecked = createAction(async (name: string, check: boolean) => {
+  const page = await getPage();
 
   const checkbox = (await page.$(
     `ul[aria-label="Min inköpslista"] > li input[aria-label="${name}"]`,
   )) as ElementHandle<HTMLInputElement> | null;
 
   if (checkbox) {
-    const checked = await checkbox.evaluate((el) => el.checked);
+    const isChecked = await checkbox.evaluate((el) => el.checked);
 
-    if (!checked) {
+    if ((isChecked && !check) || (!isChecked && check)) {
       await checkbox.click();
     }
   }
+  await page.waitForNetworkIdle();
 });
 
 export const uncheckItem = createAction(async (name: string) => {
-  const page = await loadShoppingListPage();
+  const page = await getPage();
 
   const checkbox = (await page.$(
     `ul[aria-label="Min inköpslista"] > li input[aria-label="${name}"]`,
@@ -80,10 +80,15 @@ export const uncheckItem = createAction(async (name: string) => {
       await checkbox.click();
     }
   }
+  await page.waitForNetworkIdle();
 });
 
 export const rename = createAction(async (oldName: string, newName: string) => {
-  const page = await loadShoppingListPage();
+  // There's a bug where Google's app unchecks items when you rename them,
+  // but it's not visible until you reload the page.
+  // TODO: Work around by limiting renames to unchecked items.
+
+  const page = await getPage();
 
   const [nameDisplay] = (await page.$x(
     `//ul/li//div[@role="button" and text()="${oldName}"]`,
@@ -93,31 +98,40 @@ export const rename = createAction(async (oldName: string, newName: string) => {
   await Promise.all([...oldName].map(() => nameDisplay.press("Backspace")));
   await nameDisplay.type(newName);
 
-  const submitButton = (await page.$('ul > li button[aria-label="Klart"]'))!;
-  await submitButton.click();
+  // Press the submit button, one tab away from the input field
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Enter");
+
+  await page.waitForNetworkIdle();
 });
 
 export const removeItem = createAction(async (name: string) => {
-  const page = await loadShoppingListPage();
+  console.log(`Removing item ${name}`);
+  const page = await getPage();
 
   const [nameDisplay] = (await page.$x(
     `//ul/li//div[@role="button" and text()="${name}"]`,
   )) as [ElementHandle<HTMLDivElement>];
   await nameDisplay.click();
 
-  const trashButton = (await page.$('ul > li button[aria-label="Radera"]'))!;
+  // Press the trash button, two tabs away from the input field
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Enter");
 
-  await trashButton.click();
+  await page.waitForNetworkIdle();
 });
 
 export const addItem = createAction(async (name: string) => {
-  const page = await loadShoppingListPage();
+  const page = await getPage();
 
   const newItemInput = (await page.$('input[aria-label="Lägg till objekt"]'))!;
 
   await newItemInput.type(name);
   await newItemInput.press("Enter");
+
+  await page.waitForNetworkIdle();
 });
 
-const pause = (time = 2000) =>
+export const pause = (time = 2000) =>
   new Promise((resolve) => setTimeout(resolve, time));

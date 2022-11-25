@@ -9,7 +9,6 @@ const envSchema = z
     PASSWORD: z.string().min(1),
     NODE_ENV: z.enum(["development", "production"]),
     GIT_REVISION: z.string().min(1).default("none"),
-    PUPPETEER_EXECUTABLE_PATH: z.string().optional(),
     AUTH_INFO: z.string().min(3),
     PORT: z
       .string()

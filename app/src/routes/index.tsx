@@ -1,21 +1,16 @@
 import { Motion, Presence } from "@motionone/solid";
-import { usePageVisibility } from "@solid-primitives/page-visibility";
-import { createEffect, createSignal, For, JSX, Show } from "solid-js";
-import { useRouteData } from "solid-start";
-import {
-  createServerAction$,
-  createServerData$,
-  redirect,
-} from "solid-start/server";
-import { REQUIRED_AUTH_HEADER } from "~/auth";
-import { client } from "~/trpc";
+import { createSignal, For, onMount, Show } from "solid-js";
+import { createShoppingList } from "~/lib/createShoppingList";
 import IconCheck from "~icons/ci/check";
 import IconPlus from "~icons/ci/plus";
-import IconTrash from "~icons/ci/trash-full";
 import IconCaretRight from "~icons/radix-icons/caret-right";
-import IconSync from "~icons/radix-icons/symbol";
+import { Button } from "../components/Button";
+import { ItemRow } from "../components/ItemRow";
 
 export default function Shell() {
+  const [isMounted, setIsMounted] = createSignal(false);
+  onMount(() => setIsMounted(true));
+
   return (
     <main class="mx-auto text-gray-700 max-w-lg">
       <div class="flex px-4 justify-between items-center content-center">
@@ -25,69 +20,29 @@ export default function Shell() {
         >
           Hello Bird!
         </h1>
-
-        <SyncButton />
       </div>
 
-      <Home />
+      <Show when={isMounted()}>
+        <Home />
+      </Show>
     </main>
   );
 }
 
-function SyncButton() {
-  const visible = usePageVisibility();
-  const [isLoading, setIsLoading] = createSignal(false);
-  const [, _sync] = createServerAction$(() => client.sync.mutate());
-
-  async function sync() {
-    // Work around the fact that the pending state of a serverAction
-    // does not seem to change when triggered from an effect.
-
-    setIsLoading(true);
-    await _sync();
-    setIsLoading(false);
-  }
-
-  createEffect(() => {
-    if (visible()) {
-      sync();
-    }
-  });
-
-  return (
-    <Button onClick={sync}>
-      <Motion.span
-        animate={isLoading() ? { rotate: [0, 120, 360] } : {}}
-        transition={{ duration: 1, repeat: Infinity }}
-      >
-        <IconSync height="100%" width="100%" />
-      </Motion.span>
-    </Button>
-  );
-}
-
-export function routeData() {
-  return createServerData$(
-    (_, event) => {
-      if (event.request.headers.get("authorization") !== REQUIRED_AUTH_HEADER) {
-        throw redirect("/login");
-      }
-
-      return client.getShoppingList.query();
-    },
-    {
-      initialValue: [],
-    },
-  );
-}
-
-type Item = Awaited<ReturnType<typeof client.getShoppingList.query>>[number];
-
 function Home() {
-  const shoppingList = useRouteData<typeof routeData>();
+  const {
+    items,
+    connectionStatus,
+    createItem,
+    deleteItem,
+    setChecked,
+    renameItem,
+  } = createShoppingList();
+
+  const rowActions = { deleteItem, renameItem, setChecked };
 
   const sortedList = () => {
-    return shoppingList()!
+    return items
       .filter((item) => !item.checked)
       .sort((a, b) => {
         if (a.checked && !b.checked) {
@@ -101,7 +56,7 @@ function Home() {
   };
 
   const checkedList = () => {
-    return shoppingList()!
+    return items
       .filter((item) => item.checked)
       .sort((a, b) => a.index - b.index);
   };
@@ -110,10 +65,15 @@ function Home() {
 
   return (
     <div class="text-lg">
+      <div
+        class={`w-2 h-2 ${connectionStatus() ? "bg-green-800" : "bg-gray-400"}`}
+      />
       <ul class="flex flex-col gap-2">
-        <For each={sortedList()}>{(item) => <ItemC item={item} />}</For>
+        <For each={sortedList()}>
+          {(item) => <ItemRow item={item} actions={rowActions} />}
+        </For>
 
-        <NewItem />
+        <NewItem onCreate={createItem} />
       </ul>
 
       <Show when={checkedList().length > 0}>
@@ -144,7 +104,9 @@ function Home() {
               animate={{ opacity: 0.6, transition: { duration: 0.4 } }}
               exit={{ opacity: 0, transition: { duration: 0.1 } }}
             >
-              <For each={checkedList()}>{(item) => <ItemC item={item} />}</For>
+              <For each={checkedList()}>
+                {(item) => <ItemRow item={item} actions={rowActions} />}
+              </For>
             </Motion.ul>
           </Show>
         </Presence>
@@ -153,133 +115,12 @@ function Home() {
   );
 }
 
-function ItemC(props: { item: Item }) {
-  const [isDisappearing, setIsDisappearing] = createSignal(false);
-  const [hovering, setHovering] = createSignal(false);
-  const [focusing, setFocusing] = createSignal(false);
-  const showingActions = () => {
-    return hovering() || focusing();
-  };
-
-  const [, setChecked] = createServerAction$(
-    (input: { id: string; checked: boolean }) =>
-      client.setChecked.mutate(input),
-  );
-
-  const [, removeItem] = createServerAction$((id: string) =>
-    client.removeItem.mutate(id),
-  );
-
-  const [, rename] = createServerAction$(
-    (input: { id: string; name: string }) => client.rename.mutate(input),
-  );
-
-  const [newName, setNewName] = createSignal(props.item.name);
-
-  const nameHasChanged = () => newName() !== props.item.name;
-
-  function submitNameChange() {
-    rename({ id: props.item.id, name: newName() });
-    setFocusing(false);
-  }
-
-  return (
-    <Presence initial={false}>
-      <Show when={!isDisappearing()}>
-        <Motion.li
-          exit={{ opacity: 0, transition: { duration: 0.4 } }}
-          class="flex px-1 items-center justify-between"
-          onMouseOver={() => setHovering(true)}
-          onMouseLeave={() => setHovering(false)}
-          onFocusIn={() => setFocusing(true)}
-          onFocusOut={(event) => {
-            if (
-              !(
-                event.relatedTarget &&
-                event.currentTarget.contains(event.relatedTarget as any)
-              )
-            ) {
-              setFocusing(false);
-            }
-          }}
-        >
-          <div class="flex">
-            <label class="p-3 h-10 aspect-square flex items-center justify-center">
-              <input
-                class="w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300 "
-                type="checkbox"
-                checked={props.item.checked}
-                onChange={(event) => {
-                  const { id } = props.item;
-                  const { checked } = event.currentTarget;
-
-                  setIsDisappearing(true);
-                  setTimeout(() => setChecked({ id, checked }), 500);
-                }}
-              />
-            </label>
-
-            <input
-              value={props.item.name}
-              class={`capitalize focus:outline-none focus:underline border-slate-800${
-                props.item.checked
-                  ? " line-through text-gray-500"
-                  : " text-gray-900"
-              }`}
-              onInput={(event) => setNewName(event.currentTarget.value)}
-            />
-          </div>
-
-          <Show when={showingActions()}>
-            <div class="ml-6 mr-2 flex items-center">
-              <Button disabled={!nameHasChanged()} onClick={submitNameChange}>
-                <IconCheck height="100%" />
-              </Button>
-
-              <Button
-                onClick={() => {
-                  const { id } = props.item;
-
-                  setIsDisappearing(true);
-                  setTimeout(() => removeItem(id), 500);
-                }}
-              >
-                <IconTrash height="100%" />
-              </Button>
-            </div>
-          </Show>
-        </Motion.li>
-      </Show>
-    </Presence>
-  );
-}
-
-function Button(props: {
-  onClick?: () => void;
-  disabled?: boolean;
-  children: JSX.Element;
-}) {
-  return (
-    <button
-      class="aspect-square h-7 flex items-center justify-center rounded-full enabled:hover:bg-slate-100 disabled:opacity-0"
-      onClick={props.onClick}
-      disabled={props.disabled}
-    >
-      {props.children}
-    </button>
-  );
-}
-
-function NewItem() {
+function NewItem(props: { onCreate: (name: string) => void }) {
   let inputField: HTMLInputElement | undefined;
   const [value, setValue] = createSignal("");
 
-  const [, addItem] = createServerAction$(async (name: string) => {
-    return client.addItem.mutate(name);
-  });
-
   function submit() {
-    addItem(value());
+    props.onCreate(value());
     setValue("");
     inputField?.focus();
   }

@@ -1,7 +1,5 @@
-import { executablePath } from "puppeteer";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
-import { env } from "../env";
 import { deleteCookies, loadCookies, saveCookies } from "./cookies";
 
 puppeteer.use(StealthPlugin());
@@ -17,23 +15,22 @@ function cache<T extends () => Promise<any>>(fn: T) {
 const getBrowser = cache(() => {
   console.log("[setup] Setting up browser...");
   return puppeteer.launch({
-    args: ["--no-sandbox"],
-    headless: true,
-    ignoreHTTPSErrors: true,
-    timeout: 30000,
-    executablePath: env.PUPPETEER_EXECUTABLE_PATH ?? executablePath(),
+    channel: "chrome",
+    timeout: 5_000,
   });
 });
 
-const getPage = cache(async () => {
+export const getPage = cache(async () => {
   const browser = await getBrowser();
   console.log("[setup] Creating browser page...");
   const page = await browser.newPage();
 
   const cookies = await getCookies();
 
-  if (cookies) {
-    page.setCookie(...cookies);
+  if (cookies && cookies.length > 0) {
+    console.time("Set cookies on page");
+    await page.setCookie(...cookies);
+    console.timeEnd("Set cookies on page");
   }
 
   return page;
@@ -43,11 +40,7 @@ let _cookies: any[] | null = null;
 
 export async function getCookies() {
   if (!_cookies) {
-    try {
-      _cookies = await loadCookies();
-    } catch {
-      return null;
-    }
+    _cookies = await loadCookies();
   }
 
   return _cookies;
@@ -56,7 +49,7 @@ export async function getCookies() {
 export async function setCookies(cookies: any[]) {
   _cookies = cookies;
   const page = await getPage();
-  page.setCookie(...cookies);
+  await page.setCookie(...cookies);
   await saveCookies(cookies);
 }
 
@@ -93,11 +86,8 @@ export async function loadShoppingListPage(forceRefresh = false) {
     }
     console.timeEnd("[loadShoppingListPage] page.goto/refresh");
 
-    console.log("[app] Checking if logged in...");
-    console.time("[loadShoppingListPage] check logged in");
     const isLoggedIn =
       (await page.$x('//*[contains(text(), "Min inköpslista")]')).length > 0;
-    console.timeEnd("[loadShoppingListPage] check logged in");
 
     if (!isLoggedIn) {
       await clearCookies();
@@ -107,6 +97,3 @@ export async function loadShoppingListPage(forceRefresh = false) {
 
   return page;
 }
-
-// Warm up browser
-getPage();

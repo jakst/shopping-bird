@@ -1,4 +1,3 @@
-import { executablePath } from "puppeteer";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import { cache } from "../cache";
@@ -8,7 +7,7 @@ import { loadCookies, saveCookies } from "./cookies";
 async function run() {
   let cookies = [];
 
-  await cache.connect()
+  await cache.connect();
 
   try {
     cookies = await loadCookies();
@@ -19,7 +18,7 @@ async function run() {
 
     const browser = await puppeteer.launch({
       headless: false,
-      executablePath: executablePath(),
+      channel: "chrome",
     });
 
     const page = await browser.newPage();
@@ -50,7 +49,7 @@ async function run() {
     body: JSON.stringify({ cookies }),
   });
 
-  await cache.disconnect()
+  await cache.disconnect();
 
   if (res.ok) {
     console.log(res.status, "Uploaded auth credentials successfully");

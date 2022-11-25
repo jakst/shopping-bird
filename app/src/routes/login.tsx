@@ -4,7 +4,7 @@ import {
   HttpStatusCode,
   redirect,
 } from "solid-start/server";
-import { REQUIRED_AUTH_HEADER } from "~/auth";
+import { REQUIRED_AUTH_HEADER } from "~/lib/auth";
 
 export function routeData() {
   return createServerData$((_, event) => {
