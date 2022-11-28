@@ -8,11 +8,11 @@ import {
 import {
   addItem,
   getItems,
-  refreshPage,
   removeItem,
   rename,
   setChecked,
 } from "./bot/actions";
+import { loadShoppingListPage } from "./bot/browser";
 import { cache } from "./cache";
 import { getDb } from "./db";
 import { Client, getClients } from "./sseClients";
@@ -124,7 +124,7 @@ async function syncWithGoogle(actionsToApply: EnrichedAction[] = []) {
     console.time(`Finished ${actionsToApply.length} bot tasks in`);
   }
 
-  await refreshPage();
+  await loadShoppingListPage();
 
   // Apply actions to Google Shopping List
   for (const action of actionsToApply) {

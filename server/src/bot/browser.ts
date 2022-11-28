@@ -53,37 +53,34 @@ async function clearCookies() {
 }
 
 let pageRefreshedAt = 0;
-const REFRESH_INTERVAL = 15 * 60 * 1000; // 15 minutes
+const REFRESH_INTERVAL = 59_000; // Every 59 seconds
 
-export async function loadShoppingListPage(forceRefresh = false) {
-  console.time("[loadShoppingListPage]");
+export async function loadShoppingListPage() {
+  const now = Date.now();
+  const shouldRefresh = now - pageRefreshedAt > REFRESH_INTERVAL;
+
+  console.time(`[loadShoppingListPage shouldRefresh = ${shouldRefresh}]`);
+
   const page = await getPage();
 
-  const now = Date.now();
-  const shouldRefresh =
-    forceRefresh || now - pageRefreshedAt > REFRESH_INTERVAL;
-
-  if (shouldRefresh) {
+  if (page.url() !== "https://shoppinglist.google.com/") {
+    await page.goto("https://shoppinglist.google.com/", {
+      waitUntil: "networkidle2",
+    });
+  } else if (shouldRefresh) {
     pageRefreshedAt = now;
-
-    if (forceRefresh) {
-      await page.reload({ waitUntil: "networkidle2" });
-    } else {
-      await page.goto("https://shoppinglist.google.com/", {
-        waitUntil: "networkidle2",
-      });
-    }
-
-    const isLoggedIn =
-      (await page.$x('//*[contains(text(), "Min inköpslista")]')).length > 0;
-
-    if (!isLoggedIn) {
-      await clearCookies();
-      throw new Error("BAD_COOKIES");
-    }
+    await page.reload({ waitUntil: "networkidle2" });
   }
 
-  console.timeEnd("[loadShoppingListPage]");
+  const isLoggedIn =
+    (await page.$x('//*[contains(text(), "Min inköpslista")]')).length > 0;
+
+  if (!isLoggedIn) {
+    await clearCookies();
+    throw new Error("BAD_COOKIES");
+  }
+
+  console.timeEnd(`[loadShoppingListPage shouldRefresh = ${shouldRefresh}]`);
 
   return page;
 }

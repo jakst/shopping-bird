@@ -13,13 +13,21 @@ export function getClients() {
 }
 
 let syncInterval: ReturnType<typeof setInterval>;
+
+function setWorkerInterval(interval: number) {
+  if (syncInterval) clearInterval(syncInterval);
+  syncInterval = setInterval(() => {
+    console.log("Shopping list sync triggered by schedule");
+    runSyncWorker();
+  }, interval);
+}
+
 export function createClient(id: Client["id"], reply: Client["reply"]) {
   clients.push({ id, reply });
   console.log(`${id} connection opened (${clients.length} total)`);
 
   if (clients.length === 1) {
-    if (syncInterval) clearInterval(syncInterval);
-    syncInterval = setInterval(runSyncWorker, 60_000); // Every minute
+    setWorkerInterval(60_000); // Every minute
   }
 }
 
@@ -28,7 +36,6 @@ export function removeClient(id: Client["id"]) {
   console.log(`${id} connection closed (${clients.length} total)`);
 
   if (clients.length < 1) {
-    if (syncInterval) clearInterval(syncInterval);
-    syncInterval = setInterval(runSyncWorker, 60_000 * 10); // Every ten minutes
+    setWorkerInterval(10 * 60_000); // Every ten minutes
   }
 }

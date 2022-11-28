@@ -2,7 +2,7 @@ import cors from "@fastify/cors";
 import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import fastify from "fastify";
 import FastifySSEPlugin from "fastify-sse-v2";
-import { getCookies, loadShoppingListPage, setCookies } from "./bot/browser";
+import { getCookies, setCookies } from "./bot/browser";
 import { cache } from "./cache";
 import { createContext } from "./context";
 import { initDb } from "./db";
@@ -56,12 +56,7 @@ async function startApp() {
     },
   });
 
-  await Promise.all([
-    initSyncQueue(),
-    initDb(),
-    initGoogleCache(),
-    loadShoppingListPage(), // Warm up browser
-  ]);
+  await Promise.all([initSyncQueue(), initDb(), initGoogleCache()]);
 
   await runSyncWorker();
 }

@@ -1,5 +1,5 @@
 import { type ElementHandle } from "puppeteer";
-import { getPage, loadShoppingListPage } from "./browser";
+import { getPage } from "./browser";
 
 const queue: (() => Promise<void>)[] = [];
 
@@ -23,12 +23,8 @@ function createAction<T extends (...args: any[]) => Promise<void>>(
   };
 }
 
-export async function refreshPage() {
-  await loadShoppingListPage(true);
-}
-
 export async function getItems() {
-  const page = await loadShoppingListPage();
+  const page = await getPage();
 
   const liElements = await page.$$('ul[aria-label="Min inköpslista"] > li');
 
