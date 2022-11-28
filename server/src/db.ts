@@ -12,9 +12,8 @@ export async function initDb() {
   console.time("[DB init]");
 
   const storedData = await cache.get("DB");
-  if (storedData) {
+  if (storedData)
     db = createDb(z.array(itemSchema).parse(JSON.parse(storedData)));
-  }
 
   console.timeEnd("[DB init]");
 }
@@ -56,17 +55,13 @@ function createDb(initItems: Item[]) {
   function setChecked(id: string, checked: boolean) {
     const item = db.get(id);
 
-    if (item) {
-      item.checked = checked;
-    }
+    if (item) item.checked = checked;
   }
 
   function renameItem(id: string, name: string) {
     const item = db.get(id);
 
-    if (item) {
-      item.name = name;
-    }
+    if (item) item.name = name;
   }
 
   function applyAction(action: Action) {

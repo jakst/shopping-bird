@@ -8,7 +8,7 @@ function createAction<T extends (...args: any[]) => Promise<void>>(
 ) {
   return async (...args: Parameters<T>) => {
     queue.push(() => newAction(...args));
-    if (queue.length === 1) {
+    if (queue.length === 1)
       do {
         const action = queue[0];
 
@@ -20,7 +20,6 @@ function createAction<T extends (...args: any[]) => Promise<void>>(
 
         queue.shift();
       } while (queue.length > 0);
-    }
   };
 }
 
@@ -59,10 +58,9 @@ export const setChecked = createAction(async (name: string, check: boolean) => {
   if (checkbox) {
     const isChecked = await checkbox.evaluate((el) => el.checked);
 
-    if ((isChecked && !check) || (!isChecked && check)) {
-      await checkbox.click();
-    }
+    if ((isChecked && !check) || (!isChecked && check)) await checkbox.click();
   }
+
   await page.waitForNetworkIdle();
 });
 
@@ -76,10 +74,9 @@ export const uncheckItem = createAction(async (name: string) => {
   if (checkbox) {
     const checked = await checkbox.evaluate((el) => el.checked);
 
-    if (checked) {
-      await checkbox.click();
-    }
+    if (checked) await checkbox.click();
   }
+
   await page.waitForNetworkIdle();
 });
 

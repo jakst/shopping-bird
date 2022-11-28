@@ -8,9 +8,8 @@ export const REQUIRED_AUTH_HEADER = `Basic ${Buffer.from(
 ).toString("base64")}`;
 
 export async function createContext({ req }: CreateFastifyContextOptions) {
-  if (req.headers.authorization !== REQUIRED_AUTH_HEADER) {
+  if (req.headers.authorization !== REQUIRED_AUTH_HEADER)
     return { authed: false, db: null } as const;
-  }
 
   const db = getDb();
   return { authed: true, db } as const;

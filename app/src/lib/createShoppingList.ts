@@ -36,9 +36,7 @@ export function createShoppingList() {
   async function pushActions(actions: Action[]) {
     const _sseId = sseId();
 
-    if (!_sseId) {
-      return false;
-    }
+    if (!_sseId) return false;
 
     try {
       await client.pushActions.mutate({ sseId: _sseId, actions });

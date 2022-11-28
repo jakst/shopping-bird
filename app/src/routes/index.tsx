@@ -45,11 +45,8 @@ function Home() {
     return items
       .filter((item) => !item.checked)
       .sort((a, b) => {
-        if (a.checked && !b.checked) {
-          return 1;
-        } else if (!a.checked && b.checked) {
-          return -1;
-        }
+        if (a.checked && !b.checked) return 1;
+        else if (!a.checked && b.checked) return -1;
 
         return a.index - b.index;
       });

@@ -83,11 +83,8 @@ async function run() {
 
     const cookies = await getCookies();
 
-    if (cookies.length > 0) {
-      await startApp();
-    } else {
-      console.log("No cookies found. Waiting for auth...");
-    }
+    if (cookies.length > 0) await startApp();
+    else console.log("No cookies found. Waiting for auth...");
 
     await server.listen({
       port: env.PORT,

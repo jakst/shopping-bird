@@ -41,11 +41,7 @@ export const getPage = cache(async () => {
 let _cookies: any[] | null = null;
 
 export async function getCookies() {
-  if (!_cookies) {
-    _cookies = await loadCookies();
-  }
-
-  return _cookies;
+  return (_cookies ??= await loadCookies());
 }
 
 export async function setCookies(cookies: any[]) {

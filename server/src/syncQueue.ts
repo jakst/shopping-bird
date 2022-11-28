@@ -23,9 +23,8 @@ export async function initSyncQueue() {
   console.time("[QUEUE init]");
 
   const storedQueue = await cache.get("SYNC_QUEUE");
-  if (storedQueue) {
+  if (storedQueue)
     syncQueue = enrichedActionListSchema.parse(JSON.parse(storedQueue));
-  }
 
   console.timeEnd("[QUEUE init]");
 }
@@ -73,9 +72,7 @@ export async function runSyncWorker(forcedRun = true) {
   }
 
   const currentQueue = [...syncQueue];
-  if (currentQueue.length < 1 && !forcedRun) {
-    return;
-  }
+  if (currentQueue.length < 1 && !forcedRun) return;
 
   isWorking = true;
 
@@ -94,9 +91,7 @@ export async function runSyncWorker(forcedRun = true) {
       } else {
         const item = googleCache.find((item) => item.name === action.meta.name);
 
-        if (!item) {
-          return;
-        }
+        if (!item) return;
 
         if (action.name === "RENAME_ITEM") {
           item.name = action.data.newName;
@@ -133,9 +128,8 @@ async function syncWithGoogle(actionsToApply: EnrichedAction[] = []) {
   for (const action of actionsToApply) {
     if (action.name === "CREATE_ITEM") {
       await addItem(action.data.name);
-      if (action.data.checked) {
+      if (action.data.checked)
         await setChecked(action.data.name, action.data.checked);
-      }
     } else if (action.name === "DELETE_ITEM") {
       await removeItem(action.meta.name);
     } else if (action.name === "RENAME_ITEM") {

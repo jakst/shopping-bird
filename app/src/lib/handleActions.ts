@@ -24,9 +24,7 @@ export function createActionSynchronizer(
   });
 
   eventSource.addEventListener("error", () => {
-    if (sseId()) {
-      setSseId(null);
-    }
+    if (sseId()) setSseId(null);
   });
 
   eventSource.addEventListener("db-update", (event) => {

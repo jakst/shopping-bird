@@ -14,9 +14,7 @@ export function createDb(storageKey: string) {
   });
 
   function addItem(item: Item) {
-    if (!db.some(({ id }) => id === item.id)) {
-      setDb((prev) => [...prev, item]);
-    }
+    if (!db.some(({ id }) => id === item.id)) setDb((prev) => [...prev, item]);
   }
 
   function createItem(name: string) {

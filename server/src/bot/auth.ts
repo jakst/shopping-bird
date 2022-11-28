@@ -51,11 +51,8 @@ async function run() {
 
   await cache.disconnect();
 
-  if (res.ok) {
-    console.log(res.status, "Uploaded auth credentials successfully");
-  } else {
-    console.log("Failed to upload credentials", await res.text());
-  }
+  if (res.ok) console.log(res.status, "Uploaded auth credentials successfully");
+  else console.log("Failed to upload credentials", await res.text());
 }
 
 run();
