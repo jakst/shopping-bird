@@ -26,6 +26,8 @@ export function ItemRow(props: { item: Item; actions: Actions }) {
     setFocusing(false);
   }
 
+  let nameInputField: HTMLInputElement | undefined;
+
   return (
     <Presence initial={false}>
       <Show when={!isDisappearing()}>
@@ -43,6 +45,10 @@ export function ItemRow(props: { item: Item; actions: Actions }) {
               )
             ) {
               setFocusing(false);
+
+              // Reset unsubmitted name changes when we stop focusing the row
+              setNewName(props.item.name);
+              if (nameInputField) nameInputField.value = props.item.name;
             }
           }}
         >
@@ -56,21 +62,35 @@ export function ItemRow(props: { item: Item; actions: Actions }) {
                   const { id } = props.item;
                   const { checked } = event.currentTarget;
 
+                  // If the user types a new name, and then checks/unchecks
+                  // the item, the name change should also be submitted.
+                  if (nameHasChanged()) submitNameChange();
+
                   setIsDisappearing(true);
                   setTimeout(() => props.actions.setChecked(id, checked), 500);
                 }}
               />
             </label>
 
-            <input
-              value={props.item.name}
-              class={`capitalize focus:outline-none focus:underline border-slate-800${
-                props.item.checked
-                  ? " line-through text-gray-500"
-                  : " text-gray-900"
-              }`}
-              onInput={(event) => setNewName(event.currentTarget.value)}
-            />
+            <form
+              class="flex"
+              onSubmit={(event) => {
+                event.preventDefault();
+                if (nameHasChanged()) submitNameChange();
+                (event.currentTarget[0] as HTMLInputElement)?.blur();
+              }}
+            >
+              <input
+                ref={nameInputField}
+                value={props.item.name}
+                class={`capitalize focus:outline-none focus:underline border-slate-800${
+                  props.item.checked
+                    ? " line-through text-gray-500"
+                    : " text-gray-900"
+                }`}
+                onInput={(event) => setNewName(event.currentTarget.value)}
+              />
+            </form>
           </div>
 
           <Show when={showingActions()}>
