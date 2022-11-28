@@ -1,4 +1,5 @@
 import { useConnectivitySignal } from "@solid-primitives/connectivity";
+import { usePageVisibility } from "@solid-primitives/page-visibility";
 import {
   actionSchema,
   dbSchema,
@@ -14,25 +15,34 @@ export function createActionSynchronizer(
   onDbRecieved: (items: Item[]) => void,
 ) {
   const networkIsOnline = useConnectivitySignal();
+  const pageIsVisible = usePageVisibility();
 
   const [sseId, setSseId] = createSignal<string | null>(null);
 
-  const eventSource = new EventSource(`${env.BACKEND_URL}/sse`);
+  let eventSource: EventSource | null = null;
 
-  eventSource.addEventListener("sse-id", (event: MessageEvent<string>) => {
-    setSseId(event.data);
+  createEffect(() => {
+    if (networkIsOnline() && pageIsVisible()) {
+      eventSource = new EventSource(`${env.BACKEND_URL}/sse`);
+
+      eventSource.addEventListener("sse-id", (event: MessageEvent<string>) => {
+        setSseId(event.data);
+      });
+
+      eventSource.addEventListener("error", () => {
+        if (sseId()) setSseId(null);
+      });
+
+      eventSource.addEventListener("db-update", (event) => {
+        const action = dbSchema.parse(JSON.parse(event.data));
+        onDbRecieved(action);
+      });
+    } else if (eventSource) {
+      eventSource.close();
+    }
   });
 
-  eventSource.addEventListener("error", () => {
-    if (sseId()) setSseId(null);
-  });
-
-  eventSource.addEventListener("db-update", (event) => {
-    const action = dbSchema.parse(JSON.parse(event.data));
-    onDbRecieved(action);
-  });
-
-  return { sseId: () => (networkIsOnline() || null) && sseId() };
+  return { sseId };
 }
 
 export function createActionCreator(
