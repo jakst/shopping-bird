@@ -29,11 +29,7 @@ export const getPage = cache(async () => {
 
   const cookies = await getCookies();
 
-  if (cookies && cookies.length > 0) {
-    console.time("Set cookies on page");
-    await page.setCookie(...cookies);
-    console.timeEnd("Set cookies on page");
-  }
+  if (cookies && cookies.length > 0) await page.setCookie(...cookies);
 
   return page;
 });
@@ -60,29 +56,23 @@ let pageRefreshedAt = 0;
 const REFRESH_INTERVAL = 15 * 60 * 1000; // 15 minutes
 
 export async function loadShoppingListPage(forceRefresh = false) {
-  console.time("[loadShoppingListPage] getPage");
+  console.time("[loadShoppingListPage]");
   const page = await getPage();
-  console.timeEnd("[loadShoppingListPage] getPage");
 
   const now = Date.now();
   const shouldRefresh =
     forceRefresh || now - pageRefreshedAt > REFRESH_INTERVAL;
 
   if (shouldRefresh) {
-    console.log("Loading/refreshing page...");
     pageRefreshedAt = now;
 
-    console.time("[loadShoppingListPage] page.goto/refresh");
     if (forceRefresh) {
-      console.log("[app] Refreshing page..");
       await page.reload({ waitUntil: "networkidle2" });
     } else {
-      console.log("[app] Navigating to https://shoppinglist.google.com/");
       await page.goto("https://shoppinglist.google.com/", {
         waitUntil: "networkidle2",
       });
     }
-    console.timeEnd("[loadShoppingListPage] page.goto/refresh");
 
     const isLoggedIn =
       (await page.$x('//*[contains(text(), "Min inköpslista")]')).length > 0;
@@ -92,6 +82,8 @@ export async function loadShoppingListPage(forceRefresh = false) {
       throw new Error("BAD_COOKIES");
     }
   }
+
+  console.timeEnd("[loadShoppingListPage]");
 
   return page;
 }

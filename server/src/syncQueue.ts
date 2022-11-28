@@ -119,8 +119,10 @@ export async function runSyncWorker(forcedRun = true) {
 }
 
 async function syncWithGoogle(actionsToApply: EnrichedAction[] = []) {
-  console.log(`Starting to work on ${actionsToApply.length} bot tasks`);
-  console.time(`Finished ${actionsToApply.length} bot tasks in`);
+  if (actionsToApply.length > 0) {
+    console.log(`Starting to work on ${actionsToApply.length} bot tasks`);
+    console.time(`Finished ${actionsToApply.length} bot tasks in`);
+  }
 
   await refreshPage();
 
@@ -162,7 +164,8 @@ async function syncWithGoogle(actionsToApply: EnrichedAction[] = []) {
     console.log("No changes detected in Google Shopping list");
   }
 
-  console.timeEnd(`Finished ${actionsToApply.length} bot tasks in`);
+  if (actionsToApply.length > 0)
+    console.timeEnd(`Finished ${actionsToApply.length} bot tasks in`);
 }
 
 export function notifyClient(client: Client, items: Item[]) {

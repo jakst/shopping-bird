@@ -36,7 +36,6 @@ server.post("/auth", async (req, res) => {
 });
 
 async function startApp() {
-  console.log("Starging app...");
   server.register(FastifySSEPlugin);
 
   server.get("/sse", (request, reply) => {
