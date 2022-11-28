@@ -17,7 +17,8 @@ export function createClient(id: Client["id"], reply: Client["reply"]) {
   clients.push({ id, reply });
 
   if (clients.length === 1) {
-    syncInterval = setInterval(runSyncWorker, 60_000);
+    if (syncInterval) clearInterval(syncInterval);
+    syncInterval = setInterval(runSyncWorker, 60_000); // Every minute
   }
 }
 
@@ -25,6 +26,7 @@ export function removeClient(id: Client["id"]) {
   clients = clients.filter((client) => client.id !== id);
 
   if (clients.length < 1) {
-    clearInterval(syncInterval);
+    if (syncInterval) clearInterval(syncInterval);
+    syncInterval = setInterval(runSyncWorker, 60_000 * 10); // Every ten minutes
   }
 }
