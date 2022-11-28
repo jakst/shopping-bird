@@ -1,0 +1,8 @@
+.cache
+.solid
+.turbo
+.vercel
+
+build
+dist
+node_modules
