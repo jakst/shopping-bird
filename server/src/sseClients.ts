@@ -15,6 +15,7 @@ export function getClients() {
 let syncInterval: ReturnType<typeof setInterval>;
 export function createClient(id: Client["id"], reply: Client["reply"]) {
   clients.push({ id, reply });
+  console.log(`${id} connection opened (${clients.length} total)`);
 
   if (clients.length === 1) {
     if (syncInterval) clearInterval(syncInterval);
@@ -24,6 +25,7 @@ export function createClient(id: Client["id"], reply: Client["reply"]) {
 
 export function removeClient(id: Client["id"]) {
   clients = clients.filter((client) => client.id !== id);
+  console.log(`${id} connection closed (${clients.length} total)`);
 
   if (clients.length < 1) {
     if (syncInterval) clearInterval(syncInterval);

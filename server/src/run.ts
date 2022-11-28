@@ -43,14 +43,10 @@ async function startApp() {
     const clientId = request.id;
 
     createClient(clientId, reply);
-    console.log(`${clientId} connection opened`);
 
     reply.sse({ event: "sse-id", data: clientId });
 
-    request.raw.on("close", () => {
-      console.log(`${clientId} connection closed`);
-      removeClient(clientId);
-    });
+    request.raw.on("close", () => removeClient(clientId));
   });
 
   server.register(fastifyTRPCPlugin, {
