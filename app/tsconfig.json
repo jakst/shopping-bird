@@ -1,20 +1,21 @@
 {
+  "extends": "../tsconfig.base.json",
+  "include": ["./src"],
   "compilerOptions": {
-    "noEmit": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
+    "outDir": "./node_modules/.cache/tsc",
+
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "node",
     "jsxImportSource": "solid-js",
     "jsx": "preserve",
     "types": ["vite/client", "unplugin-icons/types/solid"],
     "baseUrl": "./",
     "paths": {
       "~/*": ["./src/*"]
-    },
-
-    // Strictness
-    "strict": true
-  }
+    }
+  },
+  "references": [
+    { "path": "../lib" }, //
+    { "path": "../server" }
+  ]
 }

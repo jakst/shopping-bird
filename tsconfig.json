@@ -1,0 +1,8 @@
+{
+  "include": [],
+  "references": [
+    { "path": "app" }, //
+    { "path": "lib" },
+    { "path": "server" }
+  ]
+}
