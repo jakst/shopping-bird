@@ -1,6 +1,7 @@
 {
   "name": "hello-bird",
   "private": true,
+  "packageManager": "yarn@3.3.0",
   "workspaces": {
     "packages": [
       "server",

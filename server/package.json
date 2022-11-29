@@ -16,7 +16,7 @@
     "dotenv": "^16.0.3",
     "fastify": "^4.9.2",
     "fastify-sse-v2": "^3.0.0",
-    "hello-bird-lib": "1.0.0",
+    "hello-bird-lib": "workspace:^",
     "nanoid": "^4.0.0",
     "puppeteer": "^19.2.2",
     "puppeteer-extra": "^3.3.4",
