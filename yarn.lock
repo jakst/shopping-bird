@@ -2001,7 +2001,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*":
+"@types/node@npm:*, @types/node@npm:^18.11.9":
   version: 18.11.9
   resolution: "@types/node@npm:18.11.9"
   checksum: cc0aae109e9b7adefc32eecb838d6fad931663bb06484b5e9cbbbf74865c721b03d16fd8d74ad90e31dbe093d956a7c2c306ba5429ba0c00f3f7505103d7a496
@@ -4056,6 +4056,7 @@ __metadata:
   dependencies:
     "@fastify/cors": ^8.2.0
     "@trpc/server": ^10.4.1
+    "@types/node": ^18.11.9
     dotenv: ^16.0.3
     esbuild: ^0.15.16
     esbuild-node-tsc: ^2.0.4
