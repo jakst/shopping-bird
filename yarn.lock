@@ -6043,7 +6043,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"solid-start@npm:^0.2.6":
+"solid-start@npm:0.2.6":
   version: 0.2.6
   resolution: "solid-start@npm:0.2.6"
   dependencies:
@@ -6087,6 +6087,53 @@ __metadata:
     solid-start: bin.cjs
     start: bin.cjs
   checksum: 20611a48966c4940ecb97248ccacdf81ab8e05430738eade046134eecfe34c5692f7a7401b937d5dae0d22d6c3adb4b28a2b7fa0a8732d5c4286fea98d2c528d
+  languageName: node
+  linkType: hard
+
+"solid-start@patch:solid-start@npm%3A0.2.6#./.yarn/patches/solid-start-npm-0.2.6-671b274161.patch::locator=hello-bird%40workspace%3A.":
+  version: 0.2.6
+  resolution: "solid-start@patch:solid-start@npm%3A0.2.6#./.yarn/patches/solid-start-npm-0.2.6-671b274161.patch::version=0.2.6&hash=fd5613&locator=hello-bird%40workspace%3A."
+  dependencies:
+    "@babel/core": ^7.19.6
+    "@babel/generator": ^7.19.6
+    "@babel/plugin-syntax-jsx": ^7.18.6
+    "@babel/preset-env": ^7.19.4
+    "@babel/preset-typescript": ^7.18.6
+    "@babel/template": ^7.18.10
+    "@types/cookie": ^0.5.1
+    "@vinxi/vite-plugin-inspect": ^0.6.27
+    chokidar: ^3.5.3
+    compression: ^1.7.4
+    connect: ^3.7.0
+    debug: ^4.3.4
+    dequal: ^2.0.3
+    es-module-lexer: ^1.0.5
+    esbuild: ^0.14.54
+    esbuild-plugin-solid: ^0.4.2
+    fast-glob: ^3.2.12
+    get-port: ^6.1.2
+    parse-multipart-data: ^1.5.0
+    picocolors: ^1.0.0
+    rollup: ^2.79.1
+    rollup-plugin-visualizer: ^5.8.3
+    rollup-route-manifest: ^1.0.0
+    sade: ^1.8.1
+    sirv: ^2.0.2
+    terser: ^5.15.1
+    undici: ^5.11.0
+    vite-plugin-inspect: ^0.6.1
+    vite-plugin-solid: ^2.3.10
+    wait-on: ^6.0.1
+  peerDependencies:
+    "@solidjs/meta": ^0.28.0
+    "@solidjs/router": ^0.5.0
+    solid-js: ^1.6.2
+    vite: ^3.0.4
+  bin:
+    solid: bin.cjs
+    solid-start: bin.cjs
+    start: bin.cjs
+  checksum: 739797ee2c676649f9c7a86c86923872e501d4de81f96d5b7e81fe7baaf7efecd93dc740af29b3464568a54360e681e44e0f58f193c14dd47fa7ec5bd9035a12
   languageName: node
   linkType: hard
 
