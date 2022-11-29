@@ -55,11 +55,14 @@ export function createShoppingList() {
     }
   }
 
-  const createAction = createActionCreator(pushActions);
+  const { createAction, actionQueue } = createActionCreator(pushActions);
+
+  const connectionStatus = () =>
+    sseId() ? (actionQueue.length > 0 ? "OUT_OF_SYNC" : "IN_SYNC") : "OFFLINE";
 
   return {
     items: db.items,
-    connectionStatus: () => Boolean(sseId()),
+    connectionStatus,
     createItem: createAction("CREATE_ITEM", db.createItem),
     deleteItem: createAction("DELETE_ITEM", db.deleteItem),
     setChecked: createAction("SET_ITEM_CHECKED", db.setChecked),

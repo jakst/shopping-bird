@@ -48,14 +48,14 @@ export function createActionSynchronizer(
 export function createActionCreator(
   pushActions: (action: Action[]) => Promise<boolean>,
 ) {
-  const [actionList, setActionList] = createSignal(getStoredActions());
-  createEffect(() => persistActions(actionList()));
+  const [actionQueue, setActionQueue] = createSignal(getStoredActions());
+  createEffect(() => persistActions(actionQueue()));
 
   createEffect(async () => {
-    const actionsToSync = actionList();
+    const actionsToSync = actionQueue();
 
     if (actionsToSync.length > 0 && (await pushActions(actionsToSync))) {
-      setActionList((prev) =>
+      setActionQueue((prev) =>
         prev.filter((action) => !actionsToSync.includes(action)),
       );
     }
@@ -69,9 +69,9 @@ export function createActionCreator(
       const data = callback(...props);
 
       const action = actionSchema.parse({ name, data });
-      setActionList((prev) => [...prev, action]);
+      setActionQueue((prev) => [...prev, action]);
     };
   }
 
-  return createAction;
+  return { createAction, actionQueue };
 }

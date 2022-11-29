@@ -62,9 +62,54 @@ function Home() {
 
   return (
     <div class="text-lg">
+      <style>
+        {`
+        .dot {
+          position: absolute;
+          border-radius: 50%;
+
+          --yellow: #bbd028;
+          --green: #1adf22;
+        }
+
+        .dot-online {
+          top: 32px;
+          left: 6px;
+
+          width: 4px;
+          height: 4px;
+
+          background-color: var(--color);
+          box-shadow:
+            0 0 2px 1px var(--color),
+            0 0 4px 2px var(--color);
+        }
+
+        .dot-offline {
+          top: 31px;
+          left: 5px;
+
+          width: 7px;
+          height: 7px;
+
+          background-color: #ccc;
+        }
+        `}
+      </style>
+
       <div
-        class={`w-2 h-2 ${connectionStatus() ? "bg-green-800" : "bg-gray-400"}`}
+        class={
+          connectionStatus() === "OFFLINE"
+            ? "dot dot-offline"
+            : "dot dot-online"
+        }
+        style={
+          connectionStatus() === "IN_SYNC"
+            ? "--color: var(--green)"
+            : "--color: var(--yellow)"
+        }
       />
+
       <ul class="flex flex-col gap-2">
         <For each={sortedList()}>
           {(item) => <ItemRow item={item} actions={rowActions} />}
