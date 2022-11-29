@@ -6092,7 +6092,7 @@ __metadata:
 
 "solid-start@patch:solid-start@npm%3A0.2.6#./.yarn/patches/solid-start-npm-0.2.6-671b274161.patch::locator=hello-bird%40workspace%3A.":
   version: 0.2.6
-  resolution: "solid-start@patch:solid-start@npm%3A0.2.6#./.yarn/patches/solid-start-npm-0.2.6-671b274161.patch::version=0.2.6&hash=fd5613&locator=hello-bird%40workspace%3A."
+  resolution: "solid-start@patch:solid-start@npm%3A0.2.6#./.yarn/patches/solid-start-npm-0.2.6-671b274161.patch::version=0.2.6&hash=c0859d&locator=hello-bird%40workspace%3A."
   dependencies:
     "@babel/core": ^7.19.6
     "@babel/generator": ^7.19.6
@@ -6133,7 +6133,7 @@ __metadata:
     solid: bin.cjs
     solid-start: bin.cjs
     start: bin.cjs
-  checksum: 739797ee2c676649f9c7a86c86923872e501d4de81f96d5b7e81fe7baaf7efecd93dc740af29b3464568a54360e681e44e0f58f193c14dd47fa7ec5bd9035a12
+  checksum: 333fbd1b3fb9b66050a5a9fc4bf4bd4ab174e6cb112b70fb55dfb23250d98cacc7a10c64fa55798d353c938064f123d3f2f8295d5245ded93aeec9c227232b00
   languageName: node
   linkType: hard
 
