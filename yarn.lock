@@ -1450,7 +1450,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@iconify-json/bi@npm:^1.1.10":
+"@iconify-json/bi@npm:^1.1.12":
   version: 1.1.12
   resolution: "@iconify-json/bi@npm:1.1.12"
   dependencies:
@@ -1459,7 +1459,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@iconify-json/ci@npm:^1.1.4":
+"@iconify-json/ci@npm:^1.1.5":
   version: 1.1.5
   resolution: "@iconify-json/ci@npm:1.1.5"
   dependencies:
@@ -1468,7 +1468,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@iconify-json/radix-icons@npm:^1.1.5":
+"@iconify-json/radix-icons@npm:^1.1.6":
   version: 1.1.6
   resolution: "@iconify-json/radix-icons@npm:1.1.6"
   dependencies:
@@ -1923,7 +1923,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@solidjs/meta@npm:^0.28.0":
+"@solidjs/meta@npm:^0.28.2":
   version: 0.28.2
   resolution: "@solidjs/meta@npm:0.28.2"
   peerDependencies:
@@ -1932,7 +1932,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@solidjs/router@npm:^0.5.0":
+"@solidjs/router@npm:^0.5.1":
   version: 0.5.1
   resolution: "@solidjs/router@npm:0.5.1"
   peerDependencies:
@@ -1948,7 +1948,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@trpc/client@npm:^10.0.0-rc.6":
+"@trpc/client@npm:^10.4.1":
   version: 10.4.1
   resolution: "@trpc/client@npm:10.4.1"
   peerDependencies:
@@ -1957,7 +1957,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@trpc/server@npm:^10.0.0-rc.6":
+"@trpc/server@npm:^10.4.1":
   version: 10.4.1
   resolution: "@trpc/server@npm:10.4.1"
   checksum: ea2fe164a976caab52e32e60ffcbfccccb1c34d85eadabca0c9612fa0fbfe793c3a4f30f8c302f8bcd63555282d9ef35d8bbd43ac45464921715c50e7f4d9295
@@ -2271,7 +2271,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"autoprefixer@npm:^10.4.12":
+"autoprefixer@npm:^10.4.13":
   version: 10.4.13
   resolution: "autoprefixer@npm:10.4.13"
   dependencies:
@@ -3398,7 +3398,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esbuild@npm:^0.15.15, esbuild@npm:^0.15.9, esbuild@npm:~0.15.10":
+"esbuild@npm:^0.15.16, esbuild@npm:^0.15.9, esbuild@npm:~0.15.10":
   version: 0.15.16
   resolution: "esbuild@npm:0.15.16"
   dependencies:
@@ -3656,7 +3656,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fastify@npm:^4.9.2":
+"fastify@npm:^4.10.2":
   version: 4.10.2
   resolution: "fastify@npm:4.10.2"
   dependencies:
@@ -4009,32 +4009,32 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "hello-bird-app@workspace:app"
   dependencies:
-    "@iconify-json/bi": ^1.1.10
-    "@iconify-json/ci": ^1.1.4
-    "@iconify-json/radix-icons": ^1.1.5
+    "@iconify-json/bi": ^1.1.12
+    "@iconify-json/ci": ^1.1.5
+    "@iconify-json/radix-icons": ^1.1.6
     "@motionone/solid": ^10.14.3
     "@solid-primitives/connectivity": ^0.3.4
     "@solid-primitives/page-visibility": ^2.0.2
     "@solid-primitives/storage": ^1.3.3
-    "@solidjs/meta": ^0.28.0
-    "@solidjs/router": ^0.5.0
-    "@trpc/client": ^10.0.0-rc.6
-    "@trpc/server": ^10.0.0-rc.6
-    autoprefixer: ^10.4.12
+    "@solidjs/meta": ^0.28.2
+    "@solidjs/router": ^0.5.1
+    "@trpc/client": ^10.4.1
+    "@trpc/server": ^10.4.1
+    autoprefixer: ^10.4.13
     dotenv-cli: ^6.0.0
     hello-bird-lib: "workspace:^"
     hello-bird-server: "workspace:^"
     nanoid: ^4.0.0
-    postcss: ^8.4.18
-    solid-js: ^1.6.0
-    solid-start: ^0.2.0
-    solid-start-node: ^0.2.0
-    solid-start-vercel: ^0.2.5
-    tailwindcss: ^3.2.0
-    typescript: ^4.8.4
-    undici: ^5.11.0
-    unplugin-icons: ^0.14.13
-    vite: ^3.1.8
+    postcss: ^8.4.19
+    solid-js: ^1.6.2
+    solid-start: ^0.2.6
+    solid-start-node: ^0.2.6
+    solid-start-vercel: ^0.2.6
+    tailwindcss: ^3.2.4
+    typescript: ^4.9.3
+    undici: ^5.13.0
+    unplugin-icons: ^0.14.14
+    vite: ^3.2.4
     zod: ^3.19.1
   languageName: unknown
   linkType: soft
@@ -4043,7 +4043,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "hello-bird-lib@workspace:lib"
   dependencies:
-    esbuild: ^0.15.15
+    esbuild: ^0.15.16
     esbuild-node-tsc: ^2.0.4
     typescript: ^4.9.3
     zod: ^3.19.1
@@ -4055,19 +4055,19 @@ __metadata:
   resolution: "hello-bird-server@workspace:server"
   dependencies:
     "@fastify/cors": ^8.2.0
-    "@trpc/server": ^10.0.0-rc.6
+    "@trpc/server": ^10.4.1
     dotenv: ^16.0.3
-    esbuild: ^0.15.15
+    esbuild: ^0.15.16
     esbuild-node-tsc: ^2.0.4
-    fastify: ^4.9.2
+    fastify: ^4.10.2
     fastify-sse-v2: ^3.0.0
     hello-bird-lib: "workspace:^"
     nanoid: ^4.0.0
-    puppeteer: ^19.2.2
+    puppeteer: ^19.3.0
     puppeteer-extra: ^3.3.4
     puppeteer-extra-plugin-stealth: ^2.11.1
-    redis: ^4.5.0
-    tsx: ^3.11.0
+    redis: ^4.5.1
+    tsx: ^3.12.1
     typescript: ^4.9.3
     zod: ^3.19.1
   languageName: unknown
@@ -5285,7 +5285,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.4.18":
+"postcss@npm:^8.4.18, postcss@npm:^8.4.19":
   version: 8.4.19
   resolution: "postcss@npm:8.4.19"
   dependencies:
@@ -5502,7 +5502,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"puppeteer@npm:^19.2.2":
+"puppeteer@npm:^19.3.0":
   version: 19.3.0
   resolution: "puppeteer@npm:19.3.0"
   dependencies:
@@ -5585,7 +5585,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"redis@npm:^4.5.0":
+"redis@npm:^4.5.1":
   version: 4.5.1
   resolution: "redis@npm:4.5.1"
   dependencies:
@@ -5985,7 +5985,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"solid-js@npm:^1.6.0":
+"solid-js@npm:^1.6.2":
   version: 1.6.2
   resolution: "solid-js@npm:1.6.2"
   dependencies:
@@ -6007,7 +6007,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"solid-start-node@npm:^0.2.0":
+"solid-start-node@npm:^0.2.6":
   version: 0.2.6
   resolution: "solid-start-node@npm:0.2.6"
   dependencies:
@@ -6027,7 +6027,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"solid-start-vercel@npm:^0.2.5":
+"solid-start-vercel@npm:^0.2.6":
   version: 0.2.6
   resolution: "solid-start-vercel@npm:0.2.6"
   dependencies:
@@ -6043,7 +6043,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"solid-start@npm:^0.2.0":
+"solid-start@npm:^0.2.6":
   version: 0.2.6
   resolution: "solid-start@npm:0.2.6"
   dependencies:
@@ -6219,7 +6219,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tailwindcss@npm:^3.2.0":
+"tailwindcss@npm:^3.2.4":
   version: 3.2.4
   resolution: "tailwindcss@npm:3.2.4"
   dependencies:
@@ -6377,7 +6377,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsx@npm:^3.11.0":
+"tsx@npm:^3.12.1":
   version: 3.12.1
   resolution: "tsx@npm:3.12.1"
   dependencies:
@@ -6465,7 +6465,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^4.8.4, typescript@npm:^4.9.3":
+"typescript@npm:^4.9.3":
   version: 4.9.3
   resolution: "typescript@npm:4.9.3"
   bin:
@@ -6475,7 +6475,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^4.8.4#~builtin<compat/typescript>, typescript@patch:typescript@^4.9.3#~builtin<compat/typescript>":
+"typescript@patch:typescript@^4.9.3#~builtin<compat/typescript>":
   version: 4.9.3
   resolution: "typescript@patch:typescript@npm%3A4.9.3#~builtin<compat/typescript>::version=4.9.3&hash=d73830"
   bin:
@@ -6502,7 +6502,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:^5.11.0":
+"undici@npm:^5.11.0, undici@npm:^5.13.0":
   version: 5.13.0
   resolution: "undici@npm:5.13.0"
   dependencies:
@@ -6574,7 +6574,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"unplugin-icons@npm:^0.14.13":
+"unplugin-icons@npm:^0.14.14":
   version: 0.14.14
   resolution: "unplugin-icons@npm:0.14.14"
   dependencies:
@@ -6691,7 +6691,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:^3.1.8":
+"vite@npm:^3.2.4":
   version: 3.2.4
   resolution: "vite@npm:3.2.4"
   dependencies:
