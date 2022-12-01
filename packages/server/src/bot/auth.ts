@@ -1,3 +1,4 @@
+import { Protocol } from "puppeteer";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import { cache } from "../cache";
@@ -5,7 +6,7 @@ import { env } from "../env";
 import { loadCookies, saveCookies } from "./cookies";
 
 async function run() {
-  let cookies = [];
+  let cookies: Protocol.Network.CookieParam[] = [];
 
   await cache.connect();
 
