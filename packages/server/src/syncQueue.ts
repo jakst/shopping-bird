@@ -81,22 +81,34 @@ export async function runSyncWorker(forcedRun = true) {
   currentQueue
     .filter((action) => !action.meta.applied)
     .forEach((action) => {
-      if (action.name === "CREATE_ITEM") {
-        const { name, checked } = action.data;
-        googleCache.push({ name, checked });
-      } else if (action.name === "DELETE_ITEM") {
-        googleCache = googleCache.filter(
-          (item) => item.name !== action.meta.name,
-        );
-      } else {
-        const item = googleCache.find((item) => item.name === action.meta.name);
+      switch (action.name) {
+        case "CREATE_ITEM": {
+          const { name, checked } = action.data;
+          googleCache.push({ name, checked });
+          break;
+        }
 
-        if (!item) return;
+        case "DELETE_ITEM":
+          googleCache = googleCache.filter(
+            (item) => item.name !== action.meta.name,
+          );
+          break;
 
-        if (action.name === "RENAME_ITEM") {
-          item.name = action.data.newName;
-        } else if (action.name === "SET_ITEM_CHECKED") {
-          item.checked = action.data.checked;
+        case "RENAME_ITEM":
+        case "SET_ITEM_CHECKED": {
+          const item = googleCache.find(
+            (item) => item.name === action.meta.name,
+          );
+
+          if (!item) return;
+
+          if (action.name === "RENAME_ITEM") {
+            item.name = action.data.newName;
+          } else if (action.name === "SET_ITEM_CHECKED") {
+            item.checked = action.data.checked;
+          }
+
+          break;
         }
       }
 
@@ -128,16 +140,24 @@ async function syncWithGoogle(actionsToApply: EnrichedAction[] = []) {
 
   // Apply actions to Google Shopping List
   for (const action of actionsToApply) {
-    if (action.name === "CREATE_ITEM") {
-      await addItem(action.data.name);
-      if (action.data.checked)
-        await setChecked(action.data.name, action.data.checked);
-    } else if (action.name === "DELETE_ITEM") {
-      await removeItem(action.meta.name);
-    } else if (action.name === "RENAME_ITEM") {
-      await rename(action.meta.name, action.data.newName);
-    } else if (action.name === "SET_ITEM_CHECKED") {
-      await setChecked(action.meta.name, action.data.checked);
+    switch (action.name) {
+      case "CREATE_ITEM":
+        await addItem(action.data.name);
+        if (action.data.checked)
+          await setChecked(action.data.name, action.data.checked);
+        break;
+
+      case "DELETE_ITEM":
+        await removeItem(action.meta.name);
+        break;
+
+      case "RENAME_ITEM":
+        await rename(action.meta.name, action.data.newName);
+        break;
+
+      case "SET_ITEM_CHECKED":
+        await setChecked(action.meta.name, action.data.checked);
+        break;
     }
   }
 

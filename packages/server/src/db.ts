@@ -65,14 +65,19 @@ function createDb(initItems: Item[]) {
   }
 
   function applyAction(action: Action) {
-    if (action.name === "CREATE_ITEM") {
-      addItem(action.data);
-    } else if (action.name === "DELETE_ITEM") {
-      deleteItem(action.data.id);
-    } else if (action.name === "RENAME_ITEM") {
-      renameItem(action.data.id, action.data.newName);
-    } else if (action.name === "SET_ITEM_CHECKED") {
-      setChecked(action.data.id, action.data.checked);
+    switch (action.name) {
+      case "CREATE_ITEM":
+        addItem(action.data);
+        break;
+      case "DELETE_ITEM":
+        deleteItem(action.data.id);
+        break;
+      case "RENAME_ITEM":
+        renameItem(action.data.id, action.data.newName);
+        break;
+      case "SET_ITEM_CHECKED":
+        setChecked(action.data.id, action.data.checked);
+        break;
     }
   }
 

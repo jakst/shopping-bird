@@ -79,23 +79,30 @@ function enrichAndApplyActions(db: Db, actions: Action[]) {
   const enrichedActions: EnrichedAction[] = [];
 
   actions.forEach((action) => {
-    if (action.name === "CREATE_ITEM") {
-      const { name, checked } = action.data;
-      enrichedActions.push({
-        ...action,
-        data: { name, checked },
-        meta: { applied: false },
-      });
-    } else {
-      const item = db.getItemById(action.data.id);
-
-      if (item) {
+    switch (action.name) {
+      case "CREATE_ITEM": {
+        const { name, checked } = action.data;
         enrichedActions.push({
           ...action,
-          meta: { name: item.name, applied: false },
+          data: { name, checked },
+          meta: { applied: false },
         });
-      } else {
-        console.warn(`Could not find item with id ${action.data.id} in DB`);
+        break;
+      }
+
+      case "DELETE_ITEM":
+      case "RENAME_ITEM":
+      case "SET_ITEM_CHECKED": {
+        const item = db.getItemById(action.data.id);
+
+        if (item) {
+          enrichedActions.push({
+            ...action,
+            meta: { name: item.name, applied: false },
+          });
+        } else {
+          console.warn(`Could not find item with id ${action.data.id} in DB`);
+        }
       }
     }
 
