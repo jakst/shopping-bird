@@ -1,8 +1,8 @@
 {
   "include": [],
   "references": [
-    { "path": "app" }, //
-    { "path": "lib" },
-    { "path": "server" }
+    { "path": "./packages/app" },
+    { "path": "./packages/lib" },
+    { "path": "./packages/server" }
   ]
 }
