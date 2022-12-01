@@ -67,7 +67,7 @@ export const router = t.router({
 
       await pushToSyncQueue(googleActions);
     }),
-  pullDb: authedProcedure.query(async (req) => {
+  pullDb: authedProcedure.query((req) => {
     const { db } = req.ctx;
     return db.getItems();
   }),

@@ -39,7 +39,7 @@ async function startApp() {
   server.register(FastifySSEPlugin);
 
   server.get("/sse", (request, reply) => {
-    const clientId = request.id;
+    const clientId = request.id as string;
 
     createClient(clientId, reply);
 

@@ -47,9 +47,9 @@ export async function getItems() {
 export const setChecked = createAction(async (name: string, check: boolean) => {
   const page = await getPage();
 
-  const checkbox = (await page.$(
+  const checkbox = await page.$(
     `ul[aria-label="Min inköpslista"] > li input[aria-label="${name}"]`,
-  )) as ElementHandle<HTMLInputElement> | null;
+  );
 
   if (checkbox) {
     const isChecked = await checkbox.evaluate((el) => el.checked);
@@ -63,9 +63,9 @@ export const setChecked = createAction(async (name: string, check: boolean) => {
 export const uncheckItem = createAction(async (name: string) => {
   const page = await getPage();
 
-  const checkbox = (await page.$(
+  const checkbox = await page.$(
     `ul[aria-label="Min inköpslista"] > li input[aria-label="${name}"]`,
-  )) as ElementHandle<HTMLInputElement> | null;
+  );
 
   if (checkbox) {
     const checked = await checkbox.evaluate((el) => el.checked);

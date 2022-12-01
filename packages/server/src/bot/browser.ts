@@ -1,12 +1,12 @@
-import { executablePath } from "puppeteer";
+import { executablePath, Protocol } from "puppeteer";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import { deleteCookies, loadCookies, saveCookies } from "./cookies";
 
 puppeteer.use(StealthPlugin());
 
-function cache<T extends () => Promise<any>>(fn: T) {
-  let value: Awaited<ReturnType<T>>;
+function cache<T>(fn: () => Promise<T>) {
+  let value: T;
   return async () => {
     value ??= await fn();
     return value;
@@ -34,7 +34,7 @@ export const getPage = cache(async () => {
   return page;
 });
 
-let _cookies: any[] | null = null;
+let _cookies: Protocol.Network.CookieParam[] | null = null;
 
 export async function getCookies() {
   return (_cookies ??= await loadCookies());
@@ -59,7 +59,11 @@ export async function loadShoppingListPage() {
   const now = Date.now();
   const shouldRefresh = now - pageRefreshedAt > REFRESH_INTERVAL;
 
-  console.time(`[loadShoppingListPage shouldRefresh = ${shouldRefresh}]`);
+  const tag = `[loadShoppingListPage shouldRefresh = ${
+    shouldRefresh ? "true" : "false"
+  }]`;
+
+  console.time(tag);
 
   const page = await getPage();
 
@@ -80,7 +84,7 @@ export async function loadShoppingListPage() {
     throw new Error("BAD_COOKIES");
   }
 
-  console.timeEnd(`[loadShoppingListPage shouldRefresh = ${shouldRefresh}]`);
+  console.timeEnd(tag);
 
   return page;
 }

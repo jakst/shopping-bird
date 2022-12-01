@@ -7,7 +7,7 @@ export function createShoppingList() {
   const db = createDb("DB");
   const remoteDbCopy = createDb("REMOTE_DB");
 
-  async function applyDbDiff(newDb: Item[]) {
+  function applyDbDiff(newDb: Item[]) {
     const actions = compare(remoteDbCopy.items, newDb);
 
     if (actions.length > 0) {
