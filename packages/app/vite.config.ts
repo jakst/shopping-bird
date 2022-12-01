@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-nocheck
 import vercel from "solid-start-vercel";
 import solid from "solid-start/vite";
 import Icons from "unplugin-icons/vite";
