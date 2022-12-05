@@ -126,5 +126,29 @@ export const addItem = createAction(async (name: string) => {
   await page.waitForNetworkIdle();
 });
 
+export const clearCheckedItems = createAction(async () => {
+  const page = await getPage();
+
+  const moreButton = await page.$("button[aria-label='Mer']");
+  await moreButton?.click();
+
+  // Wait for the menu to fully open
+  await pause(200);
+
+  // Navigate to third menu item and press it
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+
+  // Wait for modal to become visible
+  await pause(200);
+
+  // Accept default modal action
+  await page.keyboard.press("Enter");
+
+  await page.waitForNetworkIdle();
+});
+
 export const pause = (time = 2000) =>
   new Promise((resolve) => setTimeout(resolve, time));

@@ -90,6 +90,15 @@ function enrichAndApplyActions(db: Db, actions: Action[]) {
         break;
       }
 
+      case "CLEAR_CHECKED_ITEMS": {
+        enrichedActions.push({
+          ...action,
+          meta: { applied: false },
+        });
+
+        break;
+      }
+
       case "DELETE_ITEM":
       case "RENAME_ITEM":
       case "SET_ITEM_CHECKED": {

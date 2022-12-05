@@ -64,6 +64,12 @@ function createDb(initItems: Item[]) {
     if (item) item.name = name;
   }
 
+  function clearCheckedItems() {
+    db.forEach((item) => {
+      if (item.checked) db.delete(item.id);
+    });
+  }
+
   function applyAction(action: Action) {
     switch (action.name) {
       case "CREATE_ITEM":
@@ -77,6 +83,9 @@ function createDb(initItems: Item[]) {
         break;
       case "SET_ITEM_CHECKED":
         setChecked(action.data.id, action.data.checked);
+        break;
+      case "CLEAR_CHECKED_ITEMS":
+        clearCheckedItems();
         break;
     }
   }

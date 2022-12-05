@@ -7,6 +7,7 @@ import {
 } from "hello-bird-lib";
 import {
   addItem,
+  clearCheckedItems,
   getItems,
   removeItem,
   rename,
@@ -94,6 +95,10 @@ export async function runSyncWorker(forcedRun = true) {
           );
           break;
 
+        case "CLEAR_CHECKED_ITEMS":
+          googleCache = googleCache.filter((item) => !item.checked);
+          break;
+
         case "RENAME_ITEM":
         case "SET_ITEM_CHECKED": {
           const item = googleCache.find(
@@ -157,6 +162,10 @@ async function syncWithGoogle(actionsToApply: EnrichedAction[] = []) {
 
       case "SET_ITEM_CHECKED":
         await setChecked(action.meta.name, action.data.checked);
+        break;
+
+      case "CLEAR_CHECKED_ITEMS":
+        await clearCheckedItems();
         break;
     }
   }

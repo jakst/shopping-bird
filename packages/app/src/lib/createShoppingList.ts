@@ -67,5 +67,9 @@ export function createShoppingList() {
     deleteItem: createAction("DELETE_ITEM", db.deleteItem),
     setChecked: createAction("SET_ITEM_CHECKED", db.setChecked),
     renameItem: createAction("RENAME_ITEM", db.renameItem),
+    clearCheckedItems: createAction(
+      "CLEAR_CHECKED_ITEMS",
+      db.clearCheckedItems,
+    ),
   };
 }

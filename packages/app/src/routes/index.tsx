@@ -37,6 +37,7 @@ function Home() {
     deleteItem,
     setChecked,
     renameItem,
+    clearCheckedItems,
   } = createShoppingList();
 
   const rowActions = { deleteItem, renameItem, setChecked };
@@ -119,7 +120,7 @@ function Home() {
       </ul>
 
       <Show when={checkedList().length > 0}>
-        <div class="mt-4 mb-2 ml-2 opacity-60">
+        <div class="mt-4 mb-2 ml-2 opacity-60 flex justify-between">
           <button
             class="flex items-center overflow-hidden"
             onClick={() => setShowChecked((v) => !v)}
@@ -136,6 +137,7 @@ function Home() {
                 : `${checkedList().length} ticked items`}
             </h2>
           </button>
+          <button onClick={() => clearCheckedItems()}>Clear all</button>
         </div>
 
         <Presence>

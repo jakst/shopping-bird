@@ -40,11 +40,17 @@ const RenameItem = z.object({
   }),
 });
 
+const ClearCheckedItems = z.object({
+  name: z.literal("CLEAR_CHECKED_ITEMS"),
+  data: z.never().optional(),
+});
+
 export const actionSchema = z.discriminatedUnion("name", [
   CreateItem,
   DeleteItem,
   SetChecked,
   RenameItem,
+  ClearCheckedItems,
 ]);
 
 export type Action = z.infer<typeof actionSchema>;
@@ -74,6 +80,9 @@ export const enrichedActionSchema = z.discriminatedUnion("name", [
   DeleteItem.extend({ meta: metaNameAndAppliedSchema }),
   SetChecked.extend({ meta: metaNameAndAppliedSchema }),
   RenameItem.extend({ meta: metaNameAndAppliedSchema }),
+  ClearCheckedItems.extend({
+    meta: metaNameAndAppliedSchema.pick({ applied: true }),
+  }),
 ]);
 
 export type EnrichedAction = z.infer<typeof enrichedActionSchema>;

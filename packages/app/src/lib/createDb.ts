@@ -42,6 +42,11 @@ export function createDb(storageKey: string) {
     return { id, newName };
   }
 
+  function clearCheckedItems() {
+    setDb((prev) => prev.filter((item) => !item.checked));
+    return undefined;
+  }
+
   function applyAction(action: Action) {
     switch (action.name) {
       case "CREATE_ITEM":
@@ -59,6 +64,10 @@ export function createDb(storageKey: string) {
       case "SET_ITEM_CHECKED":
         setChecked(action.data.id, action.data.checked);
         break;
+
+      case "CLEAR_CHECKED_ITEMS":
+        clearCheckedItems();
+        break;
     }
   }
 
@@ -70,5 +79,6 @@ export function createDb(storageKey: string) {
     deleteItem,
     setChecked,
     renameItem,
+    clearCheckedItems,
   };
 }
