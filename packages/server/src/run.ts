@@ -38,6 +38,8 @@ server.post("/auth", async (req, res) => {
 async function startApp() {
   server.register(FastifySSEPlugin);
 
+  await Promise.all([initSyncQueue(), initDb(), initGoogleCache()]);
+
   server.get("/sse", (request, reply) => {
     const clientId = request.id as string;
 
@@ -55,8 +57,6 @@ async function startApp() {
       createContext,
     },
   });
-
-  await Promise.all([initSyncQueue(), initDb(), initGoogleCache()]);
 
   await runSyncWorker();
 }
