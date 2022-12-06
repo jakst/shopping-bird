@@ -60,22 +60,6 @@ export const setChecked = createAction(async (name: string, check: boolean) => {
   await page.waitForNetworkIdle();
 });
 
-export const uncheckItem = createAction(async (name: string) => {
-  const page = await getPage();
-
-  const checkbox = await page.$(
-    `ul[aria-label="Min inköpslista"] > li input[aria-label="${name}"]`,
-  );
-
-  if (checkbox) {
-    const checked = await checkbox.evaluate((el) => el.checked);
-
-    if (checked) await checkbox.click();
-  }
-
-  await page.waitForNetworkIdle();
-});
-
 export const rename = createAction(async (oldName: string, newName: string) => {
   // There's a bug where Google's app unchecks items when you rename them,
   // but it's not visible until you reload the page.
