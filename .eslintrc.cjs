@@ -4,10 +4,12 @@ const disableOverZealousRules = {
 
   "@typescript-eslint/no-unused-vars": "off",
   "@typescript-eslint/no-empty-function": "off",
+  "@typescript-eslint/no-empty-interface": "off",
   "@typescript-eslint/no-floating-promises": "off",
   "@typescript-eslint/no-explicit-any": "off",
   "@typescript-eslint/no-unsafe-argument": "off",
   "@typescript-eslint/no-non-null-assertion": "off",
+  "@typescript-eslint/restrict-template-expressions": "off",
 };
 
 module.exports = {
@@ -36,6 +38,7 @@ module.exports = {
     project: ["./packages/*/tsconfig.json"],
   },
   rules: {
+    "object-shorthand": "warn",
     "@typescript-eslint/switch-exhaustiveness-check": "warn",
 
     ...disableOverZealousRules,
