@@ -13,3 +13,4 @@ export {
   type GoogleItem,
   type Item,
 } from "./schemas";
+export { trimAndUppercase } from "./trimAndUppercase";

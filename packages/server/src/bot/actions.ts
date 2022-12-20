@@ -1,3 +1,4 @@
+import { trimAndUppercase } from "hello-bird-lib";
 import { type ElementHandle } from "puppeteer";
 import { getPage } from "./browser";
 
@@ -37,7 +38,13 @@ export async function getItems() {
           .then((input) => input!.evaluate((el) => el.checked)),
       ]);
 
-      return { name, checked };
+      // Fix all incorrectly named items before returning the list
+      const fixedName = trimAndUppercase(name);
+      if (fixedName !== name) {
+        await rename(name, fixedName);
+      }
+
+      return { name: fixedName, checked };
     }),
   );
 

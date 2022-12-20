@@ -1,4 +1,5 @@
 import { Motion, Presence } from "@motionone/solid";
+import { trimAndUppercase } from "hello-bird-lib";
 import { createSignal, For, onMount, Show } from "solid-js";
 import { createShoppingList } from "~/lib/createShoppingList";
 import IconCheck from "~icons/ci/check";
@@ -15,7 +16,7 @@ export default function Shell() {
     <main class="mx-auto text-gray-700 max-w-lg">
       <div class="flex px-4 justify-between items-center content-center">
         <h1
-          class="text-4xl py-4 text-sky-700 uppercase"
+          class="text-4xl py-4 text-sky-700"
           style={{ "font-stretch": "condensed" }}
         >
           Hello Bird!
@@ -164,7 +165,7 @@ function NewItem(props: { onCreate: (name: string) => void }) {
   const [value, setValue] = createSignal("");
 
   function submit() {
-    props.onCreate(value());
+    props.onCreate(trimAndUppercase(value()));
     setValue("");
     inputField?.focus();
   }
