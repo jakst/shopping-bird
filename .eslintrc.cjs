@@ -10,6 +10,12 @@ const disableOverZealousRules = {
   "@typescript-eslint/no-unsafe-argument": "off",
   "@typescript-eslint/no-non-null-assertion": "off",
   "@typescript-eslint/restrict-template-expressions": "off",
+  "@typescript-eslint/require-await": "off",
+
+  // These don't seem to work properly across package boundaries
+  "@typescript-eslint/no-unsafe-member-access": "off",
+  "@typescript-eslint/no-unsafe-call": "off",
+  "@typescript-eslint/no-unsafe-assignment": "off",
 };
 
 module.exports = {
