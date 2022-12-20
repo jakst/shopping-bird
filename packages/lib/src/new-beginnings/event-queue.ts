@@ -1,37 +1,46 @@
-import { ShoppinglistEvent } from "./types";
-
-export class EventQueue {
-  #queue: ShoppinglistEvent[];
+export class EventQueue<T> {
+  #queue: T[];
+  #processPromise: Promise<void> | null = null;
 
   constructor(
-    initialQueue: ShoppinglistEvent[],
-    private onQueueChanged: (events: ShoppinglistEvent[]) => void,
+    initialQueue: T[],
+    private onQueueChanged: (events: T[]) => void,
   ) {
     this.#queue = initialQueue;
   }
 
-  push(event: ShoppinglistEvent) {
+  push(event: T) {
     this.#queue.push(event);
     this.onQueueChanged(this.#queue);
   }
 
-  async process(handleEvents: (events: ShoppinglistEvent[]) => Promise<void>) {
+  async process(handleEvents: (events: T[]) => Promise<void>) {
+    if (this.#queue.length < 1) return;
+
+    // Wait for previous run to finish
+    if (this.#processPromise) await this.#processPromise;
+
+    this.#processPromise = this.#process(handleEvents);
+
+    try {
+      await this.#processPromise;
+    } finally {
+      this.#processPromise = null;
+    }
+  }
+
+  async #process(handleEvents: (events: T[]) => Promise<void>) {
     if (this.#queue.length < 1) return;
 
     // Make a copy we can use for clearing processed events later
     const eventsToHandle = [...this.#queue];
 
-    try {
-      await handleEvents(eventsToHandle);
-      this.#queue = this.#queue.filter(
-        (event) => !eventsToHandle.includes(event),
-      );
-      this.onQueueChanged(this.#queue);
+    await handleEvents(eventsToHandle);
 
-      // Any events that arrived while handler ran need to be processed as well
-      if (this.#queue.length > 0) await this.process(handleEvents);
-    } catch (e) {
-      console.error("Failed to flush events", e);
-    }
+    this.#queue = this.#queue.filter(
+      (event) => !eventsToHandle.includes(event),
+    );
+
+    this.onQueueChanged(this.#queue);
   }
 }

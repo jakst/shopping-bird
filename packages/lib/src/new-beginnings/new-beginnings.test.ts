@@ -4,7 +4,7 @@ import {
   type ClientServerConnection,
   type ClientServerConnectionDeps,
 } from "./client-server-connection";
-import { Server, type ServerClientConnection } from "./server";
+import { BackendClient, Server, type ServerClientConnection } from "./server";
 import { ShoppingList } from "./shopping-list";
 import { type ShoppinglistEvent, type ShoppingListItem } from "./types";
 
@@ -64,7 +64,16 @@ function setupTest() {
   const serverShoppingList = new ShoppingList([], (items) => {
     console.log(`[SERVER] Persisting list with ${items.length} item(s)`);
   });
-  const server = new Server({ shoppingList: serverShoppingList });
+  const backendClient = new BackendClient([], () => {}, {
+    ADD_ITEM: async (event) => {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      console.log("[BACKEND_CLIENT] ADD_ITEM", event);
+    },
+  });
+  const server = new Server({
+    shoppingList: serverShoppingList,
+    backendClient,
+  });
 
   function createClient() {
     const serverConnection = new FakeClientServerConnection({ server });
@@ -103,7 +112,7 @@ function setupTest() {
     };
   }
 
-  return { server, serverShoppingList, createClient };
+  return { server, backendClient, serverShoppingList, createClient };
 }
 
 test("Applies events locally when not connected", async () => {
@@ -185,4 +194,21 @@ test("Events are idempotent", async () => {
 
   expect(c1.shoppingList.items).toEqual([{ id: "123" }]);
   expect(c1.shoppingList.items).toEqual(serverShoppingList.items);
+});
+
+test("Derp", async () => {
+  const { backendClient, server, serverShoppingList, createClient } =
+    setupTest();
+
+  const c1 = createClient();
+
+  await c1.client.connect();
+
+  await c1.client.applyEvent({ name: "ADD_ITEM", data: { id: "123" } });
+  await c1.client.applyEvent({ name: "ADD_ITEM", data: { id: "456" } });
+
+  await backendClient.handle();
+
+  // expect(c1.shoppingList.items).toEqual([{ id: "123" }]);
+  // expect(c1.shoppingList.items).toEqual(serverShoppingList.items);
 });

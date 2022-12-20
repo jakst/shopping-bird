@@ -23,7 +23,7 @@ interface ClientDeps {
 }
 
 export class Client {
-  eventQueue: EventQueue;
+  eventQueue: EventQueue<ShoppinglistEvent>;
 
   constructor(private $d: ClientDeps) {
     this.eventQueue = new EventQueue(

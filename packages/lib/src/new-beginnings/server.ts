@@ -1,14 +1,46 @@
 import { nanoid } from "nanoid";
+import { EventQueue } from "./event-queue";
 import { ShoppingList } from "./shopping-list";
-import { ShoppinglistEvent, ShoppingListItem } from "./types";
+import { type ShoppinglistEvent, type ShoppingListItem } from "./types";
 
 export interface ServerClientConnection {
   assignClientId(id: string): void;
   notifyListChanged(items: ShoppingListItem[]): void;
 }
 
+export class BackendClient {
+  #eventQueue: EventQueue<ShoppinglistEvent>;
+
+  constructor(
+    initialQueue: ShoppinglistEvent[],
+    onQueueChanged: (events: ShoppinglistEvent[]) => void,
+    // TODO: Narrow down event based on Key
+    private eventHandlerMap: {
+      [Key in ShoppinglistEvent["name"]]: (
+        event: ShoppinglistEvent,
+      ) => Promise<void>;
+    },
+  ) {
+    this.#eventQueue = new EventQueue(initialQueue, onQueueChanged);
+  }
+
+  doSomething(events: ShoppinglistEvent[]) {
+    events.forEach((event) => this.#eventQueue.push(event));
+  }
+
+  async handle() {
+    // TODO: Can we really use an event queue? It processes all events in one go. A: probably
+    await this.#eventQueue.process(async (events) => {
+      for (const event of events) {
+        await this.eventHandlerMap[event.name](event);
+      }
+    });
+  }
+}
+
 interface ServerDeps {
   shoppingList: ShoppingList;
+  backendClient: BackendClient;
 }
 
 export class Server {
@@ -39,6 +71,9 @@ export class Server {
 
     // Apply events
     this.$d.shoppingList.applyEvents(events);
+
+    //
+    this.$d.backendClient.doSomething(events);
 
     // Notify other clients of changes to the list
     for (const [currentClientId, client] of this.clients.entries()) {
