@@ -16,7 +16,7 @@ export default function Shell() {
     <main class="mx-auto text-gray-700 max-w-lg">
       <div class="flex px-4 justify-between items-center content-center">
         <h1
-          class="text-4xl py-4 text-sky-700"
+          class="uppercase text-4xl py-4 text-sky-700"
           style={{ "font-stretch": "condensed" }}
         >
           Hello Bird!

@@ -83,7 +83,7 @@ export function ItemRow(props: { item: Item; actions: Actions }) {
               <input
                 ref={nameInputField}
                 value={props.item.name}
-                class={`capitalize focus:outline-none focus:underline border-slate-800${
+                class={`focus:outline-none focus:underline border-slate-800${
                   props.item.checked
                     ? " line-through text-gray-500"
                     : " text-gray-900"
