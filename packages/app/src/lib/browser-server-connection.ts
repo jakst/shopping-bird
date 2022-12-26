@@ -14,6 +14,10 @@ export class BrowserServerConnection implements ClientServerConnection {
     return this.clientId !== null;
   }
 
+  constructor(
+    private onConnectionStatusChanged?: (connected: boolean) => void,
+  ) {}
+
   async connect(client: Client) {
     if (this.isConnected) return;
 
@@ -26,11 +30,13 @@ export class BrowserServerConnection implements ClientServerConnection {
 
     eventSource.addEventListener("error", () => {
       this.clientId = null;
+      this.onConnectionStatusChanged?.(false);
     });
 
     return new Promise<void>((resolve) =>
       eventSource.addEventListener("sse-id", (event: MessageEvent<string>) => {
         this.clientId = event.data;
+        this.onConnectionStatusChanged?.(true);
         resolve();
       }),
     );

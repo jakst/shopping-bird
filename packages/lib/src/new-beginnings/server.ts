@@ -40,7 +40,7 @@ export class BackendClient {
 
 interface ServerDeps {
   shoppingList: ShoppingList;
-  backendClient: BackendClient;
+  backendClient?: BackendClient;
 }
 
 export class Server {
@@ -73,7 +73,7 @@ export class Server {
     this.$d.shoppingList.applyEvents(events);
 
     //
-    this.$d.backendClient.doSomething(events);
+    this.$d.backendClient?.doSomething(events);
 
     // Notify other clients of changes to the list
     for (const [currentClientId, client] of this.clients.entries()) {

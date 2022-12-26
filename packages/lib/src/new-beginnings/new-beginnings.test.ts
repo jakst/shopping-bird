@@ -4,6 +4,7 @@ import {
   type ClientServerConnection,
   type ClientServerConnectionDeps,
 } from "./client-server-connection";
+import { EventQueue } from "./event-queue";
 import { BackendClient, Server, type ServerClientConnection } from "./server";
 import { ShoppingList } from "./shopping-list";
 import { type ShoppinglistEvent, type ShoppingListItem } from "./types";
@@ -78,12 +79,6 @@ function setupTest() {
   function createClient() {
     const serverConnection = new FakeClientServerConnection({ server });
 
-    const onEventQueueChanged = (events: ShoppinglistEvent[]): void => {
-      // console.log(
-      //   `[CLIENT:${serverConnection.clientId}] Persisting ${events.length} event(s)`,
-      // );
-    };
-
     const remoteShoppingListCopy = new ShoppingList([], (items) => {
       // console.log(
       //   `[CLIENT:${serverConnection.clientId} COPY] Persisting list with ${items.length} item(s)`,
@@ -96,12 +91,17 @@ function setupTest() {
       // );
     });
 
+    const eventQueue = new EventQueue<ShoppinglistEvent>([], (events) => {
+      // console.log(
+      //   `[CLIENT:${serverConnection.clientId}] Persisting ${events.length} event(s)`,
+      // );
+    });
+
     const client = new Client({
       serverConnection,
       shoppingList,
       remoteShoppingListCopy,
-      initialEventQueue: [],
-      onEventQueueChanged,
+      eventQueue,
     });
 
     return {

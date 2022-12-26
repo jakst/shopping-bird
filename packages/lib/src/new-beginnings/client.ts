@@ -18,19 +18,11 @@ interface ClientDeps {
   shoppingList: ShoppingList;
   remoteShoppingListCopy: ShoppingList;
   serverConnection: ClientServerConnection;
-  initialEventQueue: ShoppinglistEvent[];
-  onEventQueueChanged: (events: ShoppinglistEvent[]) => void;
+  eventQueue: EventQueue<ShoppinglistEvent>;
 }
 
 export class Client {
-  eventQueue: EventQueue<ShoppinglistEvent>;
-
-  constructor(private $d: ClientDeps) {
-    this.eventQueue = new EventQueue(
-      $d.initialEventQueue,
-      $d.onEventQueueChanged,
-    );
-  }
+  constructor(private $d: ClientDeps) {}
 
   async connect() {
     await this.$d.serverConnection.connect(this);
@@ -42,7 +34,7 @@ export class Client {
   }
 
   async flushEvents() {
-    await this.eventQueue.process(async (events) => {
+    await this.$d.eventQueue.process(async (events) => {
       await this.$d.serverConnection.pushEvents(events);
     });
   }
@@ -53,7 +45,7 @@ export class Client {
     this.$d.remoteShoppingListCopy.applyEvents([event]);
 
     // * Queue event for remote push
-    this.eventQueue.push(event);
+    this.$d.eventQueue.push(event);
 
     // * Flush if we are connected
     if (this.$d.serverConnection.isConnected) await this.flushEvents();
