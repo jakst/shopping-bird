@@ -42,8 +42,8 @@ export async function getItems() {
     }),
   );
 
-  const setOfProcessedNames = new Set<string>();
-  const duplicateIndexes: number[] = [];
+  const disoceveredItemNames = new Set<string>();
+  const duplicateItemIndexes: number[] = [];
 
   for (const [index, item] of items.entries()) {
     // Fix all incorrectly named items
@@ -53,15 +53,17 @@ export async function getItems() {
       item.name = fixedName;
     }
 
-    if (setOfProcessedNames.has(item.name)) {
-      duplicateIndexes.push(index);
+    if (disoceveredItemNames.has(item.name)) {
+      duplicateItemIndexes.push(index);
     }
+
+    disoceveredItemNames.add(item.name);
   }
 
   // Remove duplicate items, but from the back so that we don't change
   // the position of the next item to remove on every iteration.
-  duplicateIndexes.reverse();
-  for (const index of duplicateIndexes) {
+  duplicateItemIndexes.reverse();
+  for (const index of duplicateItemIndexes) {
     await removeItem(items[index].name);
     items.splice(index, 1);
   }
