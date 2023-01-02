@@ -4,6 +4,7 @@ import { Client } from "./client";
 import {
   type ClientServerConnection,
   type ClientServerConnectionDeps,
+  type OnRemoteListChangedCallback,
 } from "./client-server-connection";
 import { EventQueue } from "./event-queue";
 import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
@@ -14,7 +15,7 @@ class FakeClientServerConnection
   implements ClientServerConnection, ServerClientConnection
 {
   clientId: string | null = null;
-  client: Client | null = null;
+  onRemoteListChanged: OnRemoteListChangedCallback | null = null;
 
   constructor(private $d: ClientServerConnectionDeps) {}
 
@@ -29,15 +30,15 @@ class FakeClientServerConnection
 
   // Called from server
   notifyListChanged(items: ShoppingListItem[]) {
-    if (this.client)
-      this.client.onRemoteListChanged(JSON.parse(JSON.stringify(items)));
+    if (this.clientId && this.onRemoteListChanged)
+      this.onRemoteListChanged(JSON.parse(JSON.stringify(items)));
     else throw new Error("No client set");
   }
 
   // Called from client
-  async connect(client: Client) {
+  async connect(onRemoteListChanged: OnRemoteListChangedCallback) {
     this.clientId = this.$d.server.connectClient(this);
-    this.client = client;
+    this.onRemoteListChanged = onRemoteListChanged;
   }
 
   // Called from client
@@ -45,7 +46,6 @@ class FakeClientServerConnection
     if (this.clientId) {
       this.$d.server.disconnectClient(this.clientId);
       this.clientId = null;
-      this.client = null;
     } else {
       console.warn("Attempt to disconnect while not connected");
     }

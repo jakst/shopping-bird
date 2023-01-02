@@ -25,12 +25,10 @@ export class Client {
   constructor(private $d: ClientDeps) {}
 
   async connect() {
-    await this.$d.serverConnection.connect(this);
+    await this.$d.serverConnection.connect((newList) =>
+      this.onRemoteListChanged(newList),
+    );
     await this.flushEvents();
-  }
-
-  disconnect() {
-    this.$d.serverConnection.disconnect();
   }
 
   async flushEvents() {
