@@ -38,15 +38,33 @@ export async function getItems() {
           .then((input) => input!.evaluate((el) => el.checked)),
       ]);
 
-      // Fix all incorrectly named items before returning the list
-      const fixedName = trimAndUppercase(name);
-      if (fixedName !== name) {
-        await rename(name, fixedName);
-      }
-
-      return { name: fixedName, checked };
+      return { name, checked };
     }),
   );
+
+  const setOfProcessedNames = new Set<string>();
+  const duplicateIndexes: number[] = [];
+
+  for (const [index, item] of items.entries()) {
+    // Fix all incorrectly named items
+    const fixedName = trimAndUppercase(item.name);
+    if (fixedName !== item.name) {
+      await rename(item.name, fixedName);
+      item.name = fixedName;
+    }
+
+    if (setOfProcessedNames.has(item.name)) {
+      duplicateIndexes.push(index);
+    }
+  }
+
+  // Remove duplicate items, but from the back so that we don't change
+  // the position of the next item to remove on every iteration.
+  duplicateIndexes.reverse();
+  for (const index of duplicateIndexes) {
+    await removeItem(items[index].name);
+    items.splice(index, 1);
+  }
 
   return items;
 }
