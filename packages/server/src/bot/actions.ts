@@ -64,7 +64,7 @@ export async function getItems() {
   // the position of the next item to remove on every iteration.
   duplicateItemIndexes.reverse();
   for (const index of duplicateItemIndexes) {
-    await removeItem(items[index].name);
+    await removeDuplicates(items[index].name);
     items.splice(index, 1);
   }
 
@@ -107,6 +107,28 @@ export const rename = createAction(async (oldName: string, newName: string) => {
   await page.keyboard.press("Enter");
 
   await page.waitForNetworkIdle();
+});
+
+export const removeDuplicates = createAction(async (name: string) => {
+  const page = await getPage();
+
+  const nameDisplays = (await page.$x(
+    `//ul/li//div[@role="button" and text()="${name}"]`,
+  )) as ElementHandle<HTMLDivElement>[];
+
+  nameDisplays.shift();
+
+  console.log(`Removing ${nameDisplays.length} duplicate(s) of ${name}`);
+  for (const nameDisplay of nameDisplays) {
+    await nameDisplay.click();
+
+    // Press the trash button, two tabs away from the input field
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Enter");
+
+    await page.waitForNetworkIdle();
+  }
 });
 
 export const removeItem = createAction(async (name: string) => {
