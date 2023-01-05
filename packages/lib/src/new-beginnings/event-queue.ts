@@ -9,6 +9,10 @@ export class EventQueue<T> {
     this.#queue = initialQueue;
   }
 
+  isEmpty() {
+    return this.#queue.length === 0;
+  }
+
   push(event: T) {
     this.#queue.push(event);
     this.onQueueChanged(this.#queue);

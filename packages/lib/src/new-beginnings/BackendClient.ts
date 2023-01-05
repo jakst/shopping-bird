@@ -1,4 +1,5 @@
 import { nanoid } from "nanoid";
+import { dedupeAsync } from "./dedupeAsync";
 import { EventQueue } from "./event-queue";
 import {
   GetShoppingListEventData,
@@ -24,36 +25,39 @@ type ListItem = Pick<ShoppingListItem, "name" | "checked">;
 export class BackendClient {
   onEventsReturned: null | ((events: ShoppingListEvent[]) => void) = null;
   previousListState: ShoppingListItem[] = [];
-  #handlePromise: Promise<void> | null = null;
 
   constructor(private $d: BackendClientDeps) {
     this.previousListState = $d.initialList;
+
+    this.#startProcessor.bind(this);
   }
 
   async flush() {
-    if (this.#handlePromise) await this.#handlePromise;
+    await this.#waitAndStart();
   }
 
-  async doSomething(events: ShoppingListEvent[]) {
+  pushEvents(events: ShoppingListEvent[]) {
     this.$d.eventQueue.push(events);
-    this.handle();
+    this.#waitAndStart();
   }
 
-  handle() {
-    const previousPromise = this.#handlePromise;
-    this.#handlePromise = (async () => {
-      if (previousPromise) await previousPromise;
-      await this.$d.eventQueue.process(async (eventGroups) => {
-        for (const events of eventGroups) {
-          await this.#handle(events);
-        }
-      });
-    })().finally(() => {
-      this.#handlePromise = null;
+  #waitAndStart() {
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    return dedupeAsync(this.#startProcessor);
+  }
+
+  async #startProcessor() {
+    await this.$d.eventQueue.process(async (eventGroups) => {
+      for (const events of eventGroups) {
+        await this.#processEvents(events);
+      }
     });
+
+    // Process any events that arrived while running
+    if (!this.$d.eventQueue.isEmpty) await this.#startProcessor();
   }
 
-  async #handle(events: ShoppingListEvent[]) {
+  async #processEvents(events: ShoppingListEvent[]) {
     await this.$d.ensureFreshList();
 
     // Generate outgoing events before we make any changes
