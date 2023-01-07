@@ -1,15 +1,6 @@
-import test from "node:test";
+import { expect, test } from "vitest";
 import { compare } from "./compare";
 import { Item } from "./schemas";
-
-function assertEqual<T>(a: T, b: T) {
-  const aJson = JSON.stringify(a);
-  const bJson = JSON.stringify(b);
-
-  if (aJson !== bJson) {
-    throw new Error(`"${aJson}" is not equal to "${bJson}"`);
-  }
-}
 
 test("Adds unchecked items", () => {
   const previousList: Item[] = [];
@@ -17,7 +8,7 @@ test("Adds unchecked items", () => {
 
   const res = compare(previousList, newList);
 
-  assertEqual(res, [
+  expect(res).toEqual([
     {
       name: "CREATE_ITEM",
       data: { id: "a", index: 0, name: "Ost", checked: false },
@@ -31,7 +22,7 @@ test("Adds checked items", () => {
 
   const res = compare(previousList, newList);
 
-  assertEqual(res, [
+  expect(res).toEqual([
     {
       name: "CREATE_ITEM",
       data: { id: "a", index: 0, name: "Ost", checked: true },
@@ -47,7 +38,7 @@ test("Removes checked items", () => {
 
   const res = compare(previousList, newList);
 
-  assertEqual(res, [{ name: "DELETE_ITEM", data: { id: "a" } }]);
+  expect(res).toEqual([{ name: "DELETE_ITEM", data: { id: "a" } }]);
 });
 
 test("Removes unchecked items", () => {
@@ -58,7 +49,7 @@ test("Removes unchecked items", () => {
 
   const res = compare(previousList, newList);
 
-  assertEqual(res, [{ name: "DELETE_ITEM", data: { id: "a" } }]);
+  expect(res).toEqual([{ name: "DELETE_ITEM", data: { id: "a" } }]);
 });
 
 test("Leaves unchanged items", () => {
@@ -69,7 +60,7 @@ test("Leaves unchanged items", () => {
 
   const res = compare(previousList, newList);
 
-  assertEqual(res, []);
+  expect(res).toEqual([]);
 });
 
 test("Checks items", () => {
@@ -80,7 +71,7 @@ test("Checks items", () => {
 
   const res = compare(previousList, newList);
 
-  assertEqual(res, [
+  expect(res).toEqual([
     { name: "SET_ITEM_CHECKED", data: { id: "a", checked: true } },
   ]);
 });
@@ -93,7 +84,7 @@ test("Unchecks items", () => {
 
   const res = compare(previousList, newList);
 
-  assertEqual(res, [
+  expect(res).toEqual([
     { name: "SET_ITEM_CHECKED", data: { id: "a", checked: false } },
   ]);
 });
@@ -108,7 +99,7 @@ test("Renames items", () => {
 
   const res = compare(previousList, newList);
 
-  assertEqual(res, [
+  expect(res).toEqual([
     { name: "RENAME_ITEM", data: { id: "a", newName: "Prästost" } },
   ]);
 });
@@ -123,7 +114,7 @@ test("Renames and checks items", () => {
 
   const res = compare(previousList, newList);
 
-  assertEqual(res, [
+  expect(res).toEqual([
     { name: "SET_ITEM_CHECKED", data: { id: "a", checked: true } },
     { name: "RENAME_ITEM", data: { id: "a", newName: "Prästost" } },
   ]);
@@ -145,7 +136,7 @@ test("Works for complex cases", () => {
 
   const res = compare(previousList, newList);
 
-  assertEqual(res, [
+  expect(res).toEqual([
     { name: "SET_ITEM_CHECKED", data: { id: "a", checked: false } },
     { name: "SET_ITEM_CHECKED", data: { id: "b", checked: true } },
     {

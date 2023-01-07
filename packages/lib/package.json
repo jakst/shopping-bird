@@ -11,9 +11,11 @@
     }
   },
   "scripts": {
-    "build": "etsc"
+    "build": "etsc",
+    "test": "vitest"
   },
   "dependencies": {
+    "vitest": "^0.26.3",
     "zod": "^3.20.2"
   },
   "devDependencies": {
