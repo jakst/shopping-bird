@@ -4,11 +4,12 @@ import {
   EventQueue,
   ShoppingList,
   ShoppinglistEvent,
+  ShoppingListItem,
   trimAndUppercase,
 } from "hello-bird-lib";
 import { nanoid } from "nanoid/non-secure";
 import { createSignal, For, onMount, Show } from "solid-js";
-import { createMutable } from "solid-js/store";
+import { createMutable, reconcile } from "solid-js/store";
 import { ItemRow2 } from "~/components/ItemRow2";
 import { BrowserServerConnection } from "~/lib/browser-server-connection";
 import IconCheck from "~icons/ci/check";
@@ -54,7 +55,15 @@ function createClient() {
     setIsConnected(value),
   );
 
-  const shoppingList = new ShoppingList(createMutable([]), () => {});
+  const initialShoppingList: ShoppingListItem[] = [];
+
+  const list = createMutable({ items: initialShoppingList });
+
+  const shoppingList = new ShoppingList([...initialShoppingList], (newList) => {
+    // This updates the list without losing reactivity, but there could be more elegant ways to do it
+    list.items = reconcile(newList)(list.items);
+  });
+
   const remoteShoppingListCopy = new ShoppingList([], () => {});
 
   const eventQueue = new EventQueue<ShoppinglistEvent>([], (events) => {
@@ -68,27 +77,56 @@ function createClient() {
     eventQueue,
   });
 
+  // TODO: Handle connections either in client or fully through solid with reconnections
   client.connect();
 
-  return { client, items: shoppingList.items, connectionStatus };
+  return { client, items: list.items, connectionStatus };
 }
 
 function Home() {
   const { client, items, connectionStatus } = createClient();
 
   function createItem(name: string) {
-    client.applyEvent({ name: "ADD_ITEM", data: { id: nanoid() } });
+    client.applyEvent({ name: "ADD_ITEM", data: { id: nanoid(), name } });
+  }
+
+  function deleteItem(id: string) {
+    client.applyEvent({ name: "DELETE_ITEM", data: { id } });
+  }
+
+  function setChecked(id: string, checked: boolean) {
+    client.applyEvent({ name: "SET_ITEM_CHECKED", data: { id, checked } });
+  }
+
+  function renameItem(id: string, newName: string) {
+    client.applyEvent({ name: "RENAME_ITEM", data: { id, newName } });
+  }
+
+  function clearCheckedItems() {
+    client.applyEvent({ name: "CLEAR_CHECKED_ITEMS" });
   }
 
   const sortedList = () => {
-    return items;
+    return items
+      .filter((item) => !item.checked)
+      .sort((a, b) => {
+        // TODO: Sort by index
+        // return a.index - b.index;
+        return 0;
+      });
   };
 
   const checkedList = () => {
-    return [];
+    return items.filter((item) => item.checked);
   };
 
   const [showChecked, setShowChecked] = createSignal(false);
+
+  const actions = {
+    deleteItem,
+    setChecked,
+    renameItem,
+  };
 
   return (
     <div class="text-lg">
@@ -141,7 +179,9 @@ function Home() {
       />
 
       <ul class="flex flex-col gap-2">
-        <For each={sortedList()}>{(item) => <ItemRow2 item={item} />}</For>
+        <For each={sortedList()}>
+          {(item) => <ItemRow2 item={item} actions={actions} />}
+        </For>
 
         <NewItem onCreate={createItem} />
       </ul>
@@ -164,6 +204,8 @@ function Home() {
                 : `${checkedList().length} ticked items`}
             </h2>
           </button>
+
+          <button onClick={() => clearCheckedItems()}>Clear all</button>
         </div>
 
         <Presence>
@@ -175,7 +217,7 @@ function Home() {
               exit={{ opacity: 0, transition: { duration: 0.1 } }}
             >
               <For each={checkedList()}>
-                {(item) => <ItemRow2 item={item} />}
+                {(item) => <ItemRow2 item={item} actions={actions} />}
               </For>
             </Motion.ul>
           </Show>

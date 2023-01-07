@@ -5,11 +5,11 @@ export {
   type ClientServerConnectionDeps,
 } from "./new-beginnings/client-server-connection";
 export { EventQueue } from "./new-beginnings/event-queue";
-export { ShoppingList } from "./new-beginnings/shopping-list";
 export {
-  type ShoppinglistEvent,
+  type ShoppingListEvent as ShoppinglistEvent,
   type ShoppingListItem,
-} from "./new-beginnings/types";
+} from "./new-beginnings/newSchemas";
+export { ShoppingList } from "./new-beginnings/shopping-list";
 export {
   actionListSchema,
   actionSchema,

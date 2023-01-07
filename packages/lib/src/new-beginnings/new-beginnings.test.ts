@@ -5,9 +5,9 @@ import {
   type ClientServerConnectionDeps,
 } from "./client-server-connection";
 import { EventQueue } from "./event-queue";
+import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
 import { BackendClient, Server, type ServerClientConnection } from "./server";
 import { ShoppingList } from "./shopping-list";
-import { type ShoppinglistEvent, type ShoppingListItem } from "./types";
 
 class FakeClientServerConnection
   implements ClientServerConnection, ServerClientConnection
@@ -51,7 +51,7 @@ class FakeClientServerConnection
   }
 
   // Called from client
-  async pushEvents(events: ShoppinglistEvent[]) {
+  async pushEvents(events: ShoppingListEvent[]) {
     if (this.clientId)
       this.$d.server.pushEvents(
         this.clientId,
@@ -69,6 +69,22 @@ function setupTest() {
     ADD_ITEM: async (event) => {
       await new Promise((resolve) => setTimeout(resolve, 100));
       console.log("[BACKEND_CLIENT] ADD_ITEM", event);
+    },
+    DELETE_ITEM: async (event) => {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      console.log("[BACKEND_CLIENT] DELETE_ITEM", event);
+    },
+    SET_ITEM_CHECKED: async (event) => {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      console.log("[BACKEND_CLIENT] SET_ITEM_CHECKED", event);
+    },
+    RENAME_ITEM: async (event) => {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      console.log("[BACKEND_CLIENT] RENAME_ITEM", event);
+    },
+    CLEAR_CHECKED_ITEMS: async (event) => {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      console.log("[BACKEND_CLIENT] CLEAR_CHECKED_ITEMS", event);
     },
   });
   const server = new Server({
@@ -91,7 +107,7 @@ function setupTest() {
       // );
     });
 
-    const eventQueue = new EventQueue<ShoppinglistEvent>([], (events) => {
+    const eventQueue = new EventQueue<ShoppingListEvent>([], (events) => {
       // console.log(
       //   `[CLIENT:${serverConnection.clientId}] Persisting ${events.length} event(s)`,
       // );
@@ -123,9 +139,14 @@ test("Applies events locally when not connected", async () => {
 
   await c2.client.connect();
 
-  await c1.client.applyEvent({ name: "ADD_ITEM", data: { id: "123" } });
+  await c1.client.applyEvent({
+    name: "ADD_ITEM",
+    data: { id: "123", name: "Ost" },
+  });
 
-  expect(c1.shoppingList.items).toEqual([{ id: "123" }]);
+  expect(c1.shoppingList.items).toEqual([
+    { id: "123", name: "Ost", checked: false },
+  ]);
   expect(c2.shoppingList.items).toEqual([]);
   expect(serverShoppingList.items).toEqual([]);
 });
@@ -138,15 +159,22 @@ test("Syncs events to server and other clients when connected", async () => {
 
   await c2.client.connect();
 
-  await c1.client.applyEvent({ name: "ADD_ITEM", data: { id: "123" } });
+  await c1.client.applyEvent({
+    name: "ADD_ITEM",
+    data: { id: "123", name: "Ost" },
+  });
 
-  expect(c1.shoppingList.items).toEqual([{ id: "123" }]);
+  expect(c1.shoppingList.items).toEqual([
+    { id: "123", name: "Ost", checked: false },
+  ]);
   expect(c2.shoppingList.items).toEqual([]);
   expect(serverShoppingList.items).toEqual([]);
 
   await c1.client.connect();
 
-  expect(c1.shoppingList.items).toEqual([{ id: "123" }]);
+  expect(c1.shoppingList.items).toEqual([
+    { id: "123", name: "Ost", checked: false },
+  ]);
   expect(c1.shoppingList.items).toEqual(c2.shoppingList.items);
   expect(c1.shoppingList.items).toEqual(serverShoppingList.items);
 });
@@ -159,9 +187,14 @@ test("Syncs events immediately for connected clients", async () => {
 
   await Promise.all([c1.client.connect(), c2.client.connect()]);
 
-  await c1.client.applyEvent({ name: "ADD_ITEM", data: { id: "123" } });
+  await c1.client.applyEvent({
+    name: "ADD_ITEM",
+    data: { id: "123", name: "Ost" },
+  });
 
-  expect(c1.shoppingList.items).toEqual([{ id: "123" }]);
+  expect(c1.shoppingList.items).toEqual([
+    { id: "123", name: "Ost", checked: false },
+  ]);
   expect(c1.shoppingList.items).toEqual(c2.shoppingList.items);
   expect(c1.shoppingList.items).toEqual(serverShoppingList.items);
 });
@@ -174,10 +207,19 @@ test("Handles events from multiple clients", async () => {
 
   await Promise.all([c1.client.connect(), c2.client.connect()]);
 
-  await c1.client.applyEvent({ name: "ADD_ITEM", data: { id: "123" } });
-  await c2.client.applyEvent({ name: "ADD_ITEM", data: { id: "456" } });
+  await c1.client.applyEvent({
+    name: "ADD_ITEM",
+    data: { id: "123", name: "Ost" },
+  });
+  await c2.client.applyEvent({
+    name: "ADD_ITEM",
+    data: { id: "456", name: "Skinka" },
+  });
 
-  expect(c1.shoppingList.items).toEqual([{ id: "123" }, { id: "456" }]);
+  expect(c1.shoppingList.items).toEqual([
+    { id: "123", name: "Ost", checked: false },
+    { id: "456", name: "Skinka", checked: false },
+  ]);
   expect(c1.shoppingList.items).toEqual(c2.shoppingList.items);
   expect(c1.shoppingList.items).toEqual(serverShoppingList.items);
 });
@@ -189,10 +231,18 @@ test("Events are idempotent", async () => {
 
   await c1.client.connect();
 
-  await c1.client.applyEvent({ name: "ADD_ITEM", data: { id: "123" } });
-  await c1.client.applyEvent({ name: "ADD_ITEM", data: { id: "123" } });
+  await c1.client.applyEvent({
+    name: "ADD_ITEM",
+    data: { id: "123", name: "Ost" },
+  });
+  await c1.client.applyEvent({
+    name: "ADD_ITEM",
+    data: { id: "123", name: "Skinka" },
+  });
 
-  expect(c1.shoppingList.items).toEqual([{ id: "123" }]);
+  expect(c1.shoppingList.items).toEqual([
+    { id: "123", name: "Ost", checked: false },
+  ]);
   expect(c1.shoppingList.items).toEqual(serverShoppingList.items);
 });
 
@@ -204,8 +254,14 @@ test("Derp", async () => {
 
   await c1.client.connect();
 
-  await c1.client.applyEvent({ name: "ADD_ITEM", data: { id: "123" } });
-  await c1.client.applyEvent({ name: "ADD_ITEM", data: { id: "456" } });
+  await c1.client.applyEvent({
+    name: "ADD_ITEM",
+    data: { id: "123", name: "Ost" },
+  });
+  await c1.client.applyEvent({
+    name: "ADD_ITEM",
+    data: { id: "456", name: "Ost" },
+  });
 
   await backendClient.handle();
 

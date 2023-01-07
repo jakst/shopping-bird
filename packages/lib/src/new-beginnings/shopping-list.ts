@@ -1,4 +1,4 @@
-import { ShoppinglistEvent, ShoppingListItem } from "./types";
+import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
 
 type OnChange = (list: ShoppingListItem[]) => void;
 
@@ -14,21 +14,52 @@ export class ShoppingList {
     this.onChange(this.items);
   }
 
-  addItem(item: ShoppingListItem) {
-    if (!this.items.some(({ id }) => item.id === id)) this.items.push(item);
-  }
-
-  applyEvents(events: ShoppinglistEvent[]) {
+  applyEvents(events: ShoppingListEvent[]) {
     events.forEach((event) => {
-      switch (event.name) {
+      const eventName = event.name;
+
+      switch (eventName) {
         case "ADD_ITEM": {
-          this.addItem(event.data);
+          // Duplicate ADD_ITEM events can be ignored
+          if (this.items.some(({ id }) => event.data.id === id)) return;
+          this.items.push({ ...event.data, checked: false });
+          break;
+        }
+
+        case "DELETE_ITEM": {
+          // Duplicate DELETE_ITEM events will not have any effect
+          this.items = this.items.filter((item) => item.id !== event.data.id);
+          break;
+        }
+
+        case "SET_ITEM_CHECKED": {
+          const item = this.items.find((item) => item.id === event.data.id);
+
+          // If the item does not exist, it has been deleted and the event is moot
+          if (!item) return;
+
+          item.checked = event.data.checked;
+          break;
+        }
+
+        case "RENAME_ITEM": {
+          const item = this.items.find((item) => item.id === event.data.id);
+
+          // If the item does not exist, it has been deleted and the event is moot
+          if (!item) return;
+
+          item.name = event.data.newName;
+          break;
+        }
+
+        case "CLEAR_CHECKED_ITEMS": {
+          this.items = this.items.filter((item) => item.checked === false);
           break;
         }
 
         default: {
-          const exhaustiveCheck: never = event.name;
-          throw new Error(`EXHAUSTIVE CHECK ${exhaustiveCheck as string}`); // TODO
+          const exhaustiveCheck: never = eventName;
+          throw new Error(`EXHAUSTIVE CHECK ${exhaustiveCheck as string}`);
         }
       }
     });

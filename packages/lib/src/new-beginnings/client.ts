@@ -1,10 +1,10 @@
 import { ClientServerConnection } from "./client-server-connection";
 import { EventQueue } from "./event-queue";
+import { ShoppingListEvent, ShoppingListItem } from "./newSchemas";
 import { ShoppingList } from "./shopping-list";
-import { ShoppinglistEvent, ShoppingListItem } from "./types";
 
 function compare(oldList: ShoppingListItem[], newList: ShoppingListItem[]) {
-  const events: ShoppinglistEvent[] = [];
+  const events: ShoppingListEvent[] = [];
 
   newList.forEach((newItem) => {
     const oldItem = oldList.find((oldItem) => oldItem.id === newItem.id);
@@ -18,7 +18,7 @@ interface ClientDeps {
   shoppingList: ShoppingList;
   remoteShoppingListCopy: ShoppingList;
   serverConnection: ClientServerConnection;
-  eventQueue: EventQueue<ShoppinglistEvent>;
+  eventQueue: EventQueue<ShoppingListEvent>;
 }
 
 export class Client {
@@ -39,7 +39,7 @@ export class Client {
     });
   }
 
-  async applyEvent(event: ShoppinglistEvent) {
+  async applyEvent(event: ShoppingListEvent) {
     // * Apply event to local and remote shoppingList
     this.$d.shoppingList.applyEvents([event]);
     this.$d.remoteShoppingListCopy.applyEvents([event]);

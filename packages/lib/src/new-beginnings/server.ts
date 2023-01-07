@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 import { EventQueue } from "./event-queue";
+import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
 import { ShoppingList } from "./shopping-list";
-import { type ShoppinglistEvent, type ShoppingListItem } from "./types";
 
 export interface ServerClientConnection {
   assignClientId(id: string): void;
@@ -9,22 +9,22 @@ export interface ServerClientConnection {
 }
 
 export class BackendClient {
-  #eventQueue: EventQueue<ShoppinglistEvent>;
+  #eventQueue: EventQueue<ShoppingListEvent>;
 
   constructor(
-    initialQueue: ShoppinglistEvent[],
-    onQueueChanged: (events: ShoppinglistEvent[]) => void,
+    initialQueue: ShoppingListEvent[],
+    onQueueChanged: (events: ShoppingListEvent[]) => void,
     // TODO: Narrow down event based on Key
     private eventHandlerMap: {
-      [Key in ShoppinglistEvent["name"]]: (
-        event: ShoppinglistEvent,
+      [Key in ShoppingListEvent["name"]]: (
+        event: ShoppingListEvent,
       ) => Promise<void>;
     },
   ) {
     this.#eventQueue = new EventQueue(initialQueue, onQueueChanged);
   }
 
-  doSomething(events: ShoppinglistEvent[]) {
+  doSomething(events: ShoppingListEvent[]) {
     events.forEach((event) => this.#eventQueue.push(event));
   }
 
@@ -63,7 +63,7 @@ export class Server {
     this.clients.delete(clientId);
   }
 
-  pushEvents(clientId: string, events: ShoppinglistEvent[]) {
+  pushEvents(clientId: string, events: ShoppingListEvent[]) {
     console.log(
       `[SERVER] Recieved ${events.length} event(s) from client ${clientId}`,
       events,

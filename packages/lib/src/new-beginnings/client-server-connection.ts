@@ -1,6 +1,6 @@
 import { Client } from "./client";
+import { type ShoppingListEvent } from "./newSchemas";
 import { type Server } from "./server";
-import { ShoppinglistEvent } from "./types";
 
 export interface ClientServerConnectionDeps {
   server: Server;
@@ -11,5 +11,5 @@ export interface ClientServerConnection {
   isConnected: boolean;
   connect(client: Client): Promise<void>;
   disconnect(): void;
-  pushEvents(events: ShoppinglistEvent[]): Promise<void>;
+  pushEvents(events: ShoppingListEvent[]): Promise<void>;
 }
