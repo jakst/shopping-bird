@@ -1,12 +1,12 @@
-import test from "node:test";
-import { Client, ClientServerConnection } from "./client";
-import { ShoppingList } from "./lib";
-import { Server, ServerClientConnection } from "./server";
-import { ShoppinglistEvent, ShoppingListItem } from "./types";
-
-interface FakeClientServerConnectionDeps {
-  server: Server;
-}
+import { expect, test } from "vitest";
+import { Client } from "./client";
+import {
+  type ClientServerConnection,
+  type ClientServerConnectionDeps,
+} from "./client-server-connection";
+import { Server, type ServerClientConnection } from "./server";
+import { ShoppingList } from "./shopping-list";
+import { type ShoppinglistEvent, type ShoppingListItem } from "./types";
 
 class FakeClientServerConnection
   implements ClientServerConnection, ServerClientConnection
@@ -14,7 +14,11 @@ class FakeClientServerConnection
   clientId: string | null = null;
   client: Client | null = null;
 
-  constructor(private $d: FakeClientServerConnectionDeps) {}
+  constructor(private $d: ClientServerConnectionDeps) {}
+
+  get isConnected() {
+    return this.clientId !== null;
+  }
 
   // Called from server
   assignClientId(id: string) {
@@ -23,13 +27,15 @@ class FakeClientServerConnection
 
   // Called from server
   notifyListChanged(items: ShoppingListItem[]) {
-    if (this.client) this.client.onRemoteListChanged(items);
+    if (this.client)
+      this.client.onRemoteListChanged(JSON.parse(JSON.stringify(items)));
     else throw new Error("No client set");
   }
 
   // Called from client
-  connect(client: Client) {
+  async connect(client: Client) {
     this.clientId = this.$d.server.connectClient(this);
+    this.client = client;
   }
 
   // Called from client
@@ -37,27 +43,146 @@ class FakeClientServerConnection
     if (this.clientId) {
       this.$d.server.disconnectClient(this.clientId);
       this.clientId = null;
+      this.client = null;
     } else {
       console.warn("Attempt to disconnect while not connected");
     }
   }
 
   // Called from client
-  pushEvents(events: ShoppinglistEvent[]) {
-    if (this.clientId) this.$d.server.pushEvents(this.clientId, events);
+  async pushEvents(events: ShoppinglistEvent[]) {
+    if (this.clientId)
+      this.$d.server.pushEvents(
+        this.clientId,
+        JSON.parse(JSON.stringify(events)),
+      );
     else throw new Error("Not connected to server");
   }
 }
 
-test("", () => {
-  const server = new Server({
-    shoppingList: new ShoppingList([]),
+function setupTest() {
+  const serverShoppingList = new ShoppingList([], (items) => {
+    console.log(`[SERVER] Persisting list with ${items.length} item(s)`);
   });
+  const server = new Server({ shoppingList: serverShoppingList });
 
-  const serverConnection = new FakeClientServerConnection({ server });
+  function createClient() {
+    const serverConnection = new FakeClientServerConnection({ server });
 
-  const client1 = new Client({
-    shoppingList: new ShoppingList([]),
-    serverConnection,
-  });
+    const onEventQueueChanged = (events: ShoppinglistEvent[]): void => {
+      // console.log(
+      //   `[CLIENT:${serverConnection.clientId}] Persisting ${events.length} event(s)`,
+      // );
+    };
+
+    const remoteShoppingListCopy = new ShoppingList([], (items) => {
+      // console.log(
+      //   `[CLIENT:${serverConnection.clientId} COPY] Persisting list with ${items.length} item(s)`,
+      // );
+    });
+
+    const shoppingList = new ShoppingList([], (items) => {
+      // console.log(
+      //   `[CLIENT:${serverConnection.clientId}] Persisting list with ${items.length} item(s)`,
+      // );
+    });
+
+    const client = new Client({
+      serverConnection,
+      shoppingList,
+      remoteShoppingListCopy,
+      initialEventQueue: [],
+      onEventQueueChanged,
+    });
+
+    return {
+      serverConnection,
+      shoppingList,
+      remoteShoppingListCopy,
+      client,
+    };
+  }
+
+  return { server, serverShoppingList, createClient };
+}
+
+test("Applies events locally when not connected", async () => {
+  const { serverShoppingList, createClient } = setupTest();
+
+  const c1 = createClient();
+  const c2 = createClient();
+
+  await c2.client.connect();
+
+  await c1.client.applyEvent({ name: "ADD_ITEM", data: { id: "123" } });
+
+  expect(c1.shoppingList.items).toEqual([{ id: "123" }]);
+  expect(c2.shoppingList.items).toEqual([]);
+  expect(serverShoppingList.items).toEqual([]);
+});
+
+test("Syncs events to server and other clients when connected", async () => {
+  const { serverShoppingList, createClient } = setupTest();
+
+  const c1 = createClient();
+  const c2 = createClient();
+
+  await c2.client.connect();
+
+  await c1.client.applyEvent({ name: "ADD_ITEM", data: { id: "123" } });
+
+  expect(c1.shoppingList.items).toEqual([{ id: "123" }]);
+  expect(c2.shoppingList.items).toEqual([]);
+  expect(serverShoppingList.items).toEqual([]);
+
+  await c1.client.connect();
+
+  expect(c1.shoppingList.items).toEqual([{ id: "123" }]);
+  expect(c1.shoppingList.items).toEqual(c2.shoppingList.items);
+  expect(c1.shoppingList.items).toEqual(serverShoppingList.items);
+});
+
+test("Syncs events immediately for connected clients", async () => {
+  const { serverShoppingList, createClient } = setupTest();
+
+  const c1 = createClient();
+  const c2 = createClient();
+
+  await Promise.all([c1.client.connect(), c2.client.connect()]);
+
+  await c1.client.applyEvent({ name: "ADD_ITEM", data: { id: "123" } });
+
+  expect(c1.shoppingList.items).toEqual([{ id: "123" }]);
+  expect(c1.shoppingList.items).toEqual(c2.shoppingList.items);
+  expect(c1.shoppingList.items).toEqual(serverShoppingList.items);
+});
+
+test("Handles events from multiple clients", async () => {
+  const { serverShoppingList, createClient } = setupTest();
+
+  const c1 = createClient();
+  const c2 = createClient();
+
+  await Promise.all([c1.client.connect(), c2.client.connect()]);
+
+  await c1.client.applyEvent({ name: "ADD_ITEM", data: { id: "123" } });
+  await c2.client.applyEvent({ name: "ADD_ITEM", data: { id: "456" } });
+
+  expect(c1.shoppingList.items).toEqual([{ id: "123" }, { id: "456" }]);
+  expect(c1.shoppingList.items).toEqual(c2.shoppingList.items);
+  expect(c1.shoppingList.items).toEqual(serverShoppingList.items);
+});
+
+test("Events are idempotent", async () => {
+  const { serverShoppingList, createClient } = setupTest();
+
+  const c1 = createClient();
+
+  await c1.client.connect();
+
+  await c1.client.applyEvent({ name: "ADD_ITEM", data: { id: "123" } });
+  await c1.client.applyEvent({ name: "ADD_ITEM", data: { id: "123" } });
+
+  expect(c1.shoppingList.items).toEqual([{ id: "123" }]);
+  expect(c1.shoppingList.items).toEqual(serverShoppingList.items);
 });

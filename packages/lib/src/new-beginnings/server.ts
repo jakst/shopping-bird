@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import { ShoppingList } from "./lib";
+import { ShoppingList } from "./shopping-list";
 import { ShoppinglistEvent, ShoppingListItem } from "./types";
 
 export interface ServerClientConnection {
@@ -20,6 +20,10 @@ export class Server {
     const clientId = nanoid();
     this.clients.set(clientId, client);
 
+    console.log(
+      `[SERVER] ${this.clients.size} client(s) connected (${clientId})`,
+    );
+
     return clientId;
   }
 
@@ -28,6 +32,11 @@ export class Server {
   }
 
   pushEvents(clientId: string, events: ShoppinglistEvent[]) {
+    console.log(
+      `[SERVER] Recieved ${events.length} event(s) from client ${clientId}`,
+      events,
+    );
+
     // Apply events
     this.$d.shoppingList.applyEvents(events);
 

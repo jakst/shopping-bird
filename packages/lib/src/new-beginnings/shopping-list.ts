@@ -1,14 +1,21 @@
 import { ShoppinglistEvent, ShoppingListItem } from "./types";
 
+type OnChange = (list: ShoppingListItem[]) => void;
+
 export class ShoppingList {
   items: ShoppingListItem[];
 
-  constructor(initialItems: ShoppingListItem[]) {
+  constructor(initialItems: ShoppingListItem[], private onChange: OnChange) {
     this.items = initialItems;
   }
 
+  replaceList(items: ShoppingListItem[]) {
+    this.items = items;
+    this.onChange(this.items);
+  }
+
   addItem(item: ShoppingListItem) {
-    this.items.push(item);
+    if (!this.items.some(({ id }) => item.id === id)) this.items.push(item);
   }
 
   applyEvents(events: ShoppinglistEvent[]) {
@@ -25,5 +32,7 @@ export class ShoppingList {
         }
       }
     });
+
+    this.onChange(this.items);
   }
 }
