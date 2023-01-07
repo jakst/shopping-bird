@@ -18,12 +18,12 @@
     "clean": "git clean -xfd packages -e packages/app/.env -e packages/server/.env && yarn"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.45.0",
-    "@typescript-eslint/parser": "^5.45.0",
-    "eslint": "^8.28.0",
-    "prettier": "^2.8.0",
+    "@typescript-eslint/eslint-plugin": "^5.48.0",
+    "@typescript-eslint/parser": "^5.48.0",
+    "eslint": "^8.31.0",
+    "prettier": "^2.8.2",
     "turbo": "^1.6.3",
-    "typescript": "^4.9.3"
+    "typescript": "^4.9.4"
   },
   "resolutions": {
     "solid-start@^0.2.6": "patch:solid-start@npm%3A0.2.6#./.yarn/patches/solid-start-npm-0.2.6-671b274161.patch"

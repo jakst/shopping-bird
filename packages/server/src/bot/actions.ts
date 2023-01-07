@@ -97,6 +97,7 @@ export const rename = createAction(async (oldName: string, newName: string) => {
 
   const page = await getPage();
 
+  console.log("Renaming", { oldName, newName });
   const [nameDisplay] = (await page.$x(
     `//ul/li//div[@role="button" and text()="${oldName}"]`,
   )) as [ElementHandle<HTMLDivElement>];
