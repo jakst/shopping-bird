@@ -45,8 +45,12 @@ export class Server {
     );
 
     // Apply events
-    this.$d.shoppingList.applyEvents(events);
-    this.$d.backendClient.pushEvents(events);
+    const results = this.$d.shoppingList.applyEvents(events);
+    const successfulEvents = results
+      .filter(({ result }) => result)
+      .map(({ event }) => event);
+
+    this.$d.backendClient.pushEvents(successfulEvents);
 
     // Notify other clients of changes to the list
     for (const [currentClientId, client] of this.clients.entries()) {

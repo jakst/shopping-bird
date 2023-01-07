@@ -1,35 +1,24 @@
 import { nanoid } from "nanoid";
 import { dedupeAsync } from "./dedupeAsync";
 import { EventQueue } from "./event-queue";
-import {
-  GetShoppingListEventData,
-  type ShoppingListEvent,
-  type ShoppingListItem,
-} from "./newSchemas";
+import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
+import { applyEvent } from "./shopping-list";
 
 interface BackendClientDeps {
   eventQueue: EventQueue<ShoppingListEvent[]>;
   initialList: ShoppingListItem[];
   onListChanged: (list: ShoppingListItem[]) => void;
-  ensureFreshList: () => Promise<void>;
-  getList: () => Promise<ListItem[]>;
-  eventHandlerMap: {
-    [EventName in ShoppingListEvent["name"]]: (
-      eventData: GetShoppingListEventData<EventName>,
-    ) => Promise<void>;
-  };
+  bot: BackendClientBot;
 }
 
 type ListItem = Pick<ShoppingListItem, "name" | "checked">;
 
 export class BackendClient {
   onEventsReturned: null | ((events: ShoppingListEvent[]) => void) = null;
-  previousListState: ShoppingListItem[] = [];
+  #previousListState: ShoppingListItem[];
 
   constructor(private $d: BackendClientDeps) {
-    this.previousListState = $d.initialList;
-
-    this.#startProcessor.bind(this);
+    this.#previousListState = $d.initialList;
   }
 
   async flush() {
@@ -37,13 +26,14 @@ export class BackendClient {
   }
 
   pushEvents(events: ShoppingListEvent[]) {
-    this.$d.eventQueue.push(events);
-    this.#waitAndStart();
+    if (events.length > 0) {
+      this.$d.eventQueue.push(events);
+      this.#waitAndStart();
+    }
   }
 
   #waitAndStart() {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    return dedupeAsync(this.#startProcessor);
+    return dedupeAsync(this.#startProcessor.bind(this));
   }
 
   async #startProcessor() {
@@ -57,50 +47,68 @@ export class BackendClient {
     if (!this.$d.eventQueue.isEmpty) await this.#startProcessor();
   }
 
-  async #processEvents(events: ShoppingListEvent[]) {
-    await this.$d.ensureFreshList();
+  async #processEvents(events: readonly ShoppingListEvent[]) {
+    // Make a copy of the list old so we can mutate, while diffing against the old state
+    const oldListState = this.#previousListState;
+    const newListState = structuredClone(oldListState);
+
+    const listBeforeChanges = await this.$d.bot.getList();
 
     // Generate outgoing events before we make any changes
-    const listBeforeChanges = await this.$d.getList();
-    const generatedEvents = generateEvents(
-      listBeforeChanges,
-      this.previousListState,
-    );
-    if (generatedEvents.length > 0) this.onEventsReturned?.(generatedEvents);
+    const eventsToReturn = generateEvents(listBeforeChanges, oldListState);
+    if (eventsToReturn.length > 0) this.onEventsReturned?.(eventsToReturn);
 
     // Apply incoming events
     for (const event of events) {
-      const eventHandler = this.$d.eventHandlerMap[event.name] as (
-        data: GetShoppingListEventData<typeof event.name>,
-      ) => Promise<void>;
-
-      await eventHandler(event.data);
+      const eventWasAccepted = applyEvent(newListState, event);
+      if (eventWasAccepted) await this.#executeEvent(event, oldListState);
     }
 
-    // Read full state of list again after applied changes, without refreshing,
-    // so we don't have to deal with possible bugs from replaying events.
-    const listAfterChanges = await this.$d.getList();
+    this.$d.onListChanged(newListState);
+    this.#previousListState = newListState;
+  }
 
-    // Map the new state of the list with ids and notify
-    this.previousListState = listAfterChanges.map((item) => {
-      const id =
-        this.previousListState.find(({ name }) => name === item.name)?.id ??
-        generatedEvents.find(
-          (event) => event.name === "ADD_ITEM" && event.data.name === item.name,
-        )?.data?.id;
+  async #executeEvent(
+    event: ShoppingListEvent,
+    previousListState: readonly ShoppingListItem[],
+  ) {
+    switch (event.name) {
+      case "ADD_ITEM": {
+        await this.$d.bot.ADD_ITEM(event.data.name);
+        break;
+      }
 
-      if (!id) throw new Error("Missing ID. This should not be possible.");
+      case "DELETE_ITEM": {
+        const item = previousListState.find(({ id }) => id === event.data.id);
+        if (item) await this.$d.bot.DELETE_ITEM(item.name);
+        break;
+      }
 
-      return { ...item, id };
-    });
+      case "SET_ITEM_CHECKED": {
+        const item = previousListState.find(({ id }) => id === event.data.id);
+        if (item)
+          await this.$d.bot.SET_ITEM_CHECKED(item.name, event.data.checked);
+        break;
+      }
 
-    this.$d.onListChanged(this.previousListState);
+      case "RENAME_ITEM": {
+        const item = previousListState.find(({ id }) => id === event.data.id);
+        if (item) await this.$d.bot.RENAME_ITEM(item.name, event.data.newName);
+
+        break;
+      }
+
+      case "CLEAR_CHECKED_ITEMS": {
+        await this.$d.bot.CLEAR_CHECKED_ITEMS();
+        break;
+      }
+    }
   }
 }
 
 function generateEvents(
-  list: ListItem[],
-  previousListState: ShoppingListItem[],
+  list: readonly ListItem[],
+  previousListState: readonly ShoppingListItem[],
 ) {
   const generatedEvents: ShoppingListEvent[] = [];
 
@@ -108,6 +116,8 @@ function generateEvents(
     const itemFromBefore = previousListState.find(
       ({ name }) => name === newItem.name,
     );
+
+    // console.log({ itemFromBefore });
 
     if (!itemFromBefore) {
       const id = nanoid();
@@ -137,4 +147,13 @@ function generateEvents(
   });
 
   return generatedEvents;
+}
+
+export interface BackendClientBot {
+  getList(): Promise<ListItem[]>;
+  ADD_ITEM(name: string): Promise<void>;
+  DELETE_ITEM(name: string): Promise<void>;
+  RENAME_ITEM(oldName: string, newName: string): Promise<void>;
+  SET_ITEM_CHECKED(name: string, checked: boolean): Promise<void>;
+  CLEAR_CHECKED_ITEMS(): Promise<void>;
 }

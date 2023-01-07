@@ -15,55 +15,78 @@ export class ShoppingList {
   }
 
   applyEvents(events: ShoppingListEvent[]) {
-    events.forEach((event) => {
-      const eventName = event.name;
-
-      switch (eventName) {
-        case "ADD_ITEM": {
-          // Duplicate ADD_ITEM events can be ignored
-          if (this.items.some(({ id }) => event.data.id === id)) return;
-          this.items.push({ ...event.data, checked: false });
-          break;
-        }
-
-        case "DELETE_ITEM": {
-          // Duplicate DELETE_ITEM events will not have any effect
-          this.items = this.items.filter((item) => item.id !== event.data.id);
-          break;
-        }
-
-        case "SET_ITEM_CHECKED": {
-          const item = this.items.find((item) => item.id === event.data.id);
-
-          // If the item does not exist, it has been deleted and the event is moot
-          if (!item) return;
-
-          item.checked = event.data.checked;
-          break;
-        }
-
-        case "RENAME_ITEM": {
-          const item = this.items.find((item) => item.id === event.data.id);
-
-          // If the item does not exist, it has been deleted and the event is moot
-          if (!item) return;
-
-          item.name = event.data.newName;
-          break;
-        }
-
-        case "CLEAR_CHECKED_ITEMS": {
-          this.items = this.items.filter((item) => item.checked === false);
-          break;
-        }
-
-        default: {
-          const exhaustiveCheck: never = eventName;
-          throw new Error(`EXHAUSTIVE CHECK ${exhaustiveCheck as string}`);
-        }
-      }
-    });
+    const results = events.map((event) => ({
+      event,
+      result: applyEvent(this.items, event),
+    }));
 
     this.onChange(this.items);
+    return results;
   }
+}
+
+export function applyEvent(
+  list: ShoppingListItem[],
+  event: ShoppingListEvent,
+): boolean {
+  const eventName = event.name;
+
+  switch (eventName) {
+    case "ADD_ITEM": {
+      const alreadyExists = list.some(({ id }) => event.data.id === id);
+      // console.log({ alreadyExists, list, event });
+
+      if (alreadyExists) return false; // Duplicate ADD_ITEM events can be ignored
+      list.push({ ...event.data, checked: false });
+      break;
+    }
+
+    case "DELETE_ITEM": {
+      // Duplicate DELETE_ITEM events will not have any effect
+      const itemIndex = list.findIndex((item) => item.id === event.data.id);
+
+      if (itemIndex < 0) return false;
+
+      list.splice(itemIndex, 1);
+
+      break;
+    }
+
+    case "SET_ITEM_CHECKED": {
+      const item = list.find((item) => item.id === event.data.id);
+
+      // If the item does not exist, it has been deleted and the event is moot
+      if (!item) return false;
+
+      item.checked = event.data.checked;
+      break;
+    }
+
+    case "RENAME_ITEM": {
+      const item = list.find((item) => item.id === event.data.id);
+
+      // If the item does not exist, it has been deleted and the event is moot
+      if (!item) return false;
+
+      item.name = event.data.newName;
+      break;
+    }
+
+    case "CLEAR_CHECKED_ITEMS": {
+      let i = -1;
+      do {
+        i = list.findIndex((item) => item.checked === true);
+        list.splice(i, 1);
+      } while (i >= 0);
+
+      break;
+    }
+
+    default: {
+      const exhaustiveCheck: never = eventName;
+      throw new Error(`EXHAUSTIVE CHECK ${exhaustiveCheck as string}`);
+    }
+  }
+
+  return true;
 }
