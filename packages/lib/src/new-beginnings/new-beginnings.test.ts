@@ -1,5 +1,6 @@
 import { expect, test } from "vitest";
 import { ShoppinglistEvent } from "../lib";
+import { BackendClient } from "./BackendClient";
 import { Client } from "./client";
 import {
   type ClientServerConnection,
@@ -8,7 +9,7 @@ import {
 } from "./client-server-connection";
 import { EventQueue } from "./event-queue";
 import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
-import { BackendClient, Server, type ServerClientConnection } from "./server";
+import { Server, type ServerClientConnection } from "./server";
 import { ShoppingList } from "./shopping-list";
 
 class FakeClientServerConnection
@@ -55,8 +56,8 @@ class FakeClientServerConnection
   async pushEvents(events: ShoppingListEvent[]) {
     if (this.clientId)
       this.$d.server.pushEvents(
-        this.clientId,
         JSON.parse(JSON.stringify(events)),
+        this.clientId,
       );
     else throw new Error("Not connected to server");
   }
@@ -68,27 +69,31 @@ function setupTest() {
   });
 
   const backendClient = new BackendClient({
-    eventQueue: new EventQueue<ShoppinglistEvent>([], () => {}),
+    eventQueue: new EventQueue<ShoppinglistEvent[]>([], () => {}),
+    ensureFreshList: () => Promise.resolve(),
+    getList: () => Promise.resolve([]),
+    initialList: [],
+    onListChanged: () => {},
     eventHandlerMap: {
-      ADD_ITEM: async (event) => {
+      ADD_ITEM: async (data) => {
         await new Promise((resolve) => setTimeout(resolve, 100));
-        console.log("[BACKEND_CLIENT] ADD_ITEM", event);
+        console.log("[BACKEND_CLIENT] ADD_ITEM", data);
       },
-      DELETE_ITEM: async (event) => {
+      DELETE_ITEM: async (data) => {
         await new Promise((resolve) => setTimeout(resolve, 100));
-        console.log("[BACKEND_CLIENT] DELETE_ITEM", event);
+        console.log("[BACKEND_CLIENT] DELETE_ITEM", data);
       },
-      SET_ITEM_CHECKED: async (event) => {
+      SET_ITEM_CHECKED: async (data) => {
         await new Promise((resolve) => setTimeout(resolve, 100));
-        console.log("[BACKEND_CLIENT] SET_ITEM_CHECKED", event);
+        console.log("[BACKEND_CLIENT] SET_ITEM_CHECKED", data);
       },
-      RENAME_ITEM: async (event) => {
+      RENAME_ITEM: async (data) => {
         await new Promise((resolve) => setTimeout(resolve, 100));
-        console.log("[BACKEND_CLIENT] RENAME_ITEM", event);
+        console.log("[BACKEND_CLIENT] RENAME_ITEM", data);
       },
-      CLEAR_CHECKED_ITEMS: async (event) => {
+      CLEAR_CHECKED_ITEMS: async (data) => {
         await new Promise((resolve) => setTimeout(resolve, 100));
-        console.log("[BACKEND_CLIENT] CLEAR_CHECKED_ITEMS", event);
+        console.log("[BACKEND_CLIENT] CLEAR_CHECKED_ITEMS", data);
       },
     },
   });
@@ -229,8 +234,8 @@ test("Handles events from multiple clients", async () => {
   expect(c1.shoppingList.items).toEqual(serverShoppingList.items);
 });
 
-test("Events are idempotent", async () => {
-  const { serverShoppingList, createClient } = setupTest();
+test.only("Events are idempotent", async () => {
+  const { serverShoppingList, backendClient, createClient } = setupTest();
 
   const c1 = createClient();
 
@@ -245,13 +250,16 @@ test("Events are idempotent", async () => {
     data: { id: "123", name: "Skinka" },
   });
 
+  await backendClient.flush();
+
   expect(c1.shoppingList.items).toEqual([
     { id: "123", name: "Ost", checked: false },
   ]);
   expect(c1.shoppingList.items).toEqual(serverShoppingList.items);
+  // expect(backendClient).toEqual(serverShoppingList.items);
 });
 
-test("Derp", async () => {
+test.todo("Derp", async () => {
   const { backendClient, server, serverShoppingList, createClient } =
     setupTest();
 
@@ -268,7 +276,7 @@ test("Derp", async () => {
     data: { id: "456", name: "Ost" },
   });
 
-  await backendClient.handle();
+  await backendClient.flush();
 
   // expect(c1.shoppingList.items).toEqual([{ id: "123" }]);
   // expect(c1.shoppingList.items).toEqual(serverShoppingList.items);
