@@ -1,6 +1,7 @@
 import { executablePath, Protocol } from "puppeteer";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
+import { env } from "../env";
 import { deleteCookies, loadCookies, saveCookies } from "./cookies";
 
 puppeteer.use(StealthPlugin());
@@ -17,6 +18,7 @@ const getBrowser = cache(() => {
   console.log("[setup] Setting up browser...");
   return puppeteer.launch({
     executablePath: executablePath(),
+    headless: env.FULL_BROWSER !== "1",
     args: ["--no-sandbox"],
     timeout: 5_000,
   });

@@ -17,6 +17,7 @@ const envSchema = z
     HOST: z.string().default("localhost"),
     REDIS_URL: z.string(),
     FRONTEND_URL: z.string().url(),
+    FULL_BROWSER: z.literal("1").optional(),
   })
   .transform((value) => {
     const { NODE_ENV, ...rest } = value;
