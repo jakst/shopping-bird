@@ -26,29 +26,29 @@ export class Server {
     this.clients.set(clientId, client);
 
     console.log(
-      `[SERVER] ${this.clients.size} client(s) connected (${clientId})`,
+      `[SERVER] ${this.clients.size} client(s) (${clientId} connected)`,
     );
+
+    client.notifyListChanged(this.$d.shoppingList.items);
 
     return clientId;
   }
 
   disconnectClient(clientId: string) {
     this.clients.delete(clientId);
+
+    console.log(
+      `[SERVER] ${this.clients.size} client(s) (${clientId} disconnected)`,
+    );
   }
 
   pushEvents(events: ShoppingListEvent[], clientId?: string) {
-    if (events.length === 0) return;
-
+    const successfulEvents = this.$d.shoppingList.applyEvents(events);
     console.log(
-      `[SERVER] Recieved ${events.length} event(s) from client ${clientId}`,
-      events,
+      `[SERVER] Recieved ${events.length} event(s) from client ${clientId}. ${successfulEvents.length} of them were successful.`,
     );
 
-    // Apply events
-    const results = this.$d.shoppingList.applyEvents(events);
-    const successfulEvents = results
-      .filter(({ result }) => result)
-      .map(({ event }) => event);
+    if (successfulEvents.length === 0) return;
 
     this.$d.backendClient.pushEvents(successfulEvents);
 

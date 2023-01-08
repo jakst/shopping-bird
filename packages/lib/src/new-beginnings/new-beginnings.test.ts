@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { ShoppinglistEvent } from "../lib";
-import { BackendClient, BackendClientBot } from "./BackendClient";
+import { BackendClient } from "./BackendClient";
 import { Client } from "./client";
 import {
   type ClientServerConnection,
@@ -8,6 +8,7 @@ import {
   type OnRemoteListChangedCallback,
 } from "./client-server-connection";
 import { EventQueue } from "./event-queue";
+import { MockBackendBot } from "./mocks/MockBackendBot";
 import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
 import { Server, type ServerClientConnection } from "./server";
 import { ShoppingList } from "./shopping-list";
@@ -31,15 +32,15 @@ class FakeClientServerConnection
 
   // Called from server
   notifyListChanged(items: ShoppingListItem[]) {
-    if (this.clientId && this.onRemoteListChanged)
-      this.onRemoteListChanged(JSON.parse(JSON.stringify(items)));
-    else throw new Error("No client set");
+    if (this.onRemoteListChanged)
+      this.onRemoteListChanged(structuredClone(items));
+    else throw new Error("No onRemoteListChanged callback");
   }
 
   // Called from client
   async connect(onRemoteListChanged: OnRemoteListChangedCallback) {
-    this.clientId = this.$d.server.connectClient(this);
     this.onRemoteListChanged = onRemoteListChanged;
+    this.clientId = this.$d.server.connectClient(this);
   }
 
   // Called from client
@@ -55,60 +56,8 @@ class FakeClientServerConnection
   // Called from client
   async pushEvents(events: ShoppingListEvent[]) {
     if (this.clientId)
-      this.$d.server.pushEvents(
-        JSON.parse(JSON.stringify(events)),
-        this.clientId,
-      );
+      this.$d.server.pushEvents(structuredClone(events), this.clientId);
     else throw new Error("Not connected to server");
-  }
-}
-
-class MockBackendBot implements BackendClientBot {
-  constructor(private shoppingList: Omit<ShoppingListItem, "id">[]) {}
-
-  async getList() {
-    return this.shoppingList;
-  }
-
-  async ADD_ITEM(name: string) {
-    console.log("[BACKEND_CLIENT] ADD_ITEM", name);
-
-    await new Promise((resolve) => setTimeout(resolve, 20));
-    if (!this.shoppingList.some((item) => item.name === name))
-      this.shoppingList.push({ name, checked: false });
-  }
-
-  async DELETE_ITEM(name: string) {
-    console.log("[BACKEND_CLIENT] DELETE_ITEM", name);
-
-    await new Promise((resolve) => setTimeout(resolve, 20));
-    const index = this.shoppingList.findIndex((item) => item.name === name);
-    if (index >= 0) this.shoppingList.splice(index, 1);
-  }
-
-  async RENAME_ITEM(oldName: string, newName: string) {
-    console.log("[BACKEND_CLIENT] RENAME_ITEM", { oldName, newName });
-
-    await new Promise((resolve) => setTimeout(resolve, 20));
-    const item = this.shoppingList.find((item) => item.name === oldName);
-    if (item) item.name = newName;
-  }
-
-  async SET_ITEM_CHECKED(name: string, checked: boolean) {
-    console.log("[BACKEND_CLIENT] SET_ITEM_CHECKED", { name, checked });
-
-    await new Promise((resolve) => setTimeout(resolve, 20));
-    const item = this.shoppingList.find((item) => item.name === name);
-    if (item) item.checked = checked;
-  }
-
-  async CLEAR_CHECKED_ITEMS() {
-    console.log("[BACKEND_CLIENT] CLEAR_CHECKED_ITEMS");
-
-    await new Promise((resolve) => setTimeout(resolve, 20));
-    for (let i = this.shoppingList.length - 1; i >= 0; i--) {
-      if (this.shoppingList[i].checked) this.shoppingList.splice(i, 1);
-    }
   }
 }
 
@@ -131,6 +80,8 @@ function setupTest() {
     backendClient,
   });
 
+  const clients: Client[] = [];
+  const testLists: ShoppingListItem[][] = [serverShoppingList.items];
   function createClient() {
     const serverConnection = new FakeClientServerConnection({ server });
 
@@ -143,8 +94,11 @@ function setupTest() {
     const shoppingList = new ShoppingList([], (items) => {
       // console.log(
       //   `[CLIENT:${serverConnection.clientId}] Persisting list with ${items.length} item(s)`,
+      //   items,
       // );
     });
+
+    testLists.push(shoppingList.items);
 
     const eventQueue = new EventQueue<ShoppingListEvent>([], (events) => {
       // console.log(
@@ -159,6 +113,8 @@ function setupTest() {
       eventQueue,
     });
 
+    clients.push(client);
+
     return {
       serverConnection,
       shoppingList,
@@ -167,20 +123,49 @@ function setupTest() {
     };
   }
 
+  async function playOutListSync() {
+    await Promise.all([
+      ...clients.map((client) => client.connect()),
+      backendClient.flush(),
+    ]);
+  }
+
+  function assertEqualLists() {
+    const sortedLists = testLists.map((list) =>
+      list.sort((a, b) => a.name.localeCompare(b.name)),
+    );
+
+    sortedLists.forEach((list, i) => {
+      if (i === sortedLists.length - 1 && backendList) {
+        expect(
+          backendList.sort((a, b) => a.name.localeCompare(b.name)),
+        ).toEqual(list.map(({ id, ...rest }) => rest));
+      } else {
+        expect(list).toEqual(sortedLists[i + 1]);
+      }
+    });
+  }
+
   return {
     server,
     backendClient,
     backendList,
     serverShoppingList,
     createClient,
+    assertEqualLists,
+    playOutListSync,
   };
 }
 
-test("Applies events locally when not connected", async () => {
-  const { serverShoppingList, createClient } = setupTest();
+function createRandomString() {
+  return (Math.random() * 100_000).toFixed();
+}
 
-  const c1 = createClient();
-  const c2 = createClient();
+test("Applies events locally when not connected", async () => {
+  const setup = setupTest();
+
+  const c1 = setup.createClient();
+  const c2 = setup.createClient();
 
   await c2.client.connect();
 
@@ -193,14 +178,13 @@ test("Applies events locally when not connected", async () => {
     { id: "123", name: "Ost", checked: false },
   ]);
   expect(c2.shoppingList.items).toEqual([]);
-  expect(serverShoppingList.items).toEqual([]);
+  expect(setup.serverShoppingList.items).toEqual([]);
 });
 
 test("Syncs events to server and other clients when connected", async () => {
-  const { serverShoppingList, createClient } = setupTest();
-
-  const c1 = createClient();
-  const c2 = createClient();
+  const setup = setupTest();
+  const c1 = setup.createClient();
+  const c2 = setup.createClient();
 
   await c2.client.connect();
 
@@ -213,7 +197,7 @@ test("Syncs events to server and other clients when connected", async () => {
     { id: "123", name: "Ost", checked: false },
   ]);
   expect(c2.shoppingList.items).toEqual([]);
-  expect(serverShoppingList.items).toEqual([]);
+  expect(setup.serverShoppingList.items).toEqual([]);
 
   await c1.client.connect();
 
@@ -221,14 +205,14 @@ test("Syncs events to server and other clients when connected", async () => {
     { id: "123", name: "Ost", checked: false },
   ]);
   expect(c1.shoppingList.items).toEqual(c2.shoppingList.items);
-  expect(c1.shoppingList.items).toEqual(serverShoppingList.items);
+  expect(c1.shoppingList.items).toEqual(setup.serverShoppingList.items);
 });
 
 test("Syncs events immediately for connected clients", async () => {
-  const { serverShoppingList, createClient } = setupTest();
+  const setup = setupTest();
 
-  const c1 = createClient();
-  const c2 = createClient();
+  const c1 = setup.createClient();
+  const c2 = setup.createClient();
 
   await Promise.all([c1.client.connect(), c2.client.connect()]);
 
@@ -241,14 +225,14 @@ test("Syncs events immediately for connected clients", async () => {
     { id: "123", name: "Ost", checked: false },
   ]);
   expect(c1.shoppingList.items).toEqual(c2.shoppingList.items);
-  expect(c1.shoppingList.items).toEqual(serverShoppingList.items);
+  expect(c1.shoppingList.items).toEqual(setup.serverShoppingList.items);
 });
 
 test("Handles events from multiple clients", async () => {
-  const { serverShoppingList, createClient } = setupTest();
+  const setup = setupTest();
 
-  const c1 = createClient();
-  const c2 = createClient();
+  const c1 = setup.createClient();
+  const c2 = setup.createClient();
 
   await Promise.all([c1.client.connect(), c2.client.connect()]);
 
@@ -266,14 +250,13 @@ test("Handles events from multiple clients", async () => {
     { id: "456", name: "Skinka", checked: false },
   ]);
   expect(c1.shoppingList.items).toEqual(c2.shoppingList.items);
-  expect(c1.shoppingList.items).toEqual(serverShoppingList.items);
+  expect(c1.shoppingList.items).toEqual(setup.serverShoppingList.items);
 });
 
 test("Events are idempotent", async () => {
-  const { serverShoppingList, backendClient, backendList, createClient } =
-    setupTest();
+  const setup = setupTest();
 
-  const c1 = createClient();
+  const c1 = setup.createClient();
 
   await c1.client.connect();
 
@@ -286,36 +269,127 @@ test("Events are idempotent", async () => {
     data: { id: "123", name: "Skinka" },
   });
 
-  await backendClient.flush();
+  await setup.playOutListSync();
 
   expect(c1.shoppingList.items).toEqual([
     { id: "123", name: "Ost", checked: false },
   ]);
-  expect(c1.shoppingList.items).toEqual(serverShoppingList.items);
-  expect(c1.shoppingList.items.map(({ id, ...rest }) => ({ ...rest }))).toEqual(
-    backendList,
-  );
+  setup.assertEqualLists();
 });
 
-test.todo("Derp", async () => {
-  const { backendClient, server, serverShoppingList, createClient } =
-    setupTest();
+test("Rename an item before syncing the creation event", async () => {
+  const setup = setupTest();
 
-  const c1 = createClient();
+  const c1 = setup.createClient();
+  const c2 = setup.createClient();
 
   await c1.client.connect();
 
-  await c1.client.applyEvent({
+  await c2.client.applyEvent({
     name: "ADD_ITEM",
-    data: { id: "123", name: "Ost" },
+    data: { id: "123", name: "Old name..." },
   });
-  await c1.client.applyEvent({
-    name: "ADD_ITEM",
-    data: { id: "456", name: "Ost" },
+  await c2.client.applyEvent({
+    name: "RENAME_ITEM",
+    data: { id: "123", newName: "New name!!!" },
   });
 
-  await backendClient.flush();
+  await setup.playOutListSync();
+  setup.assertEqualLists();
+});
 
-  // expect(c1.shoppingList.items).toEqual([{ id: "123" }]);
-  // expect(c1.shoppingList.items).toEqual(serverShoppingList.items);
+// TODO: This still generates errors occasionally
+// TODO: Needs to extend to generating changes in the backend-list
+test("Random", async () => {
+  const setup = setupTest();
+
+  const c1 = setup.createClient();
+  const c2 = setup.createClient();
+
+  await c1.client.connect();
+  await c2.client.connect();
+
+  const eventWeights: [ShoppingListEvent["name"], number][] = [
+    ["ADD_ITEM", 10],
+    ["DELETE_ITEM", 3],
+    ["RENAME_ITEM", 5],
+    ["SET_ITEM_CHECKED", 10],
+    ["CLEAR_CHECKED_ITEMS", 1],
+  ];
+
+  // const totalWeight = eventWeights.reduce((prev, curr) => prev + curr[1], 0);
+
+  for (let i = 0; i < 10; i++) {
+    for (const c of [c1, c2]) {
+      if (c.serverConnection.isConnected) {
+        if (Math.random() < 0.1) c.serverConnection.disconnect();
+      } else {
+        if (Math.random() < 0.3) await c.client.connect();
+      }
+
+      if (Math.random() < 0.5) {
+        const eventName =
+          c.shoppingList.items.length > 0
+            ? eventWeights[Math.floor(Math.random() * eventWeights.length)][0]
+            : "ADD_ITEM";
+
+        const randomItem =
+          c.shoppingList.items[
+            Math.floor(Math.random() * c.shoppingList.items.length)
+          ];
+
+        switch (eventName) {
+          case "ADD_ITEM": {
+            c.client.applyEvent({
+              name: eventName,
+              data: { id: createRandomString(), name: createRandomString() },
+            });
+
+            break;
+          }
+
+          case "DELETE_ITEM": {
+            c.client.applyEvent({
+              name: eventName,
+              data: { id: randomItem.id },
+            });
+
+            break;
+          }
+
+          case "RENAME_ITEM": {
+            c.client.applyEvent({
+              name: eventName,
+              data: { id: randomItem.id, newName: createRandomString() },
+            });
+
+            break;
+          }
+
+          case "SET_ITEM_CHECKED": {
+            c.client.applyEvent({
+              name: eventName,
+              data: { id: randomItem.id, checked: !randomItem.checked },
+            });
+
+            break;
+          }
+
+          case "CLEAR_CHECKED_ITEMS": {
+            if (c.shoppingList.items.some(({ checked }) => checked))
+              c.client.applyEvent({ name: eventName });
+
+            break;
+          }
+        }
+      }
+    }
+
+    if (Math.random() < 0.1) {
+      const numberOfActions = Math.ceil(Math.random() * 5);
+    }
+  }
+
+  await setup.playOutListSync();
+  setup.assertEqualLists();
 });

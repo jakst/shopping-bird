@@ -13,6 +13,10 @@ export class EventQueue<T> {
     return this.#queue.length === 0;
   }
 
+  getQueue() {
+    return this.#queue;
+  }
+
   push(event: T) {
     this.#queue.push(event);
     this.onQueueChanged(this.#queue);

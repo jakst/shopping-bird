@@ -2,7 +2,7 @@ import { nanoid } from "nanoid";
 import { dedupeAsync } from "./dedupeAsync";
 import { EventQueue } from "./event-queue";
 import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
-import { applyEvent } from "./shopping-list";
+import { applyEvent, validateEvent } from "./shopping-list";
 
 interface BackendClientDeps {
   eventQueue: EventQueue<ShoppingListEvent[]>;
@@ -60,8 +60,11 @@ export class BackendClient {
 
     // Apply incoming events
     for (const event of events) {
-      const eventWasAccepted = applyEvent(newListState, event);
-      if (eventWasAccepted) await this.#executeEvent(event, oldListState);
+      const eventWasAccepted = validateEvent(newListState, event);
+      if (eventWasAccepted) {
+        await this.#executeEvent(event, newListState);
+        applyEvent(newListState, event); // Must happen after we have executed
+      }
     }
 
     this.$d.onListChanged(newListState);
@@ -70,7 +73,7 @@ export class BackendClient {
 
   async #executeEvent(
     event: ShoppingListEvent,
-    previousListState: readonly ShoppingListItem[],
+    newListState: readonly ShoppingListItem[],
   ) {
     switch (event.name) {
       case "ADD_ITEM": {
@@ -79,20 +82,20 @@ export class BackendClient {
       }
 
       case "DELETE_ITEM": {
-        const item = previousListState.find(({ id }) => id === event.data.id);
+        const item = newListState.find(({ id }) => id === event.data.id);
         if (item) await this.$d.bot.DELETE_ITEM(item.name);
         break;
       }
 
       case "SET_ITEM_CHECKED": {
-        const item = previousListState.find(({ id }) => id === event.data.id);
+        const item = newListState.find(({ id }) => id === event.data.id);
         if (item)
           await this.$d.bot.SET_ITEM_CHECKED(item.name, event.data.checked);
         break;
       }
 
       case "RENAME_ITEM": {
-        const item = previousListState.find(({ id }) => id === event.data.id);
+        const item = newListState.find(({ id }) => id === event.data.id);
         if (item) await this.$d.bot.RENAME_ITEM(item.name, event.data.newName);
 
         break;
@@ -116,8 +119,6 @@ function generateEvents(
     const itemFromBefore = previousListState.find(
       ({ name }) => name === newItem.name,
     );
-
-    // console.log({ itemFromBefore });
 
     if (!itemFromBefore) {
       const id = nanoid();
