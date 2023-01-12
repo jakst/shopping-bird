@@ -55,20 +55,32 @@ function createClient() {
     setIsConnected(value),
   );
 
-  const initialShoppingList: ShoppingListItem[] = [];
+  const initialShoppingList: ShoppingListItem[] = JSON.parse(
+    localStorage.getItem("main-shopping-list") ?? "[]",
+  );
 
   const list = createMutable({ items: initialShoppingList });
 
   const shoppingList = new ShoppingList([...initialShoppingList], (newList) => {
     // This updates the list without losing reactivity, but there could be more elegant ways to do it
     list.items = reconcile(newList)(list.items);
+    localStorage.setItem("main-shopping-list", JSON.stringify(newList));
   });
 
-  const remoteShoppingListCopy = new ShoppingList([], () => {});
+  const remoteShoppingListCopy = new ShoppingList(
+    JSON.parse(localStorage.getItem("remote-shopping-list") ?? "[]"),
+    (newList) => {
+      localStorage.setItem("remote-shopping-list", JSON.stringify(newList));
+    },
+  );
 
-  const eventQueue = new EventQueue<ShoppinglistEvent>([], (events) => {
-    setIsEventQueueEmpty(events.length === 0);
-  });
+  const eventQueue = new EventQueue<ShoppinglistEvent>(
+    JSON.parse(localStorage.getItem("event-queue") ?? "[]"),
+    (events) => {
+      setIsEventQueueEmpty(events.length === 0);
+      localStorage.setItem("event-queue", JSON.stringify(events));
+    },
+  );
 
   const client = new Client({
     shoppingList,
@@ -187,7 +199,7 @@ function Home() {
       </ul>
 
       <Show when={checkedList().length > 0}>
-        <div class="mt-4 mb-2 ml-2 opacity-60 flex justify-between">
+        <div class="mt-4 mb-2 mx-2 opacity-60 flex justify-between">
           <button
             class="flex items-center overflow-hidden"
             onClick={() => setShowChecked((v) => !v)}
@@ -205,7 +217,9 @@ function Home() {
             </h2>
           </button>
 
-          <button onClick={() => clearCheckedItems()}>Clear all</button>
+          <button class="px-3 py-1" onClick={() => clearCheckedItems()}>
+            Clear all
+          </button>
         </div>
 
         <Presence>

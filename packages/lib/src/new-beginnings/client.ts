@@ -1,6 +1,6 @@
-import { ClientServerConnection } from "./client-server-connection";
+import { type ClientServerConnection } from "./client-server-connection";
 import { EventQueue } from "./event-queue";
-import { ShoppingListEvent, ShoppingListItem } from "./newSchemas";
+import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
 import { ShoppingList } from "./shopping-list";
 
 function compare(oldList: ShoppingListItem[], newList: ShoppingListItem[]) {

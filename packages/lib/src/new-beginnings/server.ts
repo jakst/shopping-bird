@@ -8,33 +8,77 @@ export interface ServerClientConnection {
   notifyListChanged(items: ShoppingListItem[]): void;
 }
 
-export class BackendClient {
-  #eventQueue: EventQueue<ShoppingListEvent>;
+interface BackendClientDeps {
+  eventQueue: EventQueue<ShoppingListEvent>;
+  eventHandlerMap: {
+    [Key in ShoppingListEvent["name"]]: (
+      event: ShoppingListEvent,
+    ) => Promise<void>;
+  };
+}
 
-  constructor(
-    initialQueue: ShoppingListEvent[],
-    onQueueChanged: (events: ShoppingListEvent[]) => void,
-    // TODO: Narrow down event based on Key
-    private eventHandlerMap: {
-      [Key in ShoppingListEvent["name"]]: (
-        event: ShoppingListEvent,
-      ) => Promise<void>;
-    },
-  ) {
-    this.#eventQueue = new EventQueue(initialQueue, onQueueChanged);
+export class BackendClient {
+  nameIdMapping: Pick<ShoppingListItem, "id" | "name" | "checked">[] = [];
+
+  constructor(private $d: BackendClientDeps) {
+    // * TODO: Load id <=> name map from storage
   }
 
   doSomething(events: ShoppingListEvent[]) {
-    events.forEach((event) => this.#eventQueue.push(event));
+    events.forEach((event) => this.$d.eventQueue.push(event));
+  }
+
+  async getList(): Promise<Pick<ShoppingListItem, "name" | "checked">[]> {
+    return [];
   }
 
   async handle() {
-    // TODO: Can we really use an event queue? It processes all events in one go. A: probably
-    await this.#eventQueue.process(async (events) => {
-      for (const event of events) {
-        await this.eventHandlerMap[event.name](event);
+    // * Read current items
+    const list = await this.getList();
+
+    // * Generate events
+    const generatedEvents: ShoppingListEvent[] = [];
+    list.forEach((newItem) => {
+      const itemFromBefore = this.nameIdMapping.find(
+        ({ name }) => name === newItem.name,
+      );
+
+      if (!itemFromBefore) {
+        const id = nanoid();
+        generatedEvents.push({
+          name: "ADD_ITEM",
+          data: { id, name: newItem.name },
+        });
+
+        if (newItem.checked) {
+          generatedEvents.push({
+            name: "SET_ITEM_CHECKED",
+            data: { id, checked: true },
+          });
+        }
+      } else if (itemFromBefore.checked !== newItem.checked) {
+        generatedEvents.push({
+          name: "SET_ITEM_CHECKED",
+          data: { id: itemFromBefore.id, checked: newItem.checked },
+        });
       }
     });
+
+    this.nameIdMapping.forEach((olditem) => {
+      const currentItem = list.find(({ name }) => name === olditem.name);
+      if (!currentItem)
+        generatedEvents.push({ name: "DELETE_ITEM", data: { id: olditem.id } });
+    });
+
+    // * Apply events
+    await this.$d.eventQueue.process(async (events) => {
+      for (const event of events) {
+        await this.$d.eventHandlerMap[event.name](event);
+      }
+    });
+
+    // * TODO: Generate and persist new name <=> id map
+    // * TODO: Return generated events
   }
 }
 

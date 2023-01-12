@@ -1,4 +1,5 @@
 import { expect, test } from "vitest";
+import { ShoppinglistEvent } from "../lib";
 import { Client } from "./client";
 import {
   type ClientServerConnection,
@@ -65,26 +66,30 @@ function setupTest() {
   const serverShoppingList = new ShoppingList([], (items) => {
     console.log(`[SERVER] Persisting list with ${items.length} item(s)`);
   });
-  const backendClient = new BackendClient([], () => {}, {
-    ADD_ITEM: async (event) => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      console.log("[BACKEND_CLIENT] ADD_ITEM", event);
-    },
-    DELETE_ITEM: async (event) => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      console.log("[BACKEND_CLIENT] DELETE_ITEM", event);
-    },
-    SET_ITEM_CHECKED: async (event) => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      console.log("[BACKEND_CLIENT] SET_ITEM_CHECKED", event);
-    },
-    RENAME_ITEM: async (event) => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      console.log("[BACKEND_CLIENT] RENAME_ITEM", event);
-    },
-    CLEAR_CHECKED_ITEMS: async (event) => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      console.log("[BACKEND_CLIENT] CLEAR_CHECKED_ITEMS", event);
+
+  const backendClient = new BackendClient({
+    eventQueue: new EventQueue<ShoppinglistEvent>([], () => {}),
+    eventHandlerMap: {
+      ADD_ITEM: async (event) => {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        console.log("[BACKEND_CLIENT] ADD_ITEM", event);
+      },
+      DELETE_ITEM: async (event) => {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        console.log("[BACKEND_CLIENT] DELETE_ITEM", event);
+      },
+      SET_ITEM_CHECKED: async (event) => {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        console.log("[BACKEND_CLIENT] SET_ITEM_CHECKED", event);
+      },
+      RENAME_ITEM: async (event) => {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        console.log("[BACKEND_CLIENT] RENAME_ITEM", event);
+      },
+      CLEAR_CHECKED_ITEMS: async (event) => {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        console.log("[BACKEND_CLIENT] CLEAR_CHECKED_ITEMS", event);
+      },
     },
   });
   const server = new Server({
