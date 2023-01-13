@@ -1,5 +1,4 @@
 import { type ClientServerConnection } from "./client-server-connection";
-import { dedupeAsync } from "./dedupeAsync";
 import { EventQueue } from "./event-queue";
 import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
 import { applyEvent, ShoppingList, validateEvent } from "./shopping-list";
@@ -51,6 +50,8 @@ interface ClientDeps {
 }
 
 export class Client {
+  #promise: Promise<any> | null = null;
+
   constructor(private $d: ClientDeps) {}
 
   async connect() {
@@ -63,7 +64,8 @@ export class Client {
   }
 
   async flushEvents() {
-    await dedupeAsync(this.#flushEvents.bind(this));
+    this.#promise ??= this.#flushEvents().then(() => (this.#promise = null));
+    await this.#promise;
   }
 
   async #flushEvents() {

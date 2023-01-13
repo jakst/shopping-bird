@@ -1,5 +1,4 @@
 import { nanoid } from "nanoid";
-import { dedupeAsync } from "./dedupeAsync";
 import { EventQueue } from "./event-queue";
 import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
 import { applyEvent, validateEvent } from "./shopping-list";
@@ -17,58 +16,57 @@ export class BackendClient {
   onEventsReturned: null | ((events: ShoppingListEvent[]) => void) = null;
   #previousListState: ShoppingListItem[];
 
+  #promise: Promise<any> | null = null;
+
   constructor(private $d: BackendClientDeps) {
     this.#previousListState = $d.initialList;
   }
 
   async flush() {
-    await this.#waitAndStart();
+    await this.#startEventProcessor();
   }
 
   pushEvents(events: ShoppingListEvent[]) {
     if (events.length > 0) {
       this.$d.eventQueue.push(events);
-      this.#waitAndStart();
+      this.#startEventProcessor();
     }
   }
 
-  #waitAndStart() {
-    return dedupeAsync(this.#startProcessor.bind(this));
+  async #startEventProcessor() {
+    this.#promise ??= this.#processEvents().then(() => (this.#promise = null));
+    await this.#promise;
   }
 
-  async #startProcessor() {
+  async #processEvents() {
     await this.$d.eventQueue.process(async (eventGroups) => {
       for (const events of eventGroups) {
-        await this.#processEvents(events);
+        // Make a copy of the list old so we can mutate, while diffing against the old state
+        const oldListState = this.#previousListState;
+        const newListState = structuredClone(oldListState);
+
+        const listBeforeChanges = await this.$d.bot.getList();
+
+        // Generate outgoing events before we make any changes
+        const eventsToReturn = generateEvents(listBeforeChanges, oldListState);
+        if (eventsToReturn.length > 0) this.onEventsReturned?.(eventsToReturn);
+
+        // Apply incoming events
+        for (const event of events) {
+          const eventWasAccepted = validateEvent(newListState, event);
+          if (eventWasAccepted) {
+            await this.#executeEvent(event, newListState);
+            applyEvent(newListState, event); // Must happen after we have executed
+          }
+        }
+
+        this.$d.onListChanged(newListState);
+        this.#previousListState = newListState;
       }
     });
 
     // Process any events that arrived while running
-    if (!this.$d.eventQueue.isEmpty) await this.#startProcessor();
-  }
-
-  async #processEvents(events: readonly ShoppingListEvent[]) {
-    // Make a copy of the list old so we can mutate, while diffing against the old state
-    const oldListState = this.#previousListState;
-    const newListState = structuredClone(oldListState);
-
-    const listBeforeChanges = await this.$d.bot.getList();
-
-    // Generate outgoing events before we make any changes
-    const eventsToReturn = generateEvents(listBeforeChanges, oldListState);
-    if (eventsToReturn.length > 0) this.onEventsReturned?.(eventsToReturn);
-
-    // Apply incoming events
-    for (const event of events) {
-      const eventWasAccepted = validateEvent(newListState, event);
-      if (eventWasAccepted) {
-        await this.#executeEvent(event, newListState);
-        applyEvent(newListState, event); // Must happen after we have executed
-      }
-    }
-
-    this.$d.onListChanged(newListState);
-    this.#previousListState = newListState;
+    if (!this.$d.eventQueue.isEmpty()) await this.#processEvents();
   }
 
   async #executeEvent(

@@ -1,8 +1,35 @@
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
 import { BackendClient } from "./BackendClient";
 import { EventQueue } from "./event-queue";
-import { MockBackendBot } from "./mocks/MockBackendBot";
 import { ShoppingListEvent, ShoppingListItem } from "./newSchemas";
+import { MockBackendBot } from "./test-utils/MockBackendBot";
+import { pause } from "./test-utils/pause";
+
+test("Only calls bot once per incoming event [regression test]", async () => {
+  const backendClient = new BackendClient({
+    eventQueue: new EventQueue<ShoppingListEvent[]>([], () => {}),
+    initialList: [],
+    onListChanged: () => {},
+    bot: new MockBackendBot([]),
+  });
+
+  const spy = vi.spyOn(backendClient["$d"].bot, "ADD_ITEM");
+
+  backendClient.pushEvents([
+    { name: "ADD_ITEM", data: { id: "1", name: "Ost" } },
+  ]);
+  await pause(1);
+  backendClient.pushEvents([
+    { name: "ADD_ITEM", data: { id: "2", name: "Skinka" } },
+  ]);
+  backendClient.pushEvents([
+    { name: "ADD_ITEM", data: { id: "3", name: "Bröd" } },
+  ]);
+
+  await backendClient.flush();
+
+  expect(spy).toHaveBeenCalledTimes(3);
+});
 
 type Item = Omit<ShoppingListItem, "id">;
 
