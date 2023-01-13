@@ -39,6 +39,7 @@ class FakeClientServerConnection
 
   // Called from client
   async connect(onRemoteListChanged: OnRemoteListChangedCallback) {
+    await new Promise((resolve) => setTimeout(resolve, 1));
     this.onRemoteListChanged = onRemoteListChanged;
     this.clientId = this.$d.server.connectClient(this);
   }
