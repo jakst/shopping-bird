@@ -8,10 +8,11 @@ import {
   type OnRemoteListChangedCallback,
 } from "./client-server-connection";
 import { EventQueue } from "./event-queue";
-import { MockBackendBot } from "./mocks/MockBackendBot";
 import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
 import { Server, type ServerClientConnection } from "./server";
 import { ShoppingList } from "./shopping-list";
+import { MockBackendBot } from "./test-utils/MockBackendBot";
+import { pause } from "./test-utils/pause";
 
 class FakeClientServerConnection
   implements ClientServerConnection, ServerClientConnection
@@ -39,7 +40,7 @@ class FakeClientServerConnection
 
   // Called from client
   async connect(onRemoteListChanged: OnRemoteListChangedCallback) {
-    await new Promise((resolve) => setTimeout(resolve, 1));
+    await pause(1);
     this.onRemoteListChanged = onRemoteListChanged;
     this.clientId = this.$d.server.connectClient(this);
   }

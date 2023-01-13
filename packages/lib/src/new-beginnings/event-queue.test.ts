@@ -1,5 +1,6 @@
 import { expect, test } from "vitest";
 import { EventQueue } from "./event-queue";
+import { pause } from "./test-utils/pause";
 
 test("Calls persistance function once per event push", () => {
   let count = 0;
@@ -82,7 +83,7 @@ test("Does not reprocess old events - race", async () => {
 
   const firstProcess = queue.process(async (events) => {
     // Processing number two starts before this finishes...
-    await new Promise((resolve) => setTimeout(resolve, 1));
+    await pause(1);
     expect(events).toEqual(["1"]);
   });
 
