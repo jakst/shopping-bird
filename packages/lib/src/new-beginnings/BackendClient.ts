@@ -49,7 +49,10 @@ export class BackendClient {
 
         // Generate outgoing events before we make any changes
         const eventsToReturn = generateEvents(listBeforeChanges, oldListState);
-        if (eventsToReturn.length > 0) this.onEventsReturned?.(eventsToReturn);
+        if (eventsToReturn.length > 0) {
+          this.onEventsReturned?.(eventsToReturn);
+          eventsToReturn.forEach((event) => applyEvent(newListState, event));
+        }
 
         // Apply incoming events
         for (const event of events) {

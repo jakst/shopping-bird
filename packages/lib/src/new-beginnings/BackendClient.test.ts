@@ -31,6 +31,36 @@ test("Only calls bot once per incoming event [regression test]", async () => {
   expect(spy).toHaveBeenCalledTimes(3);
 });
 
+test("Only generates events from items once", async () => {
+  const backendClient = new BackendClient({
+    eventQueue: new EventQueue<ShoppingListEvent[]>([], () => {}),
+    initialList: [],
+    onListChanged: () => {},
+    bot: new MockBackendBot([{ name: "Ost", checked: false }]),
+  });
+
+  const mock = (backendClient.onEventsReturned = vi.fn());
+
+  backendClient.pushEvents([
+    { name: "ADD_ITEM", data: { id: "1", name: "Skinka" } },
+  ]);
+  await backendClient.flush();
+
+  expect(backendClient.onEventsReturned).toHaveBeenCalledOnce();
+  expect(backendClient.onEventsReturned).toHaveBeenCalledWith([
+    { name: "ADD_ITEM", data: expect.objectContaining({ name: "Ost" }) },
+  ]);
+
+  mock.mockReset();
+
+  backendClient.pushEvents([
+    { name: "ADD_ITEM", data: { id: "2", name: "Kaviar" } },
+  ]);
+  await backendClient.flush();
+
+  expect(backendClient.onEventsReturned).toHaveBeenCalledTimes(0);
+});
+
 type Item = Omit<ShoppingListItem, "id">;
 
 function createBackendClient() {
