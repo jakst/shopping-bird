@@ -347,7 +347,7 @@ test("Random", async () => {
 
   // const totalWeight = eventWeights.reduce((prev, curr) => prev + curr[1], 0);
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 100; i++) {
     for (const c of [c1, c2]) {
       const clientLog = (msg: string) =>
         actionLog.push(`[${c === c1 ? "C1" : "C2"}] ${msg}`);
