@@ -15,7 +15,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "vitest": "^0.26.3",
+    "vitest": "^0.27.1",
     "zod": "^3.20.2"
   },
   "devDependencies": {
