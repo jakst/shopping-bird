@@ -69,11 +69,12 @@ export function applyEvent(list: ShoppingListItem[], event: ShoppingListEvent) {
     }
 
     case "CLEAR_CHECKED_ITEMS": {
-      let i = -1;
-      do {
-        i = list.findIndex((item) => item.checked === true);
-        list.splice(i, 1);
-      } while (i >= 0);
+      while (true) {
+        const i = list.findIndex((item) => item.checked === true);
+
+        if (i >= 0) list.splice(i, 1);
+        else break;
+      }
 
       break;
     }
