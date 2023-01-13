@@ -125,10 +125,8 @@ function setupTest() {
   }
 
   async function playOutListSync() {
-    await Promise.all([
-      ...clients.map((client) => client.connect()),
-      backendClient.flush(),
-    ]);
+    await Promise.all(clients.map((client) => client.connect()));
+    await backendClient.flush();
   }
 
   function assertEqualLists() {
