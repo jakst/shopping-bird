@@ -48,6 +48,7 @@ module.exports = {
     "object-shorthand": "warn",
     "@typescript-eslint/switch-exhaustiveness-check": "warn",
     "no-debugger": "warn",
+    "no-constant-condition": ["error", { checkLoops: false }],
 
     ...disableOverZealousRules,
   },
