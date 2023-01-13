@@ -327,7 +327,6 @@ test("Handles disconnects between applying and processing events gracefully", as
 });
 
 const actionLog: any[] = [];
-// TODO: This still generates errors occasionally
 // TODO: Needs to extend to generating changes in the backend-list
 test("Random", async () => {
   const setup = setupTest();
