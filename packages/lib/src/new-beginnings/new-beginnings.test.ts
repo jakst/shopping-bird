@@ -325,6 +325,7 @@ test("Handles disconnects between applying and processing events gracefully", as
   setup.assertEqualLists();
 });
 
+const actionLog: any[] = [];
 // TODO: This still generates errors occasionally
 // TODO: Needs to extend to generating changes in the backend-list
 test("Random", async () => {
@@ -348,10 +349,20 @@ test("Random", async () => {
 
   for (let i = 0; i < 10; i++) {
     for (const c of [c1, c2]) {
+      const clientLog = (msg: string) =>
+        actionLog.push(`[${c === c1 ? "C1" : "C2"}] ${msg}`);
+
       if (c.serverConnection.isConnected) {
-        if (Math.random() < 0.1) c.serverConnection.disconnect();
+        if (Math.random() < 0.1) {
+          clientLog("disconnected");
+          c.serverConnection.disconnect();
+        }
       } else {
-        if (Math.random() < 0.3) await c.client.connect();
+        if (Math.random() < 0.3) {
+          clientLog("Started connecting");
+          await c.client.connect();
+          clientLog("Connected");
+        }
       }
 
       if (Math.random() < 0.5) {
@@ -365,49 +376,56 @@ test("Random", async () => {
             Math.floor(Math.random() * c.shoppingList.items.length)
           ];
 
+        let event: ShoppingListEvent | undefined;
+
         switch (eventName) {
           case "ADD_ITEM": {
-            c.client.applyEvent({
+            event = {
               name: eventName,
               data: { id: createRandomString(), name: createRandomString() },
-            });
+            };
 
             break;
           }
 
           case "DELETE_ITEM": {
-            c.client.applyEvent({
+            event = {
               name: eventName,
               data: { id: randomItem.id },
-            });
+            };
 
             break;
           }
 
           case "RENAME_ITEM": {
-            c.client.applyEvent({
+            event = {
               name: eventName,
               data: { id: randomItem.id, newName: createRandomString() },
-            });
+            };
 
             break;
           }
 
           case "SET_ITEM_CHECKED": {
-            c.client.applyEvent({
+            event = {
               name: eventName,
               data: { id: randomItem.id, checked: !randomItem.checked },
-            });
+            };
 
             break;
           }
 
           case "CLEAR_CHECKED_ITEMS": {
-            if (c.shoppingList.items.some(({ checked }) => checked))
-              c.client.applyEvent({ name: eventName });
-
+            if (c.shoppingList.items.some(({ checked }) => checked)) {
+              event = { name: eventName };
+            }
             break;
           }
+        }
+
+        if (event) {
+          clientLog(`event: ${JSON.stringify(event)}`);
+          c.client.applyEvent(event);
         }
       }
     }
