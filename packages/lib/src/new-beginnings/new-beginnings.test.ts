@@ -297,6 +297,34 @@ test("Rename an item before syncing the creation event", async () => {
   setup.assertEqualLists();
 });
 
+test("Handles disconnects between applying and processing events gracefully", async () => {
+  const setup = setupTest();
+  const c1 = setup.createClient();
+
+  await c1.client.connect();
+
+  // We don't await this...
+  c1.client.applyEvent({
+    name: "ADD_ITEM",
+    data: { id: "1", name: "Mackor" },
+  });
+
+  // ... so this is queued up. It is also not awaited...
+  c1.client.applyEvent({
+    name: "ADD_ITEM",
+    data: { id: "2", name: "Smör" },
+  });
+
+  // ... so disconnect happens before processing
+  c1.serverConnection.disconnect();
+
+  // When EventQueue tries to process the event,
+  // we will be disconnected.
+
+  await setup.playOutListSync();
+  setup.assertEqualLists();
+});
+
 // TODO: This still generates errors occasionally
 // TODO: Needs to extend to generating changes in the backend-list
 test("Random", async () => {

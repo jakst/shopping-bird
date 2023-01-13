@@ -1,4 +1,5 @@
 import { type ClientServerConnection } from "./client-server-connection";
+import { dedupeAsync } from "./dedupeAsync";
 import { EventQueue } from "./event-queue";
 import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
 import { applyEvent, ShoppingList, validateEvent } from "./shopping-list";
@@ -62,6 +63,10 @@ export class Client {
   }
 
   async flushEvents() {
+    await dedupeAsync(this.#flushEvents.bind(this));
+  }
+
+  async #flushEvents() {
     if (this.$d.serverConnection.isConnected)
       await this.$d.eventQueue.process(async (events) => {
         await this.$d.serverConnection.pushEvents(events);
