@@ -432,9 +432,48 @@ test("Random", async () => {
 
     if (Math.random() < 0.1) {
       const numberOfActions = Math.ceil(Math.random() * 5);
+
+      for (let i = 0; i < numberOfActions; i++) {
+        const random = Math.random();
+
+        if (random < 2 / 4) {
+          // Add item
+          const item = {
+            name: createRandomString(),
+            checked: false,
+          };
+          actionLog.push(`[BC]: ADD ${JSON.stringify(item)}`);
+          setup.backendList.push(item);
+        } else if (random < 3 / 4) {
+          // Remove item
+          const i = Math.floor(Math.random() * setup.backendList.length);
+          actionLog.push(
+            `[BC]: DELETE (i = ${i}) ${JSON.stringify(setup.backendList[i])}`,
+          );
+          setup.backendList.splice(i, 1);
+        } else if (random < 4 / 4) {
+          // Set checked/unchecked
+          const i = Math.floor(Math.random() * setup.backendList.length);
+          actionLog.push(
+            `[BC]: SET_CHECKED (i = ${i}) ${JSON.stringify(
+              setup.backendList[i],
+            )} ${setup.backendList[i].checked} => ${!setup.backendList[i]
+              .checked}`,
+          );
+          setup.backendList[i].checked = !setup.backendList[i].checked;
+        }
+      }
     }
   }
 
   await setup.playOutListSync();
-  setup.assertEqualLists();
+
+  try {
+    setup.assertEqualLists();
+  } catch (e) {
+    console.log("ALOG", actionLog);
+    console.log("SHPLIST", setup.serverShoppingList.items);
+
+    throw e;
+  }
 });
