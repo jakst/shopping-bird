@@ -425,7 +425,7 @@ test("Random", async () => {
 
         if (event) {
           clientLog(`event: ${JSON.stringify(event)}`);
-          c.client.applyEvent(event);
+          await c.client.applyEvent(event);
         }
       }
     }
