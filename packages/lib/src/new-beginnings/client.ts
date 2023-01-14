@@ -78,14 +78,14 @@ export class Client {
   async applyEvent(event: ShoppingListEvent) {
     if (!validateEvent(this.$d.shoppingList.items, event)) return;
 
-    // * Apply event to local and remote shoppingList
+    // Apply event to local and remote shoppingList
     this.$d.shoppingList.applyEvent(event);
     this.$d.remoteShoppingListCopy.applyEvent(event);
 
-    // * Queue event for remote push
+    // Queue event for remote push
     this.$d.eventQueue.push(event);
 
-    // * Flush if we are connected
+    // Flush if we are connected
     await this.flushEvents();
   }
 
@@ -95,12 +95,13 @@ export class Client {
     //
     // TODO: Could we get a timing diff here, where the events
     // are sent but not processed by the server yet? 🤔
+    // ANSWER: Yes we can...
     if (!this.$d.eventQueue.isEmpty())
-      this.$d.eventQueue
-        .getQueue()
-        .forEach((event) => applyEvent(newList, event));
+      this.$d.eventQueue.getQueue().forEach((event) => {
+        if (validateEvent(newList, event)) applyEvent(newList, event);
+      });
 
-    // * Diff remote list against last version to get events
+    // Diff remote list against last version to get events
     const diffedEvents = compare(this.$d.remoteShoppingListCopy.items, newList);
     // console.log(
     //   `[CLIENT:${this.$d.serverConnection.clientId}] onRemoteListChanged - diffed events (${diffedEvents.length})`,
@@ -112,7 +113,7 @@ export class Client {
     // );
 
     if (diffedEvents.length > 0) {
-      // * Apply events to local and replace remote shoppingList
+      // Apply events to local and replace remote shoppingList
       this.$d.shoppingList.applyEvents(diffedEvents);
       this.$d.remoteShoppingListCopy.replaceList(newList);
     }

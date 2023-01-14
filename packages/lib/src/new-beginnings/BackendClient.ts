@@ -38,6 +38,21 @@ export class BackendClient {
     await this.#promise;
   }
 
+  // TODO: cannot run concurrently with #processEvents
+  async sendDiffFromLastSync() {
+    const eventsToReturn = generateEvents(
+      await this.$d.bot.getList(),
+      this.#previousListState,
+    );
+
+    if (eventsToReturn.length > 0) {
+      this.onEventsReturned?.(eventsToReturn);
+      eventsToReturn.forEach((event) =>
+        applyEvent(this.#previousListState, event),
+      );
+    }
+  }
+
   async #processEvents() {
     await this.$d.eventQueue.process(async (eventGroups) => {
       for (const events of eventGroups) {
