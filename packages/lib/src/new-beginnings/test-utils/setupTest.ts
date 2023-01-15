@@ -9,6 +9,10 @@ import { ShoppingList } from "../shopping-list";
 import { FakeClientServerConnection } from "./FakeClientServerConnection";
 import { MockBackendBot } from "./MockBackendBot";
 
+export function createRandomString() {
+  return (Math.random() * 100_000).toFixed();
+}
+
 export function setupTest() {
   const serverShoppingList = new ShoppingList([], (items) => {});
 

@@ -1,8 +1,6 @@
 import { writeFileSync } from "fs";
 import { test } from "vitest";
-import { createRandomString } from "./integrations.test";
-import { type ShoppingListEvent } from "./newSchemas";
-import { setupTest } from "./test-utils/setupTest";
+import { createRandomString, setupTest } from "./test-utils/setupTest";
 
 test("Random", async () => {
   const setup = setupTest();
@@ -12,14 +10,6 @@ test("Random", async () => {
 
   await c1.client.connect();
   await c2.client.connect();
-
-  const eventWeights: [ShoppingListEvent["name"], number][] = [
-    ["ADD_ITEM", 10],
-    ["DELETE_ITEM", 3],
-    ["RENAME_ITEM", 5],
-    ["SET_ITEM_CHECKED", 10],
-    ["CLEAR_CHECKED_ITEMS", 1],
-  ];
 
   const actionLog: string[] = [];
   async function assertRandomTest(i: number) {
@@ -40,13 +30,12 @@ test("Random", async () => {
     }
   }
 
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 100; i++) {
     for (const c of [c1, c2]) {
       const cString = c === c1 ? "c1" : "c2";
 
       if (c.serverConnection.isConnected) {
         if (Math.random() < 0.1) {
-          // clientLog("disconnected");
           actionLog.push(`${cString}.serverConnection.disconnect();`);
           c.serverConnection.disconnect();
         }
@@ -58,69 +47,43 @@ test("Random", async () => {
       }
 
       if (Math.random() < 0.5) {
-        const eventName =
-          c.shoppingList.items.length > 0
-            ? eventWeights[Math.floor(Math.random() * eventWeights.length)][0]
-            : "ADD_ITEM";
+        const random = Math.random();
 
         const randomItem =
           c.shoppingList.items[
             Math.floor(Math.random() * c.shoppingList.items.length)
           ];
 
-        let event: ShoppingListEvent | undefined;
-
-        switch (eventName) {
-          case "ADD_ITEM": {
-            event = {
-              name: eventName,
-              data: { id: createRandomString(), name: createRandomString() },
-            };
-
-            break;
-          }
-
-          case "DELETE_ITEM": {
-            event = {
-              name: eventName,
-              data: { id: randomItem.id },
-            };
-
-            break;
-          }
-
-          case "RENAME_ITEM": {
-            event = {
-              name: eventName,
-              data: { id: randomItem.id, newName: createRandomString() },
-            };
-
-            break;
-          }
-
-          case "SET_ITEM_CHECKED": {
-            event = {
-              name: eventName,
-              data: { id: randomItem.id, checked: !randomItem.checked },
-            };
-
-            break;
-          }
-
-          case "CLEAR_CHECKED_ITEMS": {
-            if (c.shoppingList.items.some(({ checked }) => checked)) {
-              event = { name: eventName };
-            }
-            break;
-          }
-        }
-
-        if (event) {
-          // clientLog(`event: ${JSON.stringify(event)}`);
+        if (random < 1 / 5 || c.shoppingList.items.length < 1) {
+          // Add item
+          const name = createRandomString();
+          actionLog.push(`await ${cString}.client.addItem("${name}");`);
+          await c.client.addItem(name);
+        } else if (random < 2 / 5) {
+          // Delete item
           actionLog.push(
-            `await ${cString}.client.applyEvent(${JSON.stringify(event)});`,
+            `await ${cString}.client.deleteItem("${randomItem.id}");`,
           );
-          await c.client.applyEvent(event);
+          await c.client.deleteItem(randomItem.id);
+        } else if (random < 3 / 5) {
+          // Rename item
+          const newName = createRandomString();
+          actionLog.push(
+            `await ${cString}.client.renameItem("${randomItem.id}", "${newName}");`,
+          );
+          await c.client.renameItem(randomItem.id, newName);
+        } else if (random < 4 / 5) {
+          // Set item checked
+          actionLog.push(
+            `await ${cString}.client.setItemChecked("${
+              randomItem.id
+            }", ${!randomItem.checked});`,
+          );
+          await c.client.setItemChecked(randomItem.id, !randomItem.checked);
+        } else if (random < 5 / 5) {
+          // Clear checked items
+          actionLog.push(`await ${cString}.client.clearCheckedItems();`);
+          await c.client.clearCheckedItems();
         }
       }
     }
@@ -158,7 +121,7 @@ test("Random", async () => {
       }
     }
 
-    if (Math.random() < 0.05) {
+    if (Math.random() < 0.1) {
       await assertRandomTest(i);
     }
   }

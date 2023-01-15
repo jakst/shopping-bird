@@ -88,7 +88,6 @@ const testCases: TestCase[] = [
   [[[{ name: "DELETE_ITEM", data: { id: "123" } }]], []],
   [[[{ name: "SET_ITEM_CHECKED", data: { id: "123", checked: true } }]], []],
   [[[{ name: "RENAME_ITEM", data: { id: "123", newName: "Skinka" } }]], []],
-  [[[{ name: "CLEAR_CHECKED_ITEMS" }]], []],
 
   // Events in separate group on list with item
   [
@@ -172,21 +171,6 @@ const testCases: TestCase[] = [
       [{ name: "RENAME_ITEM", data: { id: "123", newName: "Bröd" } }],
     ],
     [{ name: "Bröd", checked: false }],
-  ],
-  [
-    [
-      [{ name: "ADD_ITEM", data: { id: "123", name: "Ost" } }],
-      [{ name: "CLEAR_CHECKED_ITEMS" }],
-    ],
-    [{ name: "Ost", checked: false }],
-  ],
-  [
-    [
-      [{ name: "ADD_ITEM", data: { id: "123", name: "Ost" } }],
-      [{ name: "SET_ITEM_CHECKED", data: { id: "123", checked: true } }],
-      [{ name: "CLEAR_CHECKED_ITEMS" }],
-    ],
-    [],
   ],
 
   // Events in same group on list with item
@@ -293,25 +277,6 @@ const testCases: TestCase[] = [
       ],
     ],
     [{ name: "Bröd", checked: false }],
-  ],
-  [
-    [
-      [
-        { name: "ADD_ITEM", data: { id: "123", name: "Ost" } },
-        { name: "CLEAR_CHECKED_ITEMS" },
-      ],
-    ],
-    [{ name: "Ost", checked: false }],
-  ],
-  [
-    [
-      [
-        { name: "ADD_ITEM", data: { id: "123", name: "Ost" } },
-        { name: "SET_ITEM_CHECKED", data: { id: "123", checked: true } },
-        { name: "CLEAR_CHECKED_ITEMS" },
-      ],
-    ],
-    [],
   ],
 ];
 

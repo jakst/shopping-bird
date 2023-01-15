@@ -67,17 +67,6 @@ export function applyEvent(list: ShoppingListItem[], event: ShoppingListEvent) {
       if (item) item.name = event.data.newName;
       break;
     }
-
-    case "CLEAR_CHECKED_ITEMS": {
-      while (true) {
-        const i = list.findIndex((item) => item.checked === true);
-
-        if (i >= 0) list.splice(i, 1);
-        else break;
-      }
-
-      break;
-    }
   }
 }
 
@@ -93,8 +82,5 @@ export function validateEvent(
     case "SET_ITEM_CHECKED":
     case "RENAME_ITEM":
       return list.some(({ id }) => event.data.id === id);
-
-    case "CLEAR_CHECKED_ITEMS":
-      return list.some(({ checked }) => checked);
   }
 }

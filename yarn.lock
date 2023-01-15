@@ -4775,7 +4775,6 @@ __metadata:
     dotenv-cli: ^6.0.0
     hello-bird-lib: "workspace:^"
     hello-bird-server: "workspace:^"
-    nanoid: ^4.0.0
     postcss: ^8.4.21
     solid-js: ^1.6.8
     solid-start: ^0.2.6
@@ -4796,6 +4795,7 @@ __metadata:
   dependencies:
     esbuild: ^0.16.15
     esbuild-node-tsc: ^2.0.5
+    nanoid: ^4.0.0
     typescript: ^4.9.4
     vitest: ^0.27.1
     zod: ^3.20.2

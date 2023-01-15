@@ -116,11 +116,6 @@ export class BackendClient {
 
         break;
       }
-
-      case "CLEAR_CHECKED_ITEMS": {
-        await this.$d.bot.CLEAR_CHECKED_ITEMS();
-        break;
-      }
     }
   }
 }
@@ -172,5 +167,4 @@ export interface BackendClientBot {
   DELETE_ITEM(name: string): Promise<void>;
   RENAME_ITEM(oldName: string, newName: string): Promise<void>;
   SET_ITEM_CHECKED(name: string, checked: boolean): Promise<void>;
-  CLEAR_CHECKED_ITEMS(): Promise<void>;
 }

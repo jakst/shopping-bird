@@ -36,17 +36,11 @@ const RenameItem = z.object({
   }),
 });
 
-const ClearCheckedItems = z.object({
-  name: z.literal("CLEAR_CHECKED_ITEMS"),
-  data: z.never().optional(),
-});
-
 export const actionSchema = z.discriminatedUnion("name", [
   AddItem,
   DeleteItem,
   SetChecked,
   RenameItem,
-  ClearCheckedItems,
 ]);
 
 export type ShoppingListEvent = z.infer<typeof actionSchema>;
