@@ -8,8 +8,8 @@ import { pause } from "./test-utils/pause";
 test("Only calls bot once per incoming event [regression test]", async () => {
   const backendClient = new BackendClient({
     eventQueue: new EventQueue<ShoppingListEvent[]>([], () => {}),
-    initialList: [],
-    onListChanged: () => {},
+    initialStore: [],
+    onStoreChanged: () => {},
     bot: new MockBackendBot([]),
   });
 
@@ -34,8 +34,8 @@ test("Only calls bot once per incoming event [regression test]", async () => {
 test("Only generates events from items once", async () => {
   const backendClient = new BackendClient({
     eventQueue: new EventQueue<ShoppingListEvent[]>([], () => {}),
-    initialList: [],
-    onListChanged: () => {},
+    initialStore: [],
+    onStoreChanged: () => {},
     bot: new MockBackendBot([{ name: "Ost", checked: false }]),
   });
 
@@ -69,8 +69,8 @@ function createBackendClient() {
   const bot = new MockBackendBot(shoppingList);
   const backendClient = new BackendClient({
     eventQueue,
-    initialList: [],
-    onListChanged: () => {},
+    initialStore: [],
+    onStoreChanged: () => {},
     bot,
   });
 

@@ -20,8 +20,8 @@ export function setupTest() {
 
   const backendClient = new BackendClient({
     eventQueue: new EventQueue<ShoppinglistEvent[]>([], () => {}),
-    initialList: [],
-    onListChanged: () => {},
+    initialStore: [],
+    onStoreChanged: () => {},
     bot: new MockBackendBot(backendList),
   });
 

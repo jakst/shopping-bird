@@ -36,16 +36,16 @@ const RenameItem = z.object({
   }),
 });
 
-export const actionSchema = z.discriminatedUnion("name", [
+export const eventSchema = z.discriminatedUnion("name", [
   AddItem,
   DeleteItem,
   SetChecked,
   RenameItem,
 ]);
 
-export type ShoppingListEvent = z.infer<typeof actionSchema>;
+export type ShoppingListEvent = z.infer<typeof eventSchema>;
 
-export const actionListSchema = z.array(actionSchema);
+export const eventListSchema = z.array(eventSchema);
 
 export type GetShoppingListEventData<T extends ShoppingListEvent["name"]> =
   Extract<ShoppingListEvent, { name: T }>["data"];

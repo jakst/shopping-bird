@@ -49,7 +49,7 @@ export async function setCookies(cookies: any[]) {
   await saveCookies(cookies);
 }
 
-async function clearCookies() {
+export async function clearCookies() {
   _cookies = null;
   await deleteCookies();
 }

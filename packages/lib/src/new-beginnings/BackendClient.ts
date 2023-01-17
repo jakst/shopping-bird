@@ -5,8 +5,8 @@ import { applyEvent, validateEvent } from "./shopping-list";
 
 interface BackendClientDeps {
   eventQueue: EventQueue<ShoppingListEvent[]>;
-  initialList: ShoppingListItem[];
-  onListChanged: (list: ShoppingListItem[]) => void;
+  initialStore: ShoppingListItem[];
+  onStoreChanged: (store: ShoppingListItem[]) => void;
   bot: BackendClientBot;
 }
 
@@ -14,12 +14,12 @@ type ListItem = Pick<ShoppingListItem, "name" | "checked">;
 
 export class BackendClient {
   onEventsReturned: null | ((events: ShoppingListEvent[]) => void) = null;
-  #previousListState: ShoppingListItem[];
+  #previousStore: ShoppingListItem[];
 
   #promise: Promise<any> | null = null;
 
   constructor(private $d: BackendClientDeps) {
-    this.#previousListState = $d.initialList;
+    this.#previousStore = $d.initialStore;
   }
 
   async flush() {
@@ -42,14 +42,12 @@ export class BackendClient {
   async sendDiffFromLastSync() {
     const eventsToReturn = generateEvents(
       await this.$d.bot.getList(),
-      this.#previousListState,
+      this.#previousStore,
     );
 
     if (eventsToReturn.length > 0) {
       this.onEventsReturned?.(eventsToReturn);
-      eventsToReturn.forEach((event) =>
-        applyEvent(this.#previousListState, event),
-      );
+      eventsToReturn.forEach((event) => applyEvent(this.#previousStore, event));
     }
   }
 
@@ -57,29 +55,29 @@ export class BackendClient {
     await this.$d.eventQueue.process(async (eventGroups) => {
       for (const events of eventGroups) {
         // Make a copy of the list old so we can mutate, while diffing against the old state
-        const oldListState = this.#previousListState;
-        const newListState = structuredClone(oldListState);
+        const oldStore = this.#previousStore;
+        const newStore = structuredClone(oldStore);
 
         const listBeforeChanges = await this.$d.bot.getList();
 
         // Generate outgoing events before we make any changes
-        const eventsToReturn = generateEvents(listBeforeChanges, oldListState);
+        const eventsToReturn = generateEvents(listBeforeChanges, oldStore);
         if (eventsToReturn.length > 0) {
           this.onEventsReturned?.(eventsToReturn);
-          eventsToReturn.forEach((event) => applyEvent(newListState, event));
+          eventsToReturn.forEach((event) => applyEvent(newStore, event));
         }
 
         // Apply incoming events
         for (const event of events) {
-          const eventWasAccepted = validateEvent(newListState, event);
+          const eventWasAccepted = validateEvent(newStore, event);
           if (eventWasAccepted) {
-            await this.#executeEvent(event, newListState);
-            applyEvent(newListState, event); // Must happen after we have executed
+            await this.#executeEvent(event, newStore);
+            applyEvent(newStore, event); // Must happen after we have executed
           }
         }
 
-        this.$d.onListChanged(newListState);
-        this.#previousListState = newListState;
+        this.$d.onStoreChanged(newStore);
+        this.#previousStore = newStore;
       }
     });
 
@@ -89,7 +87,7 @@ export class BackendClient {
 
   async #executeEvent(
     event: ShoppingListEvent,
-    newListState: readonly ShoppingListItem[],
+    newStore: readonly ShoppingListItem[],
   ) {
     switch (event.name) {
       case "ADD_ITEM": {
@@ -98,20 +96,20 @@ export class BackendClient {
       }
 
       case "DELETE_ITEM": {
-        const item = newListState.find(({ id }) => id === event.data.id);
+        const item = newStore.find(({ id }) => id === event.data.id);
         if (item) await this.$d.bot.DELETE_ITEM(item.name);
         break;
       }
 
       case "SET_ITEM_CHECKED": {
-        const item = newListState.find(({ id }) => id === event.data.id);
+        const item = newStore.find(({ id }) => id === event.data.id);
         if (item)
           await this.$d.bot.SET_ITEM_CHECKED(item.name, event.data.checked);
         break;
       }
 
       case "RENAME_ITEM": {
-        const item = newListState.find(({ id }) => id === event.data.id);
+        const item = newStore.find(({ id }) => id === event.data.id);
         if (item) await this.$d.bot.RENAME_ITEM(item.name, event.data.newName);
 
         break;
@@ -122,12 +120,12 @@ export class BackendClient {
 
 function generateEvents(
   list: readonly ListItem[],
-  previousListState: readonly ShoppingListItem[],
+  previousStore: readonly ShoppingListItem[],
 ) {
   const generatedEvents: ShoppingListEvent[] = [];
 
   list.forEach((newItem) => {
-    const itemFromBefore = previousListState.find(
+    const itemFromBefore = previousStore.find(
       ({ name }) => name === newItem.name,
     );
 
@@ -152,7 +150,7 @@ function generateEvents(
     }
   });
 
-  previousListState.forEach((olditem) => {
+  previousStore.forEach((olditem) => {
     const currentItem = list.find(({ name }) => name === olditem.name);
     if (!currentItem)
       generatedEvents.push({ name: "DELETE_ITEM", data: { id: olditem.id } });

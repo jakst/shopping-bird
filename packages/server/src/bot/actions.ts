@@ -97,7 +97,9 @@ export const rename = createAction(async (oldName: string, newName: string) => {
 
   const page = await getPage();
 
-  console.log("Renaming", { oldName, newName });
+  console.log(
+    `[BOT]: Renaming incorrectly named item from "${oldName}" to "${newName}"`,
+  );
   const [nameDisplay] = (await page.$x(
     `//ul/li//div[@role="button" and text()="${oldName}"]`,
   )) as [ElementHandle<HTMLDivElement>];
@@ -117,12 +119,21 @@ export const removeDuplicates = createAction(async (name: string) => {
   const page = await getPage();
 
   const nameDisplays = (await page.$x(
-    `//ul/li//div[@role="button" and text()="${name}"]`,
+    `//ul/li//div[
+      @role="button"
+    and
+      text()[contains(
+        translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ', 'abcdefghijklmnopqrstuvwxyzåäö'),
+        '${name.toLowerCase()}'
+      )]
+    ]`,
   )) as ElementHandle<HTMLDivElement>[];
 
   nameDisplays.shift();
 
-  console.log(`Removing ${nameDisplays.length} duplicate(s) of ${name}`);
+  console.log(
+    `[BOT]: Removing ${nameDisplays.length} duplicate(s) of item "${name}"`,
+  );
   for (const nameDisplay of nameDisplays) {
     await nameDisplay.click();
 
