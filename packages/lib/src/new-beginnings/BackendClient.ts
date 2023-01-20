@@ -71,7 +71,16 @@ export class BackendClient {
         for (const event of events) {
           const eventWasAccepted = validateEvent(newStore, event);
           if (eventWasAccepted) {
-            await this.#executeEvent(event, newStore);
+            try {
+              await this.#executeEvent(event, newStore);
+            } catch (e) {
+              console.error(
+                "Event failed to execute on backend client",
+                JSON.stringify(event),
+                e,
+              );
+            }
+
             applyEvent(newStore, event); // Must happen after we have executed
           }
         }
