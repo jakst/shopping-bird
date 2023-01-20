@@ -28,17 +28,12 @@ export async function createBot(): Promise<BackendClientBot> {
       const [nameDisplay] = (await page.$x(
         `//ul/li//div[@role="button" and text()="${name}"]`,
       )) as [ElementHandle<HTMLDivElement>];
-      console.log(`a ${name}`);
       await nameDisplay.click();
-      console.log(`b ${name}`);
 
       // Press the trash button, two tabs away from the input field
       await page.keyboard.press("Tab");
-      console.log(`c ${name}`);
       await page.keyboard.press("Tab");
-      console.log(`d ${name}`);
       await page.keyboard.press("Enter");
-      console.log(`e ${name}`);
 
       await page.waitForXPath('//*[text()="Varan har raderats"]');
 
@@ -56,11 +51,11 @@ export async function createBot(): Promise<BackendClientBot> {
       if (checkbox) {
         const isChecked = await checkbox.evaluate((el) => el.checked);
 
-        if ((isChecked && !value) || (!isChecked && value))
+        if ((isChecked && !value) || (!isChecked && value)) {
           await checkbox.click();
+          await page.waitForNetworkIdle();
+        }
       }
-
-      await page.waitForNetworkIdle();
     },
   };
 }
