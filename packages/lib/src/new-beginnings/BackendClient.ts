@@ -49,6 +49,8 @@ export class BackendClient {
       this.onEventsReturned?.(eventsToReturn);
       eventsToReturn.forEach((event) => applyEvent(this.#previousStore, event));
     }
+
+    this.$d.onStoreChanged(this.#previousStore);
   }
 
   async #processEvents() {
