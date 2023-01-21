@@ -1,5 +1,6 @@
 import { trimAndUppercase, type BackendClientBot } from "hello-bird-lib";
 import { ElementHandle, Page } from "puppeteer";
+import { pause } from "./actions";
 import { clearCookies, getPage } from "./browser";
 
 export async function createBot(): Promise<BackendClientBot> {
@@ -20,7 +21,7 @@ export async function createBot(): Promise<BackendClientBot> {
       await newItemInput.type(name);
       await newItemInput.press("Enter");
 
-      await page.waitForNetworkIdle();
+      await page.waitForXPath('//*[text()="Varan har lagts till"]');
     },
     async DELETE_ITEM(name: string) {
       console.log(`Removing item ${name}`);
@@ -36,9 +37,6 @@ export async function createBot(): Promise<BackendClientBot> {
       await page.keyboard.press("Enter");
 
       await page.waitForXPath('//*[text()="Varan har raderats"]');
-
-      // await page.waitForNetworkIdle();
-      console.log(`f ${name}`);
     },
     async RENAME_ITEM(oldName: string, newName: string) {
       await rename(page, oldName, newName);
@@ -53,7 +51,7 @@ export async function createBot(): Promise<BackendClientBot> {
 
         if ((isChecked && !value) || (!isChecked && value)) {
           await checkbox.click();
-          await page.waitForNetworkIdle();
+          await pause(100);
         }
       }
     },
@@ -147,7 +145,7 @@ async function rename(page: Page, oldName: string, newName: string) {
   await page.keyboard.press("Tab");
   await page.keyboard.press("Enter");
 
-  await page.waitForNetworkIdle();
+  await pause(100);
 }
 
 async function removeDuplicates(page: Page, name: string) {
@@ -177,6 +175,6 @@ async function removeDuplicates(page: Page, name: string) {
     await page.keyboard.press("Tab");
     await page.keyboard.press("Enter");
 
-    await page.waitForNetworkIdle();
+  await pause(100);
   }
 }
