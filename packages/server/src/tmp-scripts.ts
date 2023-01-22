@@ -41,13 +41,13 @@ async function run() {
     eventQueue,
     initialStore: initialBackendClientStore,
     onStoreChanged(store) {
-      console.log("NEW STORe:", store);
+      // console.log("NEW STORe:", store);
       backendClientStoreCache.set(store);
     },
   });
 
   const shoppingList = new ShoppingList(initialServerShoppingList, (v) => {
-    console.log("SHOPPING LIST CHANGED", v);
+    // console.log("SHOPPING LIST CHANGED", v);
     return void serverShoppingListCache.set(v);
   });
 
@@ -59,18 +59,36 @@ async function run() {
   const oldreturn = backendClient.onEventsReturned;
   backendClient.onEventsReturned = (events) => {
     oldreturn?.(events);
-    console.log("ON EVENTS RETURNED:", events);
+    // console.log("ON EVENTS RETURNED:", events);
   };
 
   await server.refreshDataFromBackendClient();
 
+  const id = String(Math.random()).substring(2, 6);
+
   server.pushEvents(
     [
-      { name: "ADD_ITEM", data: { id: "123", name: "TMP" } },
-      { name: "SET_ITEM_CHECKED", data: { id: "123", checked: true } },
+      { name: "ADD_ITEM", data: { id, name: "Fel namn" } },
+      // { name: "RENAME_ITEM", data: { id, newName: "Mufasa2" } },
+      { name: "SET_ITEM_CHECKED", data: { id, checked: true } },
     ],
     "derp",
   );
+
+  await backendClient.flush();
+
+  server.pushEvents(
+    [
+      // { name: "ADD_ITEM", data: { id, name: "TMP" } },
+      { name: "RENAME_ITEM", data: { id, newName: "Rätt namn" } },
+      // { name: "SET_ITEM_CHECKED", data: { id, checked: true } },
+    ],
+    "derp",
+  );
+  await backendClient.flush();
+
+  console.log("FINITO!");
+  process.exit();
 
   // client.pushEvents([{ name: "DELETE_ITEM", data: { id: "123" } }]);
 

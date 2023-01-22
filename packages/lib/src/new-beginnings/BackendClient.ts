@@ -1,4 +1,5 @@
 import { nanoid } from "nanoid";
+import { equalsList } from "./equals-list";
 import { EventQueue } from "./event-queue";
 import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
 import { applyEvent } from "./shopping-list";
@@ -52,69 +53,78 @@ export class BackendClient {
     const workingStoreCopy = structuredClone(this.#incomingStore);
     this.#incomingStore = null;
 
-    let actualList = await this.$d.bot.getList();
-    actualList.reverse();
+    await this.$d.bot.refreshList();
+    let latestListFromBot = await this.$d.bot.getList();
 
-    const eventsToReturn = generateEvents(actualList, this.#previousStore);
+    console.log({ latestListFromBot, previousStore: this.#previousStore });
+
+    const eventsToReturn = generateEvents(
+      latestListFromBot,
+      this.#previousStore,
+    );
     if (eventsToReturn.length > 0) {
       this.onEventsReturned?.(eventsToReturn);
       eventsToReturn.forEach((event) => applyEvent(workingStoreCopy, event));
     }
 
     this.$d.onStoreChanged(workingStoreCopy);
+    this.#previousStore = workingStoreCopy;
 
-    while (!equalsList(workingStoreCopy, actualList)) {
+    while (!equalsList(workingStoreCopy, latestListFromBot)) {
+      console.log("loopstart");
       const mappedItems = new Set();
 
-      for (const itan of workingStoreCopy) {
-        const otherItan = actualList.find(
-          (i) => i.name === itan.name && !mappedItems.has(i),
+      for (const incomingItem of workingStoreCopy) {
+        let clientItem = latestListFromBot.find(
+          (i) =>
+            i.name === incomingItem.name &&
+            i.checked === incomingItem.checked &&
+            !mappedItems.has(i),
         );
 
-        if (otherItan) {
-          mappedItems.add(itan);
-          mappedItems.add(otherItan);
+        // If no item with the same checked value matched, try to match on name only
+        if (!clientItem)
+          clientItem = latestListFromBot.find(
+            (i) => i.name === incomingItem.name && !mappedItems.has(i),
+          );
 
-          if (otherItan.checked !== itan.checked) {
-            await this.$d.bot.SET_ITEM_CHECKED2(otherItan.index, itan.checked);
+        if (clientItem) {
+          mappedItems.add(incomingItem);
+          mappedItems.add(clientItem);
+
+          if (clientItem.checked !== incomingItem.checked) {
+            await this.$d.bot.SET_ITEM_CHECKED(
+              clientItem.index,
+              incomingItem.checked,
+            );
           }
         }
       }
 
-      // Delete items that weren't mapped
-      for (const otherItan of actualList.filter((i) => !mappedItems.has(i))) {
-        await this.$d.bot.DELETE_ITEM2(otherItan.index);
+      // Start with the last item and go upwards, so we don't
+      // change the index of the next item to be deleted.
+      const unmappedFromClientList = latestListFromBot
+        .filter((i) => !mappedItems.has(i))
+        .sort((a, b) => b.index - a.index);
+
+      for (const item of unmappedFromClientList) {
+        await this.$d.bot.DELETE_ITEM(item.index);
       }
+
+      const unmappedFromIncomingList = workingStoreCopy.filter(
+        (i) => !mappedItems.has(i),
+      );
 
       // Add items that weren't mapped
-      for (const itan of workingStoreCopy.filter((i) => !mappedItems.has(i))) {
-        await this.$d.bot.ADD_ITEM(itan.name);
+      for (const item of unmappedFromIncomingList) {
+        await this.$d.bot.ADD_ITEM(item.name, item.checked);
       }
 
-      actualList = await this.$d.bot.getList();
-      actualList.reverse();
+      latestListFromBot = await this.$d.bot.getList();
     }
-
-    this.#previousStore = workingStoreCopy;
 
     await this.#sync();
   }
-}
-function equalsList(
-  listA: readonly { name: string; checked: boolean }[],
-  listB: readonly { name: string; checked: boolean }[],
-) {
-  if (listA.length !== listB.length) return false;
-
-  const sortedA = [...listA].sort((a, b) => a.name.localeCompare(b.name));
-  const sortedB = [...listB].sort((a, b) => a.name.localeCompare(b.name));
-
-  const somethingsWrong = sortedA.some((a, i) => {
-    const b = sortedB[i];
-    return a.name !== b.name || a.checked !== b.checked;
-  });
-
-  return !somethingsWrong;
 }
 
 function generateEvents(
@@ -159,11 +169,9 @@ function generateEvents(
 }
 
 export interface BackendClientBot {
+  refreshList(): Promise<void>;
   getList(): Promise<(BackendListItem & { index: number })[]>;
-  ADD_ITEM(name: string): Promise<void>;
-  DELETE_ITEM(name: string): Promise<void>;
-  DELETE_ITEM2(index: number): Promise<void>;
-  RENAME_ITEM(oldName: string, newName: string): Promise<void>;
-  SET_ITEM_CHECKED(name: string, checked: boolean): Promise<void>;
-  SET_ITEM_CHECKED2(index: number, checked: boolean): Promise<void>;
+  ADD_ITEM(name: string, checked?: boolean): Promise<void>;
+  DELETE_ITEM(index: number): Promise<void>;
+  SET_ITEM_CHECKED(index: number, checked: boolean): Promise<void>;
 }

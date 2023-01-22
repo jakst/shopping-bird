@@ -7,13 +7,36 @@ export async function createBot(): Promise<BackendClientBot> {
   const page = await getPage();
 
   return {
-    async getList() {
+    async refreshList() {
+      await pause(1000);
+
       await goToShoppingListPage(page);
       const list = await getList(page);
 
-      return list.map((item, index) => ({ index, ...item }));
+      for (const item of list) {
+        // Fix all incorrectly named items
+        const fixedName = trimAndUppercase(item.name);
+        // Only rename when item is not checked, because otherwise we'll trigger
+        // the bug mentioned below where the item becomes unchecked
+        if (fixedName !== item.name && !item.checked) {
+          console.log(
+            `[BOT]: Renaming incorrectly named item from "${item.name}" to "${fixedName}"`,
+          );
+          await rename(page, item.name, fixedName);
+          item.name = fixedName;
+        }
+      }
     },
-    async ADD_ITEM(name) {
+    async getList() {
+      const list = (await getList(page)).map((item, index) => ({
+        index,
+        ...item,
+      }));
+
+      // Return a reversed array, because Google stores the newest items on top
+      return list.reverse();
+    },
+    async ADD_ITEM(name, checked = false) {
       const newItemInput = (await page.$(
         'input[aria-label="Lägg till objekt"]',
       ))!;
@@ -22,44 +45,14 @@ export async function createBot(): Promise<BackendClientBot> {
       await newItemInput.press("Enter");
 
       await page.waitForXPath('//*[text()="Varan har lagts till"]');
-    },
-    async DELETE_ITEM2(index) {
-      throw new Error("Not implemented");
-    },
-    async SET_ITEM_CHECKED2(index) {
-      throw new Error("Not implemented");
-    },
-    async DELETE_ITEM(name) {
-      console.log(`[BOT]: Removing item ${name}`);
 
-      const [nameDisplay] = (await page.$x(
-        `//ul/li//div[@role="button" and text()="${name}"]`,
-      )) as [ElementHandle<HTMLDivElement>];
-      await nameDisplay.click();
-
-      // Press the trash button, two tabs away from the input field
-      await page.keyboard.press("Tab");
-      await page.keyboard.press("Tab");
-      await page.keyboard.press("Enter");
-
-      await page.waitForXPath('//*[text()="Varan har raderats"]');
+      if (checked) await setItemCheckedAtPosition(page, 0, true);
     },
-    async RENAME_ITEM(oldName, newName) {
-      await rename(page, oldName, newName);
+    async DELETE_ITEM(index) {
+      await removeItemAtPosition(page, index);
     },
-    async SET_ITEM_CHECKED(name, value) {
-      const checkbox = await page.$(
-        `ul[aria-label="Min inköpslista"] > li input[aria-label="${name}"]`,
-      );
-
-      if (checkbox) {
-        const isChecked = await checkbox.evaluate((el) => el.checked);
-
-        if ((isChecked && !value) || (!isChecked && value)) {
-          await checkbox.click();
-          await pause(100);
-        }
-      }
+    async SET_ITEM_CHECKED(index, value) {
+      await setItemCheckedAtPosition(page, index, value);
     },
   };
 }
@@ -98,38 +91,6 @@ async function getList(page: Page) {
     }),
   );
 
-  const disoceveredItemNames = new Set<string>();
-  const duplicateNames = new Set<string>();
-  const duplicateIndexes: number[] = [];
-
-  for (const [index, item] of items.entries()) {
-    // Fix all incorrectly named items
-    const fixedName = trimAndUppercase(item.name);
-    if (fixedName !== item.name) {
-      console.log(
-        `[BOT]: Renaming incorrectly named item from "${item.name}" to "${fixedName}"`,
-      );
-      await rename(page, item.name, fixedName);
-      item.name = fixedName;
-    }
-
-    if (disoceveredItemNames.has(item.name.toLowerCase())) {
-      duplicateNames.add(item.name);
-      duplicateIndexes.push(index);
-    } else {
-      disoceveredItemNames.add(item.name.toLowerCase());
-    }
-  }
-
-  for (const duplicateName of duplicateNames) {
-    await removeDuplicates(page, duplicateName);
-  }
-
-  // Remove duplicate items, but from the back so that we don't change
-  // the position of the next item to remove on every iteration.
-  duplicateIndexes.reverse();
-  duplicateIndexes.forEach((index) => items.splice(index, 1));
-
   return items;
 }
 
@@ -151,36 +112,42 @@ async function rename(page: Page, oldName: string, newName: string) {
   await page.keyboard.press("Tab");
   await page.keyboard.press("Enter");
 
-  await pause(100);
+  await pause(1000);
 }
 
-async function removeDuplicates(page: Page, name: string) {
-  // Find names case insensitively
-  const nameDisplays = (await page.$x(
-    `//ul/li//div[
-      @role="button"
-    and
-      text()[contains(
-        translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ', 'abcdefghijklmnopqrstuvwxyzåäö'),
-        '${name.toLowerCase()}'
-      )]
-    ]`,
-  )) as ElementHandle<HTMLDivElement>[];
+async function setItemCheckedAtPosition(
+  page: Page,
+  index: number,
+  value: boolean,
+) {
+  const checkbox = (
+    await page.$$(`ul[aria-label="Min inköpslista"] > li input`)
+  )[index];
 
-  // We want to keep one item, so shift the first one out of the list
-  nameDisplays.shift();
+  if (checkbox) {
+    const isChecked = await checkbox.evaluate((el) => el.checked);
 
-  console.log(
-    `[BOT]: Removing ${nameDisplays.length} duplicate(s) of item "${name}"`,
-  );
-  for (const nameDisplay of nameDisplays) {
-    await nameDisplay.click();
-
-    // Press the trash button, two tabs away from the input field
-    await page.keyboard.press("Tab");
-    await page.keyboard.press("Tab");
-    await page.keyboard.press("Enter");
-
-    await pause(100);
+    if ((isChecked && !value) || (!isChecked && value)) {
+      await checkbox.click();
+      await pause(1000);
+    }
   }
+}
+
+async function removeItemAtPosition(page: Page, index: number) {
+  const nameDisplay = (await page.$x(`//ul/li//div[@role="button"]`))[
+    index
+  ] as ElementHandle<HTMLDivElement>;
+
+  const name = await nameDisplay.evaluate((el) => el.textContent);
+
+  console.log(`[BOT]: Removing item "${name}" at index ${index}`);
+  await nameDisplay.click();
+
+  // Press the trash button, two tabs away from the input field
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Enter");
+
+  await page.waitForXPath('//*[text()="Varan har raderats"]');
 }
