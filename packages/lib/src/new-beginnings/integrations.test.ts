@@ -186,14 +186,14 @@ describe("client.clearCheckedItems()", () => {
     await c1.client.connect();
 
     // Add and set an item as checked on the client
-    const itemId = await c1.client.addItem("45319");
+    const itemId = await c1.client.addItem("Ost");
     await c1.client.setItemChecked(itemId, true);
 
     // Ensure the backendClient has recieved the checked item
     await setup.backendClient.flush();
 
     // Add and set another item as checked on the backendClient
-    setup.backendList.push({ name: "2", checked: false });
+    setup.backendList.push({ name: "Kex", checked: false });
     setup.backendList[1].checked = true;
 
     // Clear all checked items on client

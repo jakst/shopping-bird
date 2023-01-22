@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 import { EventQueue } from "./event-queue";
 import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
-import { applyEvent, validateEvent } from "./shopping-list";
+import { applyEvent } from "./shopping-list";
 
 interface BackendClientDeps {
   eventQueue: EventQueue<ShoppingListEvent[]>;
@@ -10,127 +10,115 @@ interface BackendClientDeps {
   bot: BackendClientBot;
 }
 
-type ListItem = Pick<ShoppingListItem, "name" | "checked">;
+export interface BackendListItem {
+  name: string;
+  checked: boolean;
+}
 
 export class BackendClient {
   onEventsReturned: null | ((events: ShoppingListEvent[]) => void) = null;
+
+  /** Containst the resulting store, with mapped IDs, from the last sync */
   #previousStore: ShoppingListItem[];
+
+  /** Contains the incoming store, that we aim to converge with */
+  #incomingStore: ShoppingListItem[] | null = null;
 
   #promise: Promise<any> | null = null;
 
   constructor(private $d: BackendClientDeps) {
     this.#previousStore = $d.initialStore;
+    this.#incomingStore = $d.initialStore;
   }
 
   async flush() {
-    await this.#startEventProcessor();
+    await this.#promiseToSync();
   }
 
-  pushEvents(events: ShoppingListEvent[]) {
-    if (events.length > 0) {
-      this.$d.eventQueue.push(events);
-      this.#startEventProcessor();
-    }
+  async sync(shoppingList: ShoppingListItem[]) {
+    // Deep clone, so we don't accidentally mutate
+    this.#incomingStore = structuredClone(shoppingList);
+    await this.#promiseToSync();
   }
 
-  async #startEventProcessor() {
-    this.#promise ??= this.#processEvents().then(() => (this.#promise = null));
+  async #promiseToSync() {
+    this.#promise ??= this.#sync().then(() => (this.#promise = null));
     await this.#promise;
   }
 
-  // TODO: cannot run concurrently with #processEvents
-  async sendDiffFromLastSync() {
-    const eventsToReturn = generateEvents(
-      await this.$d.bot.getList(),
-      this.#previousStore,
-    );
+  async #sync() {
+    if (!this.#incomingStore) return;
 
+    const workingStoreCopy = structuredClone(this.#incomingStore);
+    this.#incomingStore = null;
+
+    let actualList = await this.$d.bot.getList();
+    actualList.reverse();
+
+    const eventsToReturn = generateEvents(actualList, this.#previousStore);
     if (eventsToReturn.length > 0) {
       this.onEventsReturned?.(eventsToReturn);
-      eventsToReturn.forEach((event) => applyEvent(this.#previousStore, event));
+      eventsToReturn.forEach((event) => applyEvent(workingStoreCopy, event));
     }
 
-    this.$d.onStoreChanged(this.#previousStore);
-  }
+    this.$d.onStoreChanged(workingStoreCopy);
 
-  async #processEvents() {
-    await this.$d.eventQueue.process(async (eventGroups) => {
-      for (const events of eventGroups) {
-        // Make a copy of the list old so we can mutate, while diffing against the old state
-        const oldStore = this.#previousStore;
-        const newStore = structuredClone(oldStore);
+    while (!equalsList(workingStoreCopy, actualList)) {
+      const mappedItems = new Set();
 
-        const listBeforeChanges = await this.$d.bot.getList();
+      for (const itan of workingStoreCopy) {
+        const otherItan = actualList.find(
+          (i) => i.name === itan.name && !mappedItems.has(i),
+        );
 
-        // Generate outgoing events before we make any changes
-        const eventsToReturn = generateEvents(listBeforeChanges, oldStore);
-        if (eventsToReturn.length > 0) {
-          this.onEventsReturned?.(eventsToReturn);
-          eventsToReturn.forEach((event) => applyEvent(newStore, event));
-        }
+        if (otherItan) {
+          mappedItems.add(itan);
+          mappedItems.add(otherItan);
 
-        // Apply incoming events
-        for (const event of events) {
-          const eventWasAccepted = validateEvent(newStore, event);
-          if (eventWasAccepted) {
-            try {
-              await this.#executeEvent(event, newStore);
-            } catch (e) {
-              console.error(
-                "Event failed to execute on backend client",
-                JSON.stringify(event),
-                e,
-              );
-            }
-
-            applyEvent(newStore, event); // Must happen after we have executed
+          if (otherItan.checked !== itan.checked) {
+            await this.$d.bot.SET_ITEM_CHECKED2(otherItan.index, itan.checked);
           }
         }
-
-        this.$d.onStoreChanged(newStore);
-        this.#previousStore = newStore;
-      }
-    });
-
-    // Process any events that arrived while running
-    if (!this.$d.eventQueue.isEmpty()) await this.#processEvents();
-  }
-
-  async #executeEvent(
-    event: ShoppingListEvent,
-    newStore: readonly ShoppingListItem[],
-  ) {
-    switch (event.name) {
-      case "ADD_ITEM": {
-        await this.$d.bot.ADD_ITEM(event.data.name);
-        break;
       }
 
-      case "DELETE_ITEM": {
-        const item = newStore.find(({ id }) => id === event.data.id);
-        if (item) await this.$d.bot.DELETE_ITEM(item.name);
-        break;
+      // Delete items that weren't mapped
+      for (const otherItan of actualList.filter((i) => !mappedItems.has(i))) {
+        await this.$d.bot.DELETE_ITEM2(otherItan.index);
       }
 
-      case "SET_ITEM_CHECKED": {
-        const item = newStore.find(({ id }) => id === event.data.id);
-        if (item)
-          await this.$d.bot.SET_ITEM_CHECKED(item.name, event.data.checked);
-        break;
+      // Add items that weren't mapped
+      for (const itan of workingStoreCopy.filter((i) => !mappedItems.has(i))) {
+        await this.$d.bot.ADD_ITEM(itan.name);
       }
 
-      case "RENAME_ITEM": {
-        const item = newStore.find(({ id }) => id === event.data.id);
-        if (item) await this.$d.bot.RENAME_ITEM(item.name, event.data.newName);
-
-        break;
-      }
+      actualList = await this.$d.bot.getList();
+      actualList.reverse();
     }
+
+    this.#previousStore = workingStoreCopy;
+
+    await this.#sync();
   }
+}
+function equalsList(
+  listA: readonly { name: string; checked: boolean }[],
+  listB: readonly { name: string; checked: boolean }[],
+) {
+  if (listA.length !== listB.length) return false;
+
+  const sortedA = [...listA].sort((a, b) => a.name.localeCompare(b.name));
+  const sortedB = [...listB].sort((a, b) => a.name.localeCompare(b.name));
+
+  const somethingsWrong = sortedA.some((a, i) => {
+    const b = sortedB[i];
+    return a.name !== b.name || a.checked !== b.checked;
+  });
+
+  return !somethingsWrong;
 }
 
 function generateEvents(
-  list: readonly ListItem[],
+  list: readonly BackendListItem[],
   previousStore: readonly ShoppingListItem[],
 ) {
   const generatedEvents: ShoppingListEvent[] = [];
@@ -171,9 +159,11 @@ function generateEvents(
 }
 
 export interface BackendClientBot {
-  getList(): Promise<ListItem[]>;
+  getList(): Promise<(BackendListItem & { index: number })[]>;
   ADD_ITEM(name: string): Promise<void>;
   DELETE_ITEM(name: string): Promise<void>;
+  DELETE_ITEM2(index: number): Promise<void>;
   RENAME_ITEM(oldName: string, newName: string): Promise<void>;
   SET_ITEM_CHECKED(name: string, checked: boolean): Promise<void>;
+  SET_ITEM_CHECKED2(index: number, checked: boolean): Promise<void>;
 }

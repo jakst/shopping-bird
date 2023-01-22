@@ -1,12 +1,21 @@
-import { type BackendClientBot } from "../BackendClient";
-import { ShoppingListItem } from "../newSchemas";
+import { BackendListItem, type BackendClientBot } from "../BackendClient";
 import { pause } from "./pause";
 
 export class MockBackendBot implements BackendClientBot {
-  constructor(private shoppingList: Omit<ShoppingListItem, "id">[]) {}
+  constructor(private shoppingList: BackendListItem[]) {}
+
+  async DELETE_ITEM2(index: number) {
+    await pause(1);
+    this.shoppingList.splice(index, 1);
+  }
+  async SET_ITEM_CHECKED2(index: number, checked: boolean) {
+    await pause(1);
+    this.shoppingList[index].checked = checked;
+  }
 
   async getList() {
-    return this.shoppingList;
+    const list = this.shoppingList.map((item, index) => ({ index, ...item }));
+    return list;
   }
 
   async ADD_ITEM(name: string) {

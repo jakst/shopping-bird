@@ -1,9 +1,9 @@
 import { expect } from "vitest";
-import { ShoppinglistEvent } from "../../lib";
-import { BackendClient } from "../BackendClient";
+import { type ShoppingListEvent } from "../../lib";
+import { BackendClient, BackendListItem } from "../BackendClient";
 import { Client } from "../client";
 import { EventQueue } from "../event-queue";
-import { type ShoppingListEvent, type ShoppingListItem } from "../newSchemas";
+import { type ShoppingListItem } from "../newSchemas";
 import { Server } from "../server";
 import { ShoppingList } from "../shopping-list";
 import { FakeClientServerConnection } from "./FakeClientServerConnection";
@@ -16,10 +16,10 @@ export function createRandomString() {
 export function setupTest() {
   const serverShoppingList = new ShoppingList([], (items) => {});
 
-  const backendList: Omit<ShoppingListItem, "id">[] = [];
+  const backendList: BackendListItem[] = [];
 
   const backendClient = new BackendClient({
-    eventQueue: new EventQueue<ShoppinglistEvent[]>([], () => {}),
+    eventQueue: new EventQueue<ShoppingListEvent[]>([], () => {}),
     initialStore: [],
     onStoreChanged: () => {},
     bot: new MockBackendBot(backendList),

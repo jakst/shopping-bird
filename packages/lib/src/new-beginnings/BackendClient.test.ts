@@ -2,6 +2,7 @@ import { expect, test, vi } from "vitest";
 import { BackendClient } from "./BackendClient";
 import { EventQueue } from "./event-queue";
 import { ShoppingListEvent, ShoppingListItem } from "./newSchemas";
+import { ShoppingList } from "./shopping-list";
 import { MockBackendBot } from "./test-utils/MockBackendBot";
 import { pause } from "./test-utils/pause";
 
@@ -15,15 +16,16 @@ test("Only calls bot once per incoming event [regression test]", async () => {
 
   const spy = vi.spyOn(backendClient["$d"].bot, "ADD_ITEM");
 
-  backendClient.pushEvents([
-    { name: "ADD_ITEM", data: { id: "1", name: "Ost" } },
-  ]);
+  backendClient.sync([{ id: "1", name: "Ost", checked: false }]);
   await pause(1);
-  backendClient.pushEvents([
-    { name: "ADD_ITEM", data: { id: "2", name: "Skinka" } },
+  backendClient.sync([
+    { id: "1", name: "Ost", checked: false },
+    { id: "2", name: "Skinka", checked: false },
   ]);
-  backendClient.pushEvents([
-    { name: "ADD_ITEM", data: { id: "3", name: "Bröd" } },
+  backendClient.sync([
+    { id: "1", name: "Ost", checked: false },
+    { id: "2", name: "Skinka", checked: false },
+    { id: "3", name: "Bröd", checked: false },
   ]);
 
   await backendClient.flush();
@@ -41,9 +43,9 @@ test("Only generates events from items once", async () => {
 
   const mock = (backendClient.onEventsReturned = vi.fn());
 
-  backendClient.pushEvents([
-    { name: "ADD_ITEM", data: { id: "1", name: "Skinka" } },
-  ]);
+  const list = [{ id: "1", name: "Skinka", checked: false }];
+
+  backendClient.sync(list);
   await backendClient.flush();
 
   expect(backendClient.onEventsReturned).toHaveBeenCalledOnce();
@@ -53,9 +55,8 @@ test("Only generates events from items once", async () => {
 
   mock.mockReset();
 
-  backendClient.pushEvents([
-    { name: "ADD_ITEM", data: { id: "2", name: "Kaviar" } },
-  ]);
+  list.push({ id: "2", name: "Kaviar", checked: false });
+  backendClient.sync(list);
   await backendClient.flush();
 
   expect(backendClient.onEventsReturned).toHaveBeenCalledTimes(0);
@@ -282,11 +283,14 @@ const testCases: TestCase[] = [
 
 test.each(testCases)(
   "\nevents\n    %j\ngenerate list ->\n    %j",
-  async (evenGroups, expected) => {
+  async (eventGroups, expected) => {
     const { backendClient, shoppingList } = createBackendClient();
 
-    for (const events of evenGroups) {
-      backendClient.pushEvents(events);
+    const list = new ShoppingList([], () => {});
+    for (const events of eventGroups) {
+      list.applyEvents(events);
+      backendClient.sync(list.items);
+      // backendClient.pushEvents(events);
     }
 
     await backendClient.flush();

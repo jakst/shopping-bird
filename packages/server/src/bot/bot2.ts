@@ -11,9 +11,9 @@ export async function createBot(): Promise<BackendClientBot> {
       await goToShoppingListPage(page);
       const list = await getList(page);
 
-      return list;
+      return list.map((item, index) => ({ index, ...item }));
     },
-    async ADD_ITEM(name: string) {
+    async ADD_ITEM(name) {
       const newItemInput = (await page.$(
         'input[aria-label="Lägg till objekt"]',
       ))!;
@@ -23,8 +23,14 @@ export async function createBot(): Promise<BackendClientBot> {
 
       await page.waitForXPath('//*[text()="Varan har lagts till"]');
     },
-    async DELETE_ITEM(name: string) {
-      console.log(`Removing item ${name}`);
+    async DELETE_ITEM2(index) {
+      throw new Error("Not implemented");
+    },
+    async SET_ITEM_CHECKED2(index) {
+      throw new Error("Not implemented");
+    },
+    async DELETE_ITEM(name) {
+      console.log(`[BOT]: Removing item ${name}`);
 
       const [nameDisplay] = (await page.$x(
         `//ul/li//div[@role="button" and text()="${name}"]`,
@@ -38,10 +44,10 @@ export async function createBot(): Promise<BackendClientBot> {
 
       await page.waitForXPath('//*[text()="Varan har raderats"]');
     },
-    async RENAME_ITEM(oldName: string, newName: string) {
+    async RENAME_ITEM(oldName, newName) {
       await rename(page, oldName, newName);
     },
-    async SET_ITEM_CHECKED(name: string, value: boolean) {
+    async SET_ITEM_CHECKED(name, value) {
       const checkbox = await page.$(
         `ul[aria-label="Min inköpslista"] > li input[aria-label="${name}"]`,
       );
@@ -175,6 +181,6 @@ async function removeDuplicates(page: Page, name: string) {
     await page.keyboard.press("Tab");
     await page.keyboard.press("Enter");
 
-  await pause(100);
+    await pause(100);
   }
 }
