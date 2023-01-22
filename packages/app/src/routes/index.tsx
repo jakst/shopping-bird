@@ -3,7 +3,7 @@ import {
   Client,
   EventQueue,
   ShoppingList,
-  ShoppinglistEvent,
+  ShoppingListEvent,
   ShoppingListItem,
   trimAndUppercase,
 } from "hello-bird-lib";
@@ -73,7 +73,7 @@ function createClient() {
     },
   );
 
-  const eventQueue = new EventQueue<ShoppinglistEvent>(
+  const eventQueue = new EventQueue<ShoppingListEvent>(
     JSON.parse(localStorage.getItem("event-queue") ?? "[]"),
     (events) => {
       setIsEventQueueEmpty(events.length === 0);

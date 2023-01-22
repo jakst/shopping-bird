@@ -2,7 +2,7 @@ import {
   dbSchema,
   type ClientServerConnection,
   type OnRemoteListChangedCallback,
-  type ShoppinglistEvent,
+  type ShoppingListEvent,
 } from "hello-bird-lib";
 import { env } from "./env";
 
@@ -46,7 +46,7 @@ export class BrowserServerConnection implements ClientServerConnection {
     this.eventSource?.close();
   }
 
-  async pushEvents(events: ShoppinglistEvent[]) {
+  async pushEvents(events: ShoppingListEvent[]) {
     // await client.pushActions.mutate({ sseId: this.clientId, actions: events });
     throw new Error("Function not implemented.");
   }
