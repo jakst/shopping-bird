@@ -56,8 +56,6 @@ export class BackendClient {
     await this.$d.bot.refreshList();
     let latestListFromBot = await this.$d.bot.getList();
 
-    console.log({ latestListFromBot, previousStore: this.#previousStore });
-
     const eventsToReturn = generateEvents(
       latestListFromBot,
       this.#previousStore,
@@ -71,7 +69,6 @@ export class BackendClient {
     this.#previousStore = workingStoreCopy;
 
     while (!equalsList(workingStoreCopy, latestListFromBot)) {
-      console.log("loopstart");
       const mappedItems = new Set();
 
       for (const incomingItem of workingStoreCopy) {
