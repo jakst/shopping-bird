@@ -12,17 +12,17 @@ export class MockBackendBot implements BackendClientBot {
   }
 
   async ADD_ITEM(name: string, checked = false) {
+    this.shoppingList.push({ name, checked });
     await pause(1);
-      this.shoppingList.push({ name, checked });
   }
 
   async DELETE_ITEM(index: number) {
-    await pause(1);
     this.shoppingList.splice(index, 1);
+    await pause(1);
   }
 
   async SET_ITEM_CHECKED(index: number, checked: boolean) {
-    await pause(1);
     this.shoppingList[index].checked = checked;
+    await pause(1);
   }
 }
