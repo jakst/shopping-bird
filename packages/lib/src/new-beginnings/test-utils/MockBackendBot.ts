@@ -13,7 +13,6 @@ export class MockBackendBot implements BackendClientBot {
 
   async ADD_ITEM(name: string, checked = false) {
     await pause(1);
-    if (!this.shoppingList.some((item) => item.name === name))
       this.shoppingList.push({ name, checked });
   }
 

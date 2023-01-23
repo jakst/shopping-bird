@@ -101,6 +101,21 @@ test("Events are idempotent", async () => {
   setup.assertEqualLists();
 });
 
+test("Attempting to add two items with the same name", async () => {
+  const setup = setupTest();
+
+  const c1 = setup.createClient();
+
+  await c1.client.connect();
+
+  await c1.client.addItem("Ost");
+  await c1.client.addItem("Ost");
+
+  await setup.playOutListSync();
+  setup.assertEqualLists();
+  // TODO: Expect both, or one to be added?
+});
+
 test("Rename an item before syncing the creation event", async () => {
   const setup = setupTest();
 
