@@ -4,7 +4,6 @@ import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
 import { ShoppingList } from "./shopping-list";
 
 export interface ServerClientConnection {
-  assignClientId(id: string): void;
   notifyListChanged(items: ShoppingListItem[]): void;
 }
 
@@ -34,7 +33,7 @@ export class Server {
     return clientId;
   }
 
-  disconnectClient(clientId: string) {
+  onClientDisconnected(clientId: string) {
     this.clients.delete(clientId);
 
     console.log(

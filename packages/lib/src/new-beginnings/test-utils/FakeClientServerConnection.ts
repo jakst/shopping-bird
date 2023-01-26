@@ -20,11 +20,6 @@ export class FakeClientServerConnection
   }
 
   // Called from server
-  assignClientId(id: string) {
-    this.clientId = id;
-  }
-
-  // Called from server
   notifyListChanged(items: ShoppingListItem[]) {
     if (this.onRemoteListChanged)
       this.onRemoteListChanged(structuredClone(items));
@@ -41,7 +36,7 @@ export class FakeClientServerConnection
   // Called from client
   disconnect() {
     if (this.clientId) {
-      this.$d.server.disconnectClient(this.clientId);
+      this.$d.server.onClientDisconnected(this.clientId);
       this.clientId = null;
     } else {
       console.warn("Attempt to disconnect while not connected");
