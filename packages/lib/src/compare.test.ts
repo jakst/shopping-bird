@@ -1,40 +1,46 @@
 import { expect, test } from "vitest";
 import { compare } from "./compare";
-import { Item } from "./schemas";
+import { ShoppingListItem } from "./lib";
 
 test("Adds unchecked items", () => {
-  const previousList: Item[] = [];
-  const newList: Item[] = [{ id: "a", index: 0, name: "Ost", checked: false }];
+  const previousList: ShoppingListItem[] = [];
+  const newList: ShoppingListItem[] = [
+    { id: "a", name: "Ost", checked: false },
+  ];
 
   const res = compare(previousList, newList);
 
   expect(res).toEqual([
     {
-      name: "CREATE_ITEM",
-      data: { id: "a", index: 0, name: "Ost", checked: false },
+      name: "ADD_ITEM",
+      data: { id: "a", name: "Ost" },
     },
   ]);
 });
 
 test("Adds checked items", () => {
-  const previousList: Item[] = [];
-  const newList: Item[] = [{ id: "a", index: 0, name: "Ost", checked: true }];
+  const previousList: ShoppingListItem[] = [];
+  const newList: ShoppingListItem[] = [{ id: "a", name: "Ost", checked: true }];
 
   const res = compare(previousList, newList);
 
   expect(res).toEqual([
     {
-      name: "CREATE_ITEM",
-      data: { id: "a", index: 0, name: "Ost", checked: true },
+      name: "ADD_ITEM",
+      data: { id: "a", name: "Ost" },
+    },
+    {
+      name: "SET_ITEM_CHECKED",
+      data: { id: "a", checked: true },
     },
   ]);
 });
 
 test("Removes checked items", () => {
-  const previousList: Item[] = [
-    { id: "a", index: 0, name: "Kaffe", checked: true },
+  const previousList: ShoppingListItem[] = [
+    { id: "a", name: "Kaffe", checked: true },
   ];
-  const newList: Item[] = [];
+  const newList: ShoppingListItem[] = [];
 
   const res = compare(previousList, newList);
 
@@ -42,10 +48,10 @@ test("Removes checked items", () => {
 });
 
 test("Removes unchecked items", () => {
-  const previousList: Item[] = [
-    { id: "a", index: 0, name: "Kaffe", checked: false },
+  const previousList: ShoppingListItem[] = [
+    { id: "a", name: "Kaffe", checked: false },
   ];
-  const newList: Item[] = [];
+  const newList: ShoppingListItem[] = [];
 
   const res = compare(previousList, newList);
 
@@ -53,10 +59,10 @@ test("Removes unchecked items", () => {
 });
 
 test("Leaves unchanged items", () => {
-  const previousList: Item[] = [
-    { id: "a", index: 0, name: "Ost", checked: true },
+  const previousList: ShoppingListItem[] = [
+    { id: "a", name: "Ost", checked: true },
   ];
-  const newList: Item[] = [{ id: "a", index: 0, name: "Ost", checked: true }];
+  const newList: ShoppingListItem[] = [{ id: "a", name: "Ost", checked: true }];
 
   const res = compare(previousList, newList);
 
@@ -64,10 +70,10 @@ test("Leaves unchanged items", () => {
 });
 
 test("Checks items", () => {
-  const previousList: Item[] = [
-    { id: "a", index: 0, name: "Ost", checked: false },
+  const previousList: ShoppingListItem[] = [
+    { id: "a", name: "Ost", checked: false },
   ];
-  const newList: Item[] = [{ id: "a", index: 0, name: "Ost", checked: true }];
+  const newList: ShoppingListItem[] = [{ id: "a", name: "Ost", checked: true }];
 
   const res = compare(previousList, newList);
 
@@ -77,10 +83,12 @@ test("Checks items", () => {
 });
 
 test("Unchecks items", () => {
-  const previousList: Item[] = [
-    { id: "a", index: 0, name: "Ost", checked: true },
+  const previousList: ShoppingListItem[] = [
+    { id: "a", name: "Ost", checked: true },
   ];
-  const newList: Item[] = [{ id: "a", index: 0, name: "Ost", checked: false }];
+  const newList: ShoppingListItem[] = [
+    { id: "a", name: "Ost", checked: false },
+  ];
 
   const res = compare(previousList, newList);
 
@@ -90,11 +98,11 @@ test("Unchecks items", () => {
 });
 
 test("Renames items", () => {
-  const previousList: Item[] = [
-    { id: "a", index: 0, name: "Ost", checked: false },
+  const previousList: ShoppingListItem[] = [
+    { id: "a", name: "Ost", checked: false },
   ];
-  const newList: Item[] = [
-    { id: "a", index: 0, name: "Prästost", checked: false },
+  const newList: ShoppingListItem[] = [
+    { id: "a", name: "Prästost", checked: false },
   ];
 
   const res = compare(previousList, newList);
@@ -105,11 +113,11 @@ test("Renames items", () => {
 });
 
 test("Renames and checks items", () => {
-  const previousList: Item[] = [
-    { id: "a", index: 0, name: "Ost", checked: false },
+  const previousList: ShoppingListItem[] = [
+    { id: "a", name: "Ost", checked: false },
   ];
-  const newList: Item[] = [
-    { id: "a", index: 0, name: "Prästost", checked: true },
+  const newList: ShoppingListItem[] = [
+    { id: "a", name: "Prästost", checked: true },
   ];
 
   const res = compare(previousList, newList);
@@ -121,17 +129,17 @@ test("Renames and checks items", () => {
 });
 
 test("Works for complex cases", () => {
-  const previousList: Item[] = [
-    { id: "a", index: 0, name: "Ost", checked: true },
-    { id: "b", index: 1, name: "Kaffe", checked: false },
-    { id: "c", index: 2, name: "Mjölk", checked: false },
-    { id: "d", index: 3, name: "Yoghurt", checked: true },
+  const previousList: ShoppingListItem[] = [
+    { id: "a", name: "Ost", checked: true },
+    { id: "b", name: "Kaffe", checked: false },
+    { id: "c", name: "Mjölk", checked: false },
+    { id: "d", name: "Yoghurt", checked: true },
   ];
-  const newList: Item[] = [
-    { id: "a", index: 0, name: "Ost", checked: false },
-    { id: "b", index: 1, name: "Kaffe", checked: true },
-    { id: "e", index: 2, name: "Bröd", checked: false },
-    { id: "f", index: 3, name: "Bullar", checked: true },
+  const newList: ShoppingListItem[] = [
+    { id: "a", name: "Ost", checked: false },
+    { id: "b", name: "Kaffe", checked: true },
+    { id: "e", name: "Bröd", checked: false },
+    { id: "f", name: "Bullar", checked: true },
   ];
 
   const res = compare(previousList, newList);
@@ -140,13 +148,14 @@ test("Works for complex cases", () => {
     { name: "SET_ITEM_CHECKED", data: { id: "a", checked: false } },
     { name: "SET_ITEM_CHECKED", data: { id: "b", checked: true } },
     {
-      name: "CREATE_ITEM",
-      data: { id: "e", index: 2, name: "Bröd", checked: false },
+      name: "ADD_ITEM",
+      data: { id: "e", name: "Bröd" },
     },
     {
-      name: "CREATE_ITEM",
-      data: { id: "f", index: 3, name: "Bullar", checked: true },
+      name: "ADD_ITEM",
+      data: { id: "f", name: "Bullar" },
     },
+    { name: "SET_ITEM_CHECKED", data: { id: "f", checked: true } },
     { name: "DELETE_ITEM", data: { id: "c" } },
     { name: "DELETE_ITEM", data: { id: "d" } },
   ]);

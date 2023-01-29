@@ -1,47 +1,9 @@
 import { nanoid } from "nanoid/non-secure";
 import { type ClientServerConnection } from "./client-server-connection";
+import { compare } from "./compare";
 import { EventQueue } from "./event-queue";
 import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
 import { applyEvent, ShoppingList, validateEvent } from "./shopping-list";
-
-// TODO: Test this
-function compare(oldList: ShoppingListItem[], newList: ShoppingListItem[]) {
-  const events: ShoppingListEvent[] = [];
-
-  newList.forEach((newItem) => {
-    const oldItem = oldList.find((oldItem) => oldItem.id === newItem.id);
-    if (!oldItem) {
-      events.push({
-        name: "ADD_ITEM",
-        data: { id: newItem.id, name: newItem.name },
-      });
-      if (newItem.checked)
-        events.push({
-          name: "SET_ITEM_CHECKED",
-          data: { id: newItem.id, checked: true },
-        });
-    } else {
-      if (newItem.checked !== oldItem.checked)
-        events.push({
-          name: "SET_ITEM_CHECKED",
-          data: { id: newItem.id, checked: newItem.checked },
-        });
-      if (newItem.name !== oldItem.name)
-        events.push({
-          name: "RENAME_ITEM",
-          data: { id: newItem.id, newName: newItem.name },
-        });
-    }
-  });
-
-  oldList.forEach((oldItem) => {
-    const newItem = newList.find(({ id }) => id === oldItem.id);
-    if (!newItem)
-      events.push({ name: "DELETE_ITEM", data: { id: oldItem.id } });
-  });
-
-  return events;
-}
 
 interface ClientDeps {
   shoppingList: ShoppingList;
@@ -104,14 +66,6 @@ export class Client {
 
     // Diff remote list against last version to get events
     const diffedEvents = compare(this.$d.remoteShoppingListCopy.items, newList);
-    // console.log(
-    //   `[CLIENT:${this.$d.serverConnection.clientId}] onRemoteListChanged - diffed events (${diffedEvents.length})`,
-    //   {
-    //     remoteShoppingListCopy: this.$d.remoteShoppingListCopy.items,
-    //     newList,
-    //     diffedEvents: JSON.stringify(diffedEvents),
-    //   },
-    // );
 
     if (diffedEvents.length > 0) {
       // Apply events to local and replace remote shoppingList

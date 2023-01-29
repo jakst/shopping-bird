@@ -1,31 +1,42 @@
-import { Action, Item } from "./schemas";
+import { ShoppingListEvent, ShoppingListItem } from "./lib";
 
-export function compare(oldList: Item[], newList: Item[]) {
-  const actions: Action[] = [];
+export function compare(
+  oldList: ShoppingListItem[],
+  newList: ShoppingListItem[],
+) {
+  const events: ShoppingListEvent[] = [];
 
   newList.forEach((newItem) => {
     const oldItem = oldList.find((oldItem) => oldItem.id === newItem.id);
-    if (oldItem) {
-      if (newItem.checked !== oldItem.checked)
-        actions.push({
+    if (!oldItem) {
+      events.push({
+        name: "ADD_ITEM",
+        data: { id: newItem.id, name: newItem.name },
+      });
+      if (newItem.checked)
+        events.push({
           name: "SET_ITEM_CHECKED",
-          data: { id: oldItem.id, checked: newItem.checked },
-        });
-
-      if (newItem.name !== oldItem.name)
-        actions.push({
-          name: "RENAME_ITEM",
-          data: { id: oldItem.id, newName: newItem.name },
+          data: { id: newItem.id, checked: true },
         });
     } else {
-      actions.push({ name: "CREATE_ITEM", data: newItem });
+      if (newItem.checked !== oldItem.checked)
+        events.push({
+          name: "SET_ITEM_CHECKED",
+          data: { id: newItem.id, checked: newItem.checked },
+        });
+      if (newItem.name !== oldItem.name)
+        events.push({
+          name: "RENAME_ITEM",
+          data: { id: newItem.id, newName: newItem.name },
+        });
     }
   });
 
   oldList.forEach((oldItem) => {
-    if (!newList.some((newItem) => newItem.id === oldItem.id))
-      actions.push({ name: "DELETE_ITEM", data: { id: oldItem.id } });
+    const newItem = newList.find(({ id }) => id === oldItem.id);
+    if (!newItem)
+      events.push({ name: "DELETE_ITEM", data: { id: oldItem.id } });
   });
 
-  return actions;
+  return events;
 }

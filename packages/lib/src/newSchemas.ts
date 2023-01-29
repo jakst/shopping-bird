@@ -8,6 +8,8 @@ export const shoppingListItemSchema = z.object({
 
 export type ShoppingListItem = z.infer<typeof shoppingListItemSchema>;
 
+export const shoppingListSchema = z.array(shoppingListItemSchema);
+
 const AddItem = z.object({
   name: z.literal("ADD_ITEM"),
   data: shoppingListItemSchema.pick({ id: true, name: true }),

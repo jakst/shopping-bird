@@ -1,8 +1,8 @@
 import { expect } from "vitest";
-import { type ShoppingListEvent } from "../../lib";
 import { Client } from "../client";
 import { EventQueue } from "../event-queue";
 import { ExternalClient, ExternalListItem } from "../external-client";
+import { type ShoppingListEvent } from "../lib";
 import { type ShoppingListItem } from "../newSchemas";
 import { Server } from "../server";
 import { ShoppingList } from "../shopping-list";

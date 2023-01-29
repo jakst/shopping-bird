@@ -1,4 +1,3 @@
-export { compare } from "./compare";
 export { Client } from "./new-beginnings/client";
 export {
   type ClientServerConnection,
@@ -11,23 +10,10 @@ export {
   eventListSchema,
   eventSchema,
   shoppingListItemSchema,
+  shoppingListSchema,
   type ShoppingListEvent,
   type ShoppingListItem,
 } from "./new-beginnings/newSchemas";
 export { Server } from "./new-beginnings/server";
 export { ShoppingList } from "./new-beginnings/shopping-list";
-export {
-  actionListSchema,
-  actionSchema,
-  dbSchema,
-  enrichedActionListSchema,
-  googleCacheSchema,
-  itemSchema,
-  type Action,
-  type Db,
-  type EnrichedAction,
-  type GetActionData,
-  type GoogleItem,
-  type Item,
-} from "./schemas";
 export { trimAndUppercase } from "./trimAndUppercase";

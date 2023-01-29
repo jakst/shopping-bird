@@ -1,5 +1,5 @@
 import {
-  dbSchema,
+  shoppingListSchema,
   type ClientServerConnection,
   type OnRemoteListChangedCallback,
   type ShoppingListEvent,
@@ -25,7 +25,7 @@ export class BrowserServerConnection implements ClientServerConnection {
     this.eventSource = eventSource;
 
     const listUpdateListener = (event: { data: string }) => {
-      const data = dbSchema.parse(JSON.parse(event.data));
+      const data = shoppingListSchema.parse(JSON.parse(event.data));
       onRemoteListChanged(data);
     };
 
