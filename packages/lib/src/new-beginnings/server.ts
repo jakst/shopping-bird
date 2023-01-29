@@ -12,12 +12,31 @@ interface ServerDeps {
   backendClient: BackendClient;
 }
 
+const ACTIVE_SYNC_INTERVAL = 60 * 1000; // Every minute
+const INACTIVE_SYNC_INTERVAL = 10 * 60 * 1000; // Every ten minutes
+
+type SyncMode = "active" | "inactive";
+
 export class Server {
   clients = new Map<string, ServerClientConnection>();
+  syncMode: SyncMode = "inactive";
+  syncInterval!: ReturnType<typeof setInterval>;
 
   constructor(private $d: ServerDeps) {
     this.$d.backendClient.onEventsReturned = (events) =>
       this.pushEvents(events);
+
+    this.setSyncMode("inactive");
+  }
+
+  setSyncMode(mode: SyncMode) {
+    if (this.syncMode === mode && this.syncInterval) return;
+
+    if (this.syncInterval) clearInterval(this.syncInterval);
+    this.syncInterval = setInterval(
+      () => void this.refreshDataFromBackendClient(),
+      mode === "active" ? ACTIVE_SYNC_INTERVAL : INACTIVE_SYNC_INTERVAL,
+    );
   }
 
   connectClient(client: ServerClientConnection) {
@@ -30,11 +49,16 @@ export class Server {
 
     client.notifyListChanged(this.$d.shoppingList.items);
 
+    this.setSyncMode("active");
+    this.refreshDataFromBackendClient();
+
     return clientId;
   }
 
   onClientDisconnected(clientId: string) {
     this.clients.delete(clientId);
+
+    if (this.clients.size === 0) this.setSyncMode("inactive");
 
     console.log(
       `[SERVER] ${this.clients.size} client(s) (${clientId} disconnected)`,
