@@ -53,14 +53,12 @@ export class BrowserServerConnection implements ClientServerConnection {
   }
 
   async pushEvents(events: ShoppingListEvent[]) {
-    const response = await fetch("??? TODO", {
+    await fetch(`${env.BACKEND_URL}/events`, {
       method: "POST",
       body: JSON.stringify({
-        clientId: "", // TODO
+        clientId: this.clientId,
         events,
       }),
     });
-
-    // TODO: Handle response
   }
 }
