@@ -3,7 +3,7 @@ import { ElementHandle, Page } from "puppeteer";
 import { pause } from "./actions";
 import { clearCookies, getPage } from "./browser";
 
-export async function createBot(): Promise<Bot> {
+export async function createGoogleBot(): Promise<Bot> {
   const page = await getPage();
 
   return {

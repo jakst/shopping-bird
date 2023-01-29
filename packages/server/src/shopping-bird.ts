@@ -7,7 +7,7 @@ import {
   shoppingListItemSchema,
 } from "hello-bird-lib";
 import { z } from "zod";
-import { createBot } from "./bot/bot";
+import { createGoogleBot } from "./bot/google-bot";
 import { createCached } from "./create-cached";
 
 export async function createShoppingBird() {
@@ -17,7 +17,7 @@ export async function createShoppingBird() {
     initialExternalClientStore,
     initialServerShoppingList,
   ] = await Promise.all([
-    createBot(),
+    createGoogleBot(),
     externalClientQueueCache.get(),
     externalClientStoreCache.get(),
     serverShoppingListCache.get(),
