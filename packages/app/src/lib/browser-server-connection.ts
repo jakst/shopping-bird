@@ -21,25 +21,31 @@ export class BrowserServerConnection implements ClientServerConnection {
   async connect(onRemoteListChanged: OnRemoteListChangedCallback) {
     if (this.isConnected) return;
 
-    const eventSource = new EventSource(`${env.BACKEND_URL}/sse`);
+    const eventSource = new EventSource(`${env.BACKEND_URL}/register`);
     this.eventSource = eventSource;
-    eventSource.addEventListener("db-update", (event) => {
+
+    const listUpdateListener = (event: { data: string }) => {
       const data = dbSchema.parse(JSON.parse(event.data));
       onRemoteListChanged(data);
-    });
+    };
 
-    eventSource.addEventListener("error", () => {
+    const errorListener = () => {
       this.clientId = null;
       this.onConnectionStatusChanged?.(false);
-    });
+    };
 
-    return new Promise<void>((resolve) =>
-      eventSource.addEventListener("sse-id", (event: MessageEvent<string>) => {
+    eventSource.addEventListener("list-update", listUpdateListener);
+    eventSource.addEventListener("error", errorListener);
+
+    return new Promise<void>((resolve) => {
+      const listener = (event: MessageEvent<string>) => {
         this.clientId = event.data;
         this.onConnectionStatusChanged?.(true);
         resolve();
-      }),
-    );
+      };
+
+      eventSource.addEventListener("client-id", listener);
+    });
   }
 
   disconnect() {
@@ -47,7 +53,14 @@ export class BrowserServerConnection implements ClientServerConnection {
   }
 
   async pushEvents(events: ShoppingListEvent[]) {
-    // await client.pushActions.mutate({ sseId: this.clientId, actions: events });
-    throw new Error("Function not implemented.");
+    const response = await fetch("??? TODO", {
+      method: "POST",
+      body: JSON.stringify({
+        clientId: "", // TODO
+        events,
+      }),
+    });
+
+    // TODO: Handle response
   }
 }
