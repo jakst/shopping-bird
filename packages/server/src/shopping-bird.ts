@@ -1,7 +1,7 @@
 import {
-  BackendClient,
   eventListSchema,
   EventQueue,
+  ExternalClient,
   Server,
   ShoppingList,
   shoppingListItemSchema,
@@ -13,27 +13,27 @@ import { createCached } from "./create-cached";
 export async function createShoppingBird() {
   const [
     bot,
-    initialBackendClientQueue,
-    initialBackendClientStore,
+    initialExternalClientQueue,
+    initialExternalClientStore,
     initialServerShoppingList,
   ] = await Promise.all([
     createBot(),
-    backendClientQueueCache.get(),
-    backendClientStoreCache.get(),
+    externalClientQueueCache.get(),
+    externalClientStoreCache.get(),
     serverShoppingListCache.get(),
   ]);
 
   const eventQueue = new EventQueue(
-    initialBackendClientQueue,
-    (queue) => void backendClientQueueCache.set(queue),
+    initialExternalClientQueue,
+    (queue) => void externalClientQueueCache.set(queue),
   );
 
-  const backendClient = new BackendClient({
+  const externalClient = new ExternalClient({
     bot,
     eventQueue,
-    initialStore: initialBackendClientStore,
+    initialStore: initialExternalClientStore,
     onStoreChanged(store) {
-      backendClientStoreCache.set(store);
+      externalClientStoreCache.set(store);
     },
   });
 
@@ -43,23 +43,23 @@ export async function createShoppingBird() {
   );
 
   return new Server({
-    backendClient,
+    externalClient,
     shoppingList,
   });
 }
 
-const backendClientQueueCache = createCached(
-  "backend-client-queue",
+const externalClientQueueCache = createCached(
+  "external-client-queue",
   // Array of event arrays... 😐
   z.array(eventListSchema),
 );
 
-const backendClientStoreCache = createCached(
-  "backend-client-store",
+const externalClientStoreCache = createCached(
+  "external-client-store",
   z.array(shoppingListItemSchema),
 );
 
 const serverShoppingListCache = createCached(
-  "backend-client-store",
+  "server-shopping-list",
   z.array(shoppingListItemSchema),
 );

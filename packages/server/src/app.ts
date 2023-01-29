@@ -71,7 +71,7 @@ async function startApp() {
     reply.status(204);
   });
 
-  await shoppingBird.refreshDataFromBackendClient();
+  await shoppingBird.refreshDataFromExternalClient();
 }
 
 async function run() {

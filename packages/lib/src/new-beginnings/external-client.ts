@@ -4,19 +4,19 @@ import { EventQueue } from "./event-queue";
 import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
 import { applyEvent } from "./shopping-list";
 
-interface BackendClientDeps {
+interface ExternalClientDeps {
   eventQueue: EventQueue<ShoppingListEvent[]>;
   initialStore: ShoppingListItem[];
   onStoreChanged: (store: ShoppingListItem[]) => void;
-  bot: BackendClientBot;
+  bot: Bot;
 }
 
-export interface BackendListItem {
+export interface ExternalListItem {
   name: string;
   checked: boolean;
 }
 
-export class BackendClient {
+export class ExternalClient {
   onEventsReturned: null | ((events: ShoppingListEvent[]) => void) = null;
 
   /** Containst the resulting store, with mapped IDs, from the last sync */
@@ -27,7 +27,7 @@ export class BackendClient {
 
   #promise: Promise<any> | null = null;
 
-  constructor(private $d: BackendClientDeps) {
+  constructor(private $d: ExternalClientDeps) {
     this.#previousStore = $d.initialStore;
     this.#incomingStore = $d.initialStore;
   }
@@ -125,7 +125,7 @@ export class BackendClient {
 }
 
 function generateEvents(
-  list: readonly BackendListItem[],
+  list: readonly ExternalListItem[],
   previousStore: readonly ShoppingListItem[],
 ) {
   const generatedEvents: ShoppingListEvent[] = [];
@@ -165,9 +165,9 @@ function generateEvents(
   return generatedEvents;
 }
 
-export interface BackendClientBot {
+export interface Bot {
   refreshList(): Promise<void>;
-  getList(): Promise<(BackendListItem & { index: number })[]>;
+  getList(): Promise<(ExternalListItem & { index: number })[]>;
   ADD_ITEM(name: string, checked?: boolean): Promise<void>;
   DELETE_ITEM(index: number): Promise<void>;
   SET_ITEM_CHECKED(index: number, checked: boolean): Promise<void>;

@@ -1,8 +1,8 @@
-import { BackendListItem, type BackendClientBot } from "../BackendClient";
+import { ExternalListItem, type Bot } from "../external-client";
 import { pause } from "./pause";
 
-export class MockBackendBot implements BackendClientBot {
-  constructor(private shoppingList: BackendListItem[]) {}
+export class MockBot implements Bot {
+  constructor(private shoppingList: ExternalListItem[]) {}
 
   async refreshList() {}
 

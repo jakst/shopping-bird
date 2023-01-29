@@ -1,8 +1,4 @@
 export { compare } from "./compare";
-export {
-  BackendClient,
-  type BackendClientBot,
-} from "./new-beginnings/BackendClient";
 export { Client } from "./new-beginnings/client";
 export {
   type ClientServerConnection,
@@ -10,6 +6,7 @@ export {
   type OnRemoteListChangedCallback,
 } from "./new-beginnings/client-server-connection";
 export { EventQueue } from "./new-beginnings/event-queue";
+export { ExternalClient, type Bot } from "./new-beginnings/external-client";
 export {
   eventListSchema,
   eventSchema,

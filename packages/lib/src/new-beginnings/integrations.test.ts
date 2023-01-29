@@ -131,14 +131,14 @@ test("Rename an item before syncing the creation event", async () => {
   setup.assertEqualLists();
 });
 
-test("Rename an item before syncing the creation event, with changes on the backendList", async () => {
+test("Rename an item before syncing the creation event, with changes on the external list", async () => {
   const setup = setupTest();
   const c1 = setup.createClient();
 
   const itemId1 = await c1.client.addItem("Gammal ost");
   await c1.client.renameItem(itemId1, "Ny ost");
 
-  setup.backendList.push({ name: "Gröt", checked: false });
+  setup.externalList.push({ name: "Gröt", checked: false });
 
   await setup.playOutListSync();
   setup.assertEqualLists();
@@ -204,19 +204,19 @@ describe("client.clearCheckedItems()", () => {
     const itemId = await c1.client.addItem("Ost");
     await c1.client.setItemChecked(itemId, true);
 
-    // Ensure the backendClient has recieved the checked item
-    await setup.backendClient.flush();
+    // Ensure the external client has recieved the checked item
+    await setup.externalClient.flush();
 
-    // Add and set another item as checked on the backendClient
-    setup.backendList.push({ name: "Kex", checked: false });
-    setup.backendList[1].checked = true;
+    // Add and set another item as checked on the external client
+    setup.externalList.push({ name: "Kex", checked: false });
+    setup.externalList[1].checked = true;
 
     // Clear all checked items on client
     await c1.client.clearCheckedItems();
 
-    await setup.backendClient.flush();
+    await setup.externalClient.flush();
 
     // This should only have cleared the item that was created on the client
-    expect(setup.backendList).toHaveLength(1);
+    expect(setup.externalList).toHaveLength(1);
   });
 });

@@ -1,81 +1,81 @@
 import { expect, test, vi } from "vitest";
-import { BackendClient } from "./BackendClient";
 import { EventQueue } from "./event-queue";
+import { ExternalClient } from "./external-client";
 import { ShoppingListEvent, ShoppingListItem } from "./newSchemas";
 import { ShoppingList } from "./shopping-list";
-import { MockBackendBot } from "./test-utils/MockBackendBot";
+import { MockBot } from "./test-utils/bot.mock";
 import { pause } from "./test-utils/pause";
 
 test("Only calls bot once per incoming event [regression test]", async () => {
-  const backendClient = new BackendClient({
+  const externalClient = new ExternalClient({
     eventQueue: new EventQueue<ShoppingListEvent[]>([], () => {}),
     initialStore: [],
     onStoreChanged: () => {},
-    bot: new MockBackendBot([]),
+    bot: new MockBot([]),
   });
 
-  const spy = vi.spyOn(backendClient["$d"].bot, "ADD_ITEM");
+  const spy = vi.spyOn(externalClient["$d"].bot, "ADD_ITEM");
 
-  backendClient.sync([{ id: "1", name: "Ost", checked: false }]);
+  externalClient.sync([{ id: "1", name: "Ost", checked: false }]);
   await pause(1);
-  backendClient.sync([
+  externalClient.sync([
     { id: "1", name: "Ost", checked: false },
     { id: "2", name: "Skinka", checked: false },
   ]);
-  backendClient.sync([
+  externalClient.sync([
     { id: "1", name: "Ost", checked: false },
     { id: "2", name: "Skinka", checked: false },
     { id: "3", name: "Bröd", checked: false },
   ]);
 
-  await backendClient.flush();
+  await externalClient.flush();
 
   expect(spy).toHaveBeenCalledTimes(3);
 });
 
 test("Only generates events from items once", async () => {
-  const backendClient = new BackendClient({
+  const externalClient = new ExternalClient({
     eventQueue: new EventQueue<ShoppingListEvent[]>([], () => {}),
     initialStore: [],
     onStoreChanged: () => {},
-    bot: new MockBackendBot([{ name: "Ost", checked: false }]),
+    bot: new MockBot([{ name: "Ost", checked: false }]),
   });
 
-  const mock = (backendClient.onEventsReturned = vi.fn());
+  const mock = (externalClient.onEventsReturned = vi.fn());
 
   const list = [{ id: "1", name: "Skinka", checked: false }];
 
-  backendClient.sync(list);
-  await backendClient.flush();
+  externalClient.sync(list);
+  await externalClient.flush();
 
-  expect(backendClient.onEventsReturned).toHaveBeenCalledOnce();
-  expect(backendClient.onEventsReturned).toHaveBeenCalledWith([
+  expect(externalClient.onEventsReturned).toHaveBeenCalledOnce();
+  expect(externalClient.onEventsReturned).toHaveBeenCalledWith([
     { name: "ADD_ITEM", data: expect.objectContaining({ name: "Ost" }) },
   ]);
 
   mock.mockReset();
 
   list.push({ id: "2", name: "Kaviar", checked: false });
-  backendClient.sync(list);
-  await backendClient.flush();
+  externalClient.sync(list);
+  await externalClient.flush();
 
-  expect(backendClient.onEventsReturned).toHaveBeenCalledTimes(0);
+  expect(externalClient.onEventsReturned).toHaveBeenCalledTimes(0);
 });
 
 type Item = Omit<ShoppingListItem, "id">;
 
-function createBackendClient() {
+function createExternalClient() {
   const shoppingList: Item[] = [];
   const eventQueue = new EventQueue<ShoppingListEvent[]>([], () => {});
-  const bot = new MockBackendBot(shoppingList);
-  const backendClient = new BackendClient({
+  const bot = new MockBot(shoppingList);
+  const externalClient = new ExternalClient({
     eventQueue,
     initialStore: [],
     onStoreChanged: () => {},
     bot,
   });
 
-  return { backendClient, shoppingList };
+  return { externalClient, shoppingList };
 }
 
 type TestCase = [ShoppingListEvent[][], Item[]];
@@ -284,16 +284,16 @@ const testCases: TestCase[] = [
 test.each(testCases)(
   "\nevents\n    %j\ngenerate list ->\n    %j",
   async (eventGroups, expected) => {
-    const { backendClient, shoppingList } = createBackendClient();
+    const { externalClient, shoppingList } = createExternalClient();
 
     const list = new ShoppingList([], () => {});
     for (const events of eventGroups) {
       list.applyEvents(events);
-      backendClient.sync(list.items);
-      // backendClient.pushEvents(events);
+      externalClient.sync(list.items);
+      // externalClient.pushEvents(events);
     }
 
-    await backendClient.flush();
+    await externalClient.flush();
 
     expect(shoppingList).toEqual(expected);
   },

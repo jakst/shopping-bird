@@ -1,13 +1,13 @@
 import { expect } from "vitest";
 import { type ShoppingListEvent } from "../../lib";
-import { BackendClient, BackendListItem } from "../BackendClient";
 import { Client } from "../client";
 import { EventQueue } from "../event-queue";
+import { ExternalClient, ExternalListItem } from "../external-client";
 import { type ShoppingListItem } from "../newSchemas";
 import { Server } from "../server";
 import { ShoppingList } from "../shopping-list";
+import { MockBot } from "./bot.mock";
 import { FakeClientServerConnection } from "./FakeClientServerConnection";
-import { MockBackendBot } from "./MockBackendBot";
 
 export function createRandomString() {
   return (Math.random() * 100_000).toFixed();
@@ -16,18 +16,18 @@ export function createRandomString() {
 export function setupTest() {
   const serverShoppingList = new ShoppingList([], (items) => {});
 
-  const backendList: BackendListItem[] = [];
+  const externalList: ExternalListItem[] = [];
 
-  const backendClient = new BackendClient({
+  const externalClient = new ExternalClient({
     eventQueue: new EventQueue<ShoppingListEvent[]>([], () => {}),
     initialStore: [],
     onStoreChanged: () => {},
-    bot: new MockBackendBot(backendList),
+    bot: new MockBot(externalList),
   });
 
   const server = new Server({
     shoppingList: serverShoppingList,
-    backendClient,
+    externalClient,
   });
 
   const clients: Client[] = [];
@@ -62,8 +62,8 @@ export function setupTest() {
 
   async function playOutListSync() {
     await Promise.all(clients.map((client) => client.connect()));
-    await backendClient.flush();
-    await server.refreshDataFromBackendClient();
+    await externalClient.flush();
+    await server.refreshDataFromExternalClient();
   }
 
   function assertEqualLists() {
@@ -72,9 +72,9 @@ export function setupTest() {
     );
 
     sortedLists.forEach((list, i) => {
-      if (i === sortedLists.length - 1 && backendList) {
+      if (i === sortedLists.length - 1 && externalList) {
         expect(
-          backendList.sort((a, b) => a.name.localeCompare(b.name)),
+          externalList.sort((a, b) => a.name.localeCompare(b.name)),
         ).toEqual(list.map(({ id, ...rest }) => rest));
       } else {
         expect(list).toEqual(sortedLists[i + 1]);
@@ -84,8 +84,8 @@ export function setupTest() {
 
   return {
     server,
-    backendClient,
-    backendList,
+    externalClient,
+    externalList,
     serverShoppingList,
     createClient,
     assertEqualLists,

@@ -100,20 +100,20 @@ test("Random", async () => {
             name: createRandomString(),
             checked: false,
           };
-          actionLog.push(`setup.backendList.push(${JSON.stringify(item)});`);
-          setup.backendList.push(item);
+          actionLog.push(`setup.externalList.push(${JSON.stringify(item)});`);
+          setup.externalList.push(item);
         } else if (random < 3 / 4) {
           // Remove item
-          const i = Math.floor(Math.random() * setup.backendList.length);
-          actionLog.push(`setup.backendList.splice(${i}, 1);`);
-          setup.backendList.splice(i, 1);
+          const i = Math.floor(Math.random() * setup.externalList.length);
+          actionLog.push(`setup.externalList.splice(${i}, 1);`);
+          setup.externalList.splice(i, 1);
         } else if (random < 4 / 4) {
-          if (setup.backendList.length > 0) {
+          if (setup.externalList.length > 0) {
             // Set checked/unchecked
-            const i = Math.floor(Math.random() * setup.backendList.length);
-            const item = setup.backendList[i];
+            const i = Math.floor(Math.random() * setup.externalList.length);
+            const item = setup.externalList[i];
             actionLog.push(
-              `setup.backendList[${i}].checked = ${!item.checked};`,
+              `setup.externalList[${i}].checked = ${!item.checked};`,
             );
             item.checked = !item.checked;
           }

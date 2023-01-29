@@ -1,9 +1,9 @@
-import { trimAndUppercase, type BackendClientBot } from "hello-bird-lib";
+import { trimAndUppercase, type Bot } from "hello-bird-lib";
 import { ElementHandle, Page } from "puppeteer";
 import { pause } from "./actions";
 import { clearCookies, getPage } from "./browser";
 
-export async function createBot(): Promise<BackendClientBot> {
+export async function createBot(): Promise<Bot> {
   const page = await getPage();
 
   return {
