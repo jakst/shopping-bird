@@ -1,8 +1,8 @@
 import { nanoid } from "nanoid";
-import { equalsList } from "./equals-list";
 import { EventQueue } from "./event-queue";
-import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
+import { type ShoppingListEvent, type ShoppingListItem } from "./schemas";
 import { applyEvent } from "./shopping-list";
+import { equalsList } from "./utils/equals-list";
 
 interface ExternalClientDeps {
   eventQueue: EventQueue<ShoppingListEvent[]>;

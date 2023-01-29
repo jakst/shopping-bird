@@ -1,4 +1,4 @@
-import { ShoppingListEvent, ShoppingListItem } from "./lib";
+import { ShoppingListEvent, ShoppingListItem } from "../lib";
 
 export function compare(
   oldList: ShoppingListItem[],

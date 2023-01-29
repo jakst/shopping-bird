@@ -1,4 +1,4 @@
-import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
+import { type ShoppingListEvent, type ShoppingListItem } from "./schemas";
 
 type OnChange = (list: ShoppingListItem[]) => void;
 

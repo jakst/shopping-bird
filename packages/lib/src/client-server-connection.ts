@@ -1,4 +1,4 @@
-import { ShoppingListItem, type ShoppingListEvent } from "./newSchemas";
+import { ShoppingListItem, type ShoppingListEvent } from "./schemas";
 import { type Server } from "./server";
 
 export interface ClientServerConnectionDeps {

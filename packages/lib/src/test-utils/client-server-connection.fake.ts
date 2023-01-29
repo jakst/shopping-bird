@@ -3,7 +3,7 @@ import {
   type ClientServerConnectionDeps,
   type OnRemoteListChangedCallback,
 } from "../client-server-connection";
-import { type ShoppingListEvent, type ShoppingListItem } from "../newSchemas";
+import { type ShoppingListEvent, type ShoppingListItem } from "../schemas";
 import { type ServerClientConnection } from "../server";
 import { pause } from "./pause";
 

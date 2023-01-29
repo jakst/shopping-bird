@@ -1,6 +1,6 @@
 import { writeFileSync } from "fs";
 import { test } from "vitest";
-import { createRandomString, setupTest } from "./test-utils/setupTest";
+import { createRandomString, setupTest } from "./test-utils/test-setup";
 
 test("Random", async () => {
   const setup = setupTest();

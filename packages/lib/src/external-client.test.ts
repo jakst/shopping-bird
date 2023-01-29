@@ -1,7 +1,7 @@
 import { expect, test, vi } from "vitest";
 import { EventQueue } from "./event-queue";
 import { ExternalClient } from "./external-client";
-import { ShoppingListEvent, ShoppingListItem } from "./newSchemas";
+import { ShoppingListEvent, ShoppingListItem } from "./schemas";
 import { ShoppingList } from "./shopping-list";
 import { MockBot } from "./test-utils/bot.mock";
 import { pause } from "./test-utils/pause";

@@ -1,9 +1,9 @@
 import { nanoid } from "nanoid/non-secure";
 import { type ClientServerConnection } from "./client-server-connection";
-import { compare } from "./compare";
 import { EventQueue } from "./event-queue";
-import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
+import { type ShoppingListEvent, type ShoppingListItem } from "./schemas";
 import { applyEvent, ShoppingList, validateEvent } from "./shopping-list";
+import { compare } from "./utils/compare";
 
 interface ClientDeps {
   shoppingList: ShoppingList;

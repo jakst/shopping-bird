@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { setupTest } from "./test-utils/setupTest";
+import { setupTest } from "./test-utils/test-setup";
 
 test("Applies events locally when not connected", async () => {
   const setup = setupTest();

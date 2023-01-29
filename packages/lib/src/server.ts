@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import { type ExternalClient } from "./external-client";
-import { type ShoppingListEvent, type ShoppingListItem } from "./newSchemas";
+import { type ShoppingListEvent, type ShoppingListItem } from "./schemas";
 import { ShoppingList } from "./shopping-list";
 
 export interface ServerClientConnection {

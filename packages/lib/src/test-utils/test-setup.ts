@@ -3,11 +3,11 @@ import { Client } from "../client";
 import { EventQueue } from "../event-queue";
 import { ExternalClient, ExternalListItem } from "../external-client";
 import { type ShoppingListEvent } from "../lib";
-import { type ShoppingListItem } from "../newSchemas";
+import { type ShoppingListItem } from "../schemas";
 import { Server } from "../server";
 import { ShoppingList } from "../shopping-list";
 import { MockBot } from "./bot.mock";
-import { FakeClientServerConnection } from "./FakeClientServerConnection";
+import { FakeClientServerConnection } from "./client-server-connection.fake";
 
 export function createRandomString() {
   return (Math.random() * 100_000).toFixed();

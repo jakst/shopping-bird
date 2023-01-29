@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
+import { ShoppingListItem } from "../lib";
 import { compare } from "./compare";
-import { ShoppingListItem } from "./lib";
 
 test("Adds unchecked items", () => {
   const previousList: ShoppingListItem[] = [];
