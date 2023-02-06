@@ -52,14 +52,17 @@ const externalClientQueueCache = createCached(
   "external-client-queue",
   // Array of event arrays... 😐
   z.array(eventListSchema),
+  [],
 );
 
 const externalClientStoreCache = createCached(
   "external-client-store",
   z.array(shoppingListItemSchema),
+  [],
 );
 
 const serverShoppingListCache = createCached(
   "server-shopping-list",
   z.array(shoppingListItemSchema),
+  [],
 );

@@ -1,7 +1,8 @@
 import {
-  shoppingListSchema,
+  responseMessageSchema,
+  updateMessageSchema,
   type ClientServerConnection,
-  type OnRemoteListChangedCallback,
+  type OnListUpdateCallback,
   type ShoppingListEvent,
 } from "hello-bird-lib";
 import { env } from "./env";
@@ -15,36 +16,32 @@ export class BrowserServerConnection implements ClientServerConnection {
   }
 
   constructor(
-    private onConnectionStatusChanged?: (connected: boolean) => void,
+    private onConnectionStatusChanged: (connected: boolean) => void,
   ) {}
 
-  async connect(onRemoteListChanged: OnRemoteListChangedCallback) {
+  async connect(onListUpdate: OnListUpdateCallback) {
     if (this.isConnected) return;
 
     const eventSource = new EventSource(`${env.BACKEND_URL}/register`);
     this.eventSource = eventSource;
 
-    const listUpdateListener = (event: { data: string }) => {
-      const data = shoppingListSchema.parse(JSON.parse(event.data));
-      onRemoteListChanged(data);
-    };
-
-    const errorListener = () => {
-      this.clientId = null;
-      this.onConnectionStatusChanged?.(false);
-    };
-
-    eventSource.addEventListener("list-update", listUpdateListener);
-    eventSource.addEventListener("error", errorListener);
-
     return new Promise<void>((resolve) => {
-      const listener = (event: MessageEvent<string>) => {
-        this.clientId = event.data;
-        this.onConnectionStatusChanged?.(true);
+      const listUpdateListener = (event: MessageEvent<string>) => {
+        const data = updateMessageSchema.parse(JSON.parse(event.data));
+        this.clientId = data.clientId;
+        onListUpdate(data);
+
+        this.onConnectionStatusChanged(true);
         resolve();
       };
 
-      eventSource.addEventListener("client-id", listener);
+      const errorListener = () => {
+        this.clientId = null;
+        this.onConnectionStatusChanged(false);
+      };
+
+      eventSource.addEventListener("update", listUpdateListener);
+      eventSource.addEventListener("error", errorListener);
     });
   }
 
@@ -53,12 +50,19 @@ export class BrowserServerConnection implements ClientServerConnection {
   }
 
   async pushEvents(events: ShoppingListEvent[]) {
-    await fetch(`${env.BACKEND_URL}/events`, {
+    const response = await fetch(`${env.BACKEND_URL}/events`, {
       method: "POST",
       body: JSON.stringify({
         clientId: this.clientId,
         events,
       }),
     });
+
+    if (response.ok) {
+      const body = await response.json();
+      return responseMessageSchema.parse(body).shoppingList;
+    } else {
+      throw new Error(`Pushing events failed: ${response}`);
+    }
   }
 }

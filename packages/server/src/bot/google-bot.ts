@@ -46,6 +46,8 @@ export async function createGoogleBot(): Promise<Bot> {
 
       await page.waitForXPath('//*[text()="Varan har lagts till"]');
 
+      await pause(500);
+
       if (checked) await setItemCheckedAtPosition(page, 0, true);
     },
     async DELETE_ITEM(index) {
@@ -150,4 +152,5 @@ async function removeItemAtPosition(page: Page, index: number) {
   await page.keyboard.press("Enter");
 
   await page.waitForXPath('//*[text()="Varan har raderats"]');
+  await pause(1000);
 }

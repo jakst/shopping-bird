@@ -4,11 +4,12 @@ import { cache } from "./cache";
 export function createCached<Schema extends z.ZodType, Value = z.infer<Schema>>(
   key: string,
   schema: Schema,
+  defaultValue: z.infer<Schema>,
 ) {
   async function get(): Promise<Value> {
     const queue = await cache
       .get(key)
-      .then((str) => (str ? schema.parse(JSON.parse(str)) : []));
+      .then((str) => (str ? schema.parse(JSON.parse(str)) : defaultValue));
 
     return queue;
   }

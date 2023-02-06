@@ -1,7 +1,7 @@
 import cors from "@fastify/cors";
 import fastify from "fastify";
 import FastifySSEPlugin from "fastify-sse-v2";
-import { eventListSchema } from "hello-bird-lib";
+import { eventListSchema, UpdateMessage } from "hello-bird-lib";
 import { z } from "zod";
 import { getCookies, setCookies } from "./bot/browser";
 import { cache } from "./cache";
@@ -15,7 +15,6 @@ const eventsEndpointSchema = z.object({
 
 const f = fastify({
   maxParamLength: 5000,
-  logger: true,
 });
 
 f.register(cors, {
@@ -39,6 +38,7 @@ f.post("/auth", async (req, reply) => {
 });
 
 let appStarted = false;
+let requestLock = false;
 async function startApp() {
   appStarted = true;
   f.register(FastifySSEPlugin);
@@ -46,29 +46,29 @@ async function startApp() {
   const shoppingBird = await createShoppingBird();
 
   f.get("/register", (request, reply) => {
-    const clientId = shoppingBird.connectClient({
-      notifyListChanged(items) {
-        reply.sse({ event: "list-update", data: JSON.stringify(items) });
-      },
-    });
+    function onListChanged(payload: UpdateMessage) {
+      reply.sse({ event: "update", data: JSON.stringify(payload) });
+    }
 
-    reply.sse({ event: "client-id", data: clientId });
-
+    const clientId = shoppingBird.connectClient({ onListChanged });
     request.raw.on("close", () => shoppingBird.onClientDisconnected(clientId));
   });
 
-  f.post("/events", (request, reply) => {
+  f.post("/events", async (request, reply) => {
     const parsedBody = eventsEndpointSchema.safeParse(
       JSON.parse(request.body as string),
     );
 
-    if (!parsedBody.success) {
-      reply.status(400);
-      return;
+    if (!parsedBody.success || requestLock) {
+      return reply.code(400);
     }
 
-    shoppingBird.pushEvents(parsedBody.data.events, parsedBody.data.clientId);
-    reply.status(204);
+    const shoppingList = shoppingBird.pushEvents(
+      parsedBody.data.events,
+      parsedBody.data.clientId,
+    );
+    await reply.send({ shoppingList });
+    requestLock = false;
   });
 
   await shoppingBird.refreshDataFromExternalClient();
@@ -101,14 +101,3 @@ async function run() {
 }
 
 run();
-//   .then(() => {
-//   fetch("http://localhost:3500/events", {
-//     method: "POST",
-//     body: JSON.stringify({
-//       clientId: "kungen",
-//       events: [{ name: "DELETE_ITEM", data: { id: "123" } }],
-//     }),
-//   })
-//     .then((res) => res.json())
-//     .then((res) => console.log("HEJ", res));
-// });

@@ -1,9 +1,9 @@
 import {
   type ClientServerConnection,
   type ClientServerConnectionDeps,
-  type OnRemoteListChangedCallback,
+  type OnListUpdateCallback,
 } from "../client-server-connection";
-import { type ShoppingListEvent, type ShoppingListItem } from "../schemas";
+import { UpdateMessage, type ShoppingListEvent } from "../schemas";
 import { type ServerClientConnection } from "../server";
 import { pause } from "./pause";
 
@@ -11,7 +11,7 @@ export class FakeClientServerConnection
   implements ClientServerConnection, ServerClientConnection
 {
   clientId: string | null = null;
-  onRemoteListChanged: OnRemoteListChangedCallback | null = null;
+  onRemoteListChanged: OnListUpdateCallback | null = null;
 
   constructor(private $d: ClientServerConnectionDeps) {}
 
@@ -20,14 +20,14 @@ export class FakeClientServerConnection
   }
 
   // Called from server
-  notifyListChanged(items: ShoppingListItem[]) {
+  onListChanged(payload: UpdateMessage) {
     if (this.onRemoteListChanged)
-      this.onRemoteListChanged(structuredClone(items));
+      this.onRemoteListChanged(structuredClone(payload));
     else throw new Error("No onRemoteListChanged callback");
   }
 
   // Called from client
-  async connect(onRemoteListChanged: OnRemoteListChangedCallback) {
+  async connect(onRemoteListChanged: OnListUpdateCallback) {
     await pause(1);
     this.onRemoteListChanged = onRemoteListChanged;
     this.clientId = this.$d.server.connectClient(this);
@@ -45,8 +45,13 @@ export class FakeClientServerConnection
 
   // Called from client
   async pushEvents(events: ShoppingListEvent[]) {
-    if (this.clientId)
-      this.$d.server.pushEvents(structuredClone(events), this.clientId);
-    else throw new Error("Not connected to server");
+    if (!this.clientId) throw new Error("Not connected to server");
+
+    const newList = this.$d.server.pushEvents(
+      structuredClone(events),
+      this.clientId,
+    );
+
+    return structuredClone(newList);
   }
 }

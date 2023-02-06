@@ -198,7 +198,7 @@ function Home() {
 
           <button
             class="px-3 py-1"
-            onClick={void client.clearCheckedItems.bind(client)}
+            onClick={() => void client.clearCheckedItems()}
           >
             Clear all
           </button>

@@ -49,5 +49,13 @@ export type ShoppingListEvent = z.infer<typeof eventSchema>;
 
 export const eventListSchema = z.array(eventSchema);
 
-export type GetShoppingListEventData<T extends ShoppingListEvent["name"]> =
-  Extract<ShoppingListEvent, { name: T }>["data"];
+export const responseMessageSchema = z.object({
+  shoppingList: shoppingListSchema,
+});
+
+export const updateMessageSchema = z.object({
+  clientId: z.string(),
+  shoppingList: shoppingListSchema,
+});
+
+export type UpdateMessage = z.infer<typeof updateMessageSchema>;

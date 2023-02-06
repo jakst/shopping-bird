@@ -2,7 +2,7 @@ import { nanoid } from "nanoid/non-secure";
 import { type ClientServerConnection } from "./client-server-connection";
 import { EventQueue } from "./event-queue";
 import { type ShoppingListEvent, type ShoppingListItem } from "./schemas";
-import { applyEvent, ShoppingList, validateEvent } from "./shopping-list";
+import { ShoppingList, validateEvent } from "./shopping-list";
 import { compare } from "./utils/compare";
 
 interface ClientDeps {
@@ -14,15 +14,20 @@ interface ClientDeps {
 
 export class Client {
   #promise: Promise<any> | null = null;
+  #pendingUpdates = false;
 
-  constructor(private $d: ClientDeps) {}
+  constructor(private $d: ClientDeps) {
+    this.#pendingUpdates = !this.$d.eventQueue.isEmpty();
+  }
 
   async connect() {
     if (this.$d.serverConnection.isConnected) return;
 
-    await this.$d.serverConnection.connect((newList) =>
-      this.onRemoteListChanged(newList),
-    );
+    await this.$d.serverConnection.connect(({ shoppingList }) => {
+      // Don't accept any external updates as long as we still have unsent updates ourselves
+      if (!this.#pendingUpdates) this.onRemoteListChanged(shoppingList);
+    });
+
     await this.flushEvents();
   }
 
@@ -32,10 +37,14 @@ export class Client {
   }
 
   async #flushEvents() {
-    if (this.$d.serverConnection.isConnected)
+    if (this.$d.serverConnection.isConnected && !this.$d.eventQueue.isEmpty()) {
       await this.$d.eventQueue.process(async (events) => {
-        await this.$d.serverConnection.pushEvents(events);
+        const newList = await this.$d.serverConnection.pushEvents(events);
+        this.onRemoteListChanged(newList);
       });
+
+      this.#pendingUpdates = false;
+    }
   }
 
   async applyEvent(event: ShoppingListEvent, flush = true) {
@@ -47,23 +56,13 @@ export class Client {
 
     // Queue event for remote push
     this.$d.eventQueue.push(event);
+    this.#pendingUpdates = true;
 
     // Flush to server
     if (flush) await this.flushEvents();
   }
 
   onRemoteListChanged(newList: ShoppingListItem[]) {
-    // If we have unsent events in the queue, apply them to the
-    // incoming list or our local changes will be overridden.
-    //
-    // TODO: Could we get a timing diff here, where the events
-    // are sent but not processed by the server yet? 🤔
-    // ANSWER: Yes we can...
-    if (!this.$d.eventQueue.isEmpty())
-      this.$d.eventQueue.getQueue().forEach((event) => {
-        if (validateEvent(newList, event)) applyEvent(newList, event);
-      });
-
     // Diff remote list against last version to get events
     const diffedEvents = compare(this.$d.remoteShoppingListCopy.items, newList);
 

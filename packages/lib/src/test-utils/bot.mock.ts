@@ -7,6 +7,7 @@ export class MockBot implements Bot {
   async refreshList() {}
 
   async getList() {
+    await pause(1);
     const list = this.shoppingList.map((item, index) => ({ index, ...item }));
     return list;
   }
