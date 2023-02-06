@@ -1,4 +1,8 @@
-const isNode = true;
+const isNode = !!(
+  typeof process !== "undefined" &&
+  process.versions &&
+  process.versions.node
+);
 
 export let createId = (): string => {
   throw new Error("Module nanoid not loaded");
