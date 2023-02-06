@@ -8,7 +8,7 @@
     "dev": "NODE_ENV=development tsx src/app.ts",
     "auth": "NODE_ENV=production tsx scripts/auth.ts",
     "build": "etsc",
-    "start": "NODE_ENV=production node dist/app.js"
+    "start": "NODE_ENV=production node dist/src/app.js"
   },
   "dependencies": {
     "@fastify/cors": "^8.2.0",
@@ -17,7 +17,6 @@
     "fastify": "^4.11.0",
     "fastify-sse-v2": "^3.0.0",
     "hello-bird-lib": "workspace:^",
-    "nanoid": "^4.0.0",
     "puppeteer": "^19.4.1",
     "puppeteer-extra": "^3.3.4",
     "puppeteer-extra-plugin-stealth": "^2.11.1",

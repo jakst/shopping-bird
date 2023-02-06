@@ -1,5 +1,5 @@
-import { nanoid } from "nanoid/non-secure";
 import { type ClientServerConnection } from "./client-server-connection";
+import { createId } from "./create-id";
 import { EventQueue } from "./event-queue";
 import { type ShoppingListEvent, type ShoppingListItem } from "./schemas";
 import { ShoppingList, validateEvent } from "./shopping-list";
@@ -74,7 +74,7 @@ export class Client {
   }
 
   async addItem(name: string) {
-    const id = nanoid();
+    const id = createId();
     await this.applyEvent({ name: "ADD_ITEM", data: { id, name } });
 
     return id;

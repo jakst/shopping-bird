@@ -1,4 +1,4 @@
-import { nanoid } from "nanoid";
+import { createId } from "./create-id";
 import { type ExternalClient } from "./external-client";
 import { type ShoppingListEvent, type UpdateMessage } from "./schemas";
 import { ShoppingList } from "./shopping-list";
@@ -40,7 +40,7 @@ export class Server {
   }
 
   connectClient(client: ServerClientConnection) {
-    const clientId = nanoid();
+    const clientId = createId();
     this.clients.set(clientId, client);
 
     console.log(

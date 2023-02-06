@@ -1,4 +1,4 @@
-import { nanoid } from "nanoid";
+import { createId } from "./create-id";
 import { EventQueue } from "./event-queue";
 import { type ShoppingListEvent, type ShoppingListItem } from "./schemas";
 import { applyEvent } from "./shopping-list";
@@ -136,7 +136,7 @@ function generateEvents(
     );
 
     if (!itemFromBefore) {
-      const id = nanoid();
+      const id = createId();
       generatedEvents.push({
         name: "ADD_ITEM",
         data: { id, name: newItem.name },
