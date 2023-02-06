@@ -9,7 +9,7 @@ import {
 } from "hello-bird-lib";
 import { createSignal, For, onMount, Show } from "solid-js";
 import { createMutable, reconcile } from "solid-js/store";
-import { ItemRow2 } from "~/components/ItemRow2";
+import { ItemRow } from "~/components/ItemRow";
 import { BrowserServerConnection } from "~/lib/browser-server-connection";
 import IconCheck from "~icons/ci/check";
 import IconPlus from "~icons/ci/plus";
@@ -171,7 +171,7 @@ function Home() {
 
       <ul class="flex flex-col gap-2">
         <For each={sortedList()}>
-          {(item) => <ItemRow2 item={item} actions={actions} />}
+          {(item) => <ItemRow item={item} actions={actions} />}
         </For>
 
         <NewItem onCreate={(name) => void client.addItem(name)} />
@@ -213,7 +213,7 @@ function Home() {
               exit={{ opacity: 0, transition: { duration: 0.1 } }}
             >
               <For each={checkedList()}>
-                {(item) => <ItemRow2 item={item} actions={actions} />}
+                {(item) => <ItemRow item={item} actions={actions} />}
               </For>
             </Motion.ul>
           </Show>
