@@ -1,15 +1,24 @@
 import { Motion, Presence } from "@motionone/solid";
-import { trimAndUppercase } from "hello-bird-lib";
+import {
+  Client,
+  EventQueue,
+  ShoppingList,
+  ShoppingListEvent,
+  ShoppingListItem,
+  trimAndUppercase,
+} from "hello-bird-lib";
 import { createSignal, For, onMount, Show } from "solid-js";
-import { createShoppingList } from "~/lib/createShoppingList";
+import { createMutable, reconcile } from "solid-js/store";
+import { ItemRow } from "~/components/ItemRow";
+import { BrowserServerConnection } from "~/lib/browser-server-connection";
 import IconCheck from "~icons/ci/check";
 import IconPlus from "~icons/ci/plus";
 import IconCaretRight from "~icons/radix-icons/caret-right";
 import { Button } from "../components/Button";
-import { ItemRow } from "../components/ItemRow";
 
 export default function Shell() {
   const [isMounted, setIsMounted] = createSignal(false);
+
   onMount(() => setIsMounted(true));
 
   return (
@@ -30,37 +39,85 @@ export default function Shell() {
   );
 }
 
-function Home() {
-  const {
-    items,
-    connectionStatus,
-    createItem,
-    deleteItem,
-    setChecked,
-    renameItem,
-    clearCheckedItems,
-  } = createShoppingList();
+function createClient() {
+  const [isConnected, setIsConnected] = createSignal(false);
+  const [isEventQueueEmpty, setIsEventQueueEmpty] = createSignal(true);
 
-  const rowActions = { deleteItem, renameItem, setChecked };
+  const connectionStatus = () =>
+    isConnected()
+      ? isEventQueueEmpty()
+        ? "IN_SYNC"
+        : "OUT_OF_SYNC"
+      : "OFFLINE";
+
+  const serverConnection = new BrowserServerConnection((value) =>
+    setIsConnected(value),
+  );
+
+  const initialShoppingList: ShoppingListItem[] = JSON.parse(
+    localStorage.getItem("main-shopping-list") ?? "[]",
+  );
+
+  const list = createMutable({ items: initialShoppingList });
+
+  const shoppingList = new ShoppingList([...initialShoppingList], (newList) => {
+    // This updates the list without losing reactivity, but there could be more elegant ways to do it
+    list.items = reconcile(newList)(list.items);
+    localStorage.setItem("main-shopping-list", JSON.stringify(newList));
+  });
+
+  const remoteShoppingListCopy = new ShoppingList(
+    JSON.parse(localStorage.getItem("remote-shopping-list") ?? "[]"),
+    (newList) => {
+      localStorage.setItem("remote-shopping-list", JSON.stringify(newList));
+    },
+  );
+
+  const eventQueue = new EventQueue<ShoppingListEvent>(
+    JSON.parse(localStorage.getItem("event-queue") ?? "[]"),
+    (events) => {
+      setIsEventQueueEmpty(events.length === 0);
+      localStorage.setItem("event-queue", JSON.stringify(events));
+    },
+  );
+
+  const client = new Client({
+    shoppingList,
+    remoteShoppingListCopy,
+    serverConnection,
+    eventQueue,
+  });
+
+  // TODO: Handle connections either in client or fully through solid with reconnections
+  client.connect();
+
+  return { client, items: list.items, connectionStatus };
+}
+
+function Home() {
+  const { client, items, connectionStatus } = createClient();
 
   const sortedList = () => {
     return items
       .filter((item) => !item.checked)
       .sort((a, b) => {
-        if (a.checked && !b.checked) return 1;
-        else if (!a.checked && b.checked) return -1;
-
-        return a.index - b.index;
+        // TODO: Sort by index
+        // return a.index - b.index;
+        return 0;
       });
   };
 
   const checkedList = () => {
-    return items
-      .filter((item) => item.checked)
-      .sort((a, b) => a.index - b.index);
+    return items.filter((item) => item.checked);
   };
 
   const [showChecked, setShowChecked] = createSignal(false);
+
+  const actions = {
+    deleteItem: client.deleteItem.bind(client),
+    setChecked: client.setItemChecked.bind(client),
+    renameItem: client.renameItem.bind(client),
+  };
 
   return (
     <div class="text-lg">
@@ -114,10 +171,10 @@ function Home() {
 
       <ul class="flex flex-col gap-2">
         <For each={sortedList()}>
-          {(item) => <ItemRow item={item} actions={rowActions} />}
+          {(item) => <ItemRow item={item} actions={actions} />}
         </For>
 
-        <NewItem onCreate={createItem} />
+        <NewItem onCreate={(name) => void client.addItem(name)} />
       </ul>
 
       <Show when={checkedList().length > 0}>
@@ -139,7 +196,10 @@ function Home() {
             </h2>
           </button>
 
-          <button class="px-3 py-1" onClick={() => clearCheckedItems()}>
+          <button
+            class="px-3 py-1"
+            onClick={() => void client.clearCheckedItems()}
+          >
             Clear all
           </button>
         </div>
@@ -153,7 +213,7 @@ function Home() {
               exit={{ opacity: 0, transition: { duration: 0.1 } }}
             >
               <For each={checkedList()}>
-                {(item) => <ItemRow item={item} actions={rowActions} />}
+                {(item) => <ItemRow item={item} actions={actions} />}
               </For>
             </Motion.ul>
           </Show>

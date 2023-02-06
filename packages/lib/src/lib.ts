@@ -1,16 +1,22 @@
-export { compare } from "./compare";
+export { Client } from "./client";
 export {
-  actionListSchema,
-  actionSchema,
-  dbSchema,
-  enrichedActionListSchema,
-  googleCacheSchema,
-  itemSchema,
-  type Action,
-  type Db,
-  type EnrichedAction,
-  type GetActionData,
-  type GoogleItem,
-  type Item,
+  type ClientServerConnection,
+  type ClientServerConnectionDeps,
+  type OnListUpdateCallback,
+} from "./client-server-connection";
+export { EventQueue } from "./event-queue";
+export { ExternalClient, type Bot } from "./external-client";
+export {
+  eventListSchema,
+  eventSchema,
+  responseMessageSchema,
+  shoppingListItemSchema,
+  shoppingListSchema,
+  updateMessageSchema,
+  type ShoppingListEvent,
+  type ShoppingListItem,
+  type UpdateMessage,
 } from "./schemas";
-export { trimAndUppercase } from "./trimAndUppercase";
+export { Server } from "./server";
+export { ShoppingList } from "./shopping-list";
+export { trimAndUppercase } from "./utils/trim-and-uppercase";

@@ -1,20 +1,18 @@
 import { z } from "zod";
 
-export const itemSchema = z.object({
+export const shoppingListItemSchema = z.object({
   id: z.string(),
   name: z.string(),
   checked: z.boolean(),
-  index: z.number(),
 });
 
-export type Item = z.infer<typeof itemSchema>;
+export type ShoppingListItem = z.infer<typeof shoppingListItemSchema>;
 
-export const dbSchema = z.array(itemSchema);
-export type Db = z.infer<typeof dbSchema>;
+export const shoppingListSchema = z.array(shoppingListItemSchema);
 
-const CreateItem = z.object({
-  name: z.literal("CREATE_ITEM"),
-  data: itemSchema,
+const AddItem = z.object({
+  name: z.literal("ADD_ITEM"),
+  data: shoppingListItemSchema.pick({ id: true, name: true }),
 });
 
 const DeleteItem = z.object({
@@ -40,51 +38,24 @@ const RenameItem = z.object({
   }),
 });
 
-const ClearCheckedItems = z.object({
-  name: z.literal("CLEAR_CHECKED_ITEMS"),
-  data: z.never().optional(),
-});
-
-export const actionSchema = z.discriminatedUnion("name", [
-  CreateItem,
+export const eventSchema = z.discriminatedUnion("name", [
+  AddItem,
   DeleteItem,
   SetChecked,
   RenameItem,
-  ClearCheckedItems,
 ]);
 
-export type Action = z.infer<typeof actionSchema>;
+export type ShoppingListEvent = z.infer<typeof eventSchema>;
 
-export const actionListSchema = z.array(actionSchema);
+export const eventListSchema = z.array(eventSchema);
 
-export type GetActionData<T extends Action["name"]> = Extract<
-  Action,
-  { name: T }
->["data"];
-
-export const googleItemSchema = itemSchema.pick({ name: true, checked: true });
-
-export const googleCacheSchema = z.array(googleItemSchema);
-
-export type GoogleItem = z.infer<typeof googleItemSchema>;
-
-const metaNameAndAppliedSchema = z.object({
-  name: z.string(),
-  applied: z.boolean(),
+export const responseMessageSchema = z.object({
+  shoppingList: shoppingListSchema,
 });
-export const enrichedActionSchema = z.discriminatedUnion("name", [
-  CreateItem.pick({ name: true }).extend({
-    data: googleItemSchema,
-    meta: metaNameAndAppliedSchema.pick({ applied: true }),
-  }),
-  DeleteItem.extend({ meta: metaNameAndAppliedSchema }),
-  SetChecked.extend({ meta: metaNameAndAppliedSchema }),
-  RenameItem.extend({ meta: metaNameAndAppliedSchema }),
-  ClearCheckedItems.extend({
-    meta: metaNameAndAppliedSchema.pick({ applied: true }),
-  }),
-]);
 
-export type EnrichedAction = z.infer<typeof enrichedActionSchema>;
-export const enrichedActionListSchema = z.array(enrichedActionSchema);
-export type EnrichedActionList = z.infer<typeof enrichedActionListSchema>;
+export const updateMessageSchema = z.object({
+  clientId: z.string(),
+  shoppingList: shoppingListSchema,
+});
+
+export type UpdateMessage = z.infer<typeof updateMessageSchema>;

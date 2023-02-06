@@ -1,5 +1,5 @@
 import { Motion, Presence } from "@motionone/solid";
-import { Item } from "hello-bird-lib";
+import { type ShoppingListItem } from "hello-bird-lib";
 import { createSignal, Show } from "solid-js";
 import IconCheck from "~icons/ci/check";
 import IconTrash from "~icons/ci/trash-full";
@@ -11,7 +11,7 @@ interface Actions {
   renameItem: (id: string, name: string) => void;
 }
 
-export function ItemRow(props: { item: Item; actions: Actions }) {
+export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
   const [isDisappearing, setIsDisappearing] = createSignal(false);
   const [hovering, setHovering] = createSignal(false);
   const [focusing, setFocusing] = createSignal(false);

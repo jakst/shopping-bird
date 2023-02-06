@@ -49,44 +49,7 @@ export async function setCookies(cookies: any[]) {
   await saveCookies(cookies);
 }
 
-async function clearCookies() {
+export async function clearCookies() {
   _cookies = null;
   await deleteCookies();
-}
-
-let pageRefreshedAt = 0;
-const REFRESH_INTERVAL = 59_000; // Every 59 seconds
-
-export async function loadShoppingListPage() {
-  const now = Date.now();
-  const shouldRefresh = now - pageRefreshedAt > REFRESH_INTERVAL;
-
-  const tag = `[loadShoppingListPage shouldRefresh = ${
-    shouldRefresh ? "true" : "false"
-  }]`;
-
-  console.time(tag);
-
-  const page = await getPage();
-
-  if (page.url() !== "https://shoppinglist.google.com/") {
-    await page.goto("https://shoppinglist.google.com/", {
-      waitUntil: "networkidle2",
-    });
-  } else if (shouldRefresh) {
-    pageRefreshedAt = now;
-    await page.reload({ waitUntil: "networkidle2" });
-  }
-
-  const isLoggedIn =
-    (await page.$x('//*[contains(text(), "Min inköpslista")]')).length > 0;
-
-  if (!isLoggedIn) {
-    await clearCookies();
-    throw new Error("BAD_COOKIES");
-  }
-
-  console.timeEnd(tag);
-
-  return page;
 }
