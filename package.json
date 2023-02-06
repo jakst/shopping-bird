@@ -2,6 +2,9 @@
   "name": "hello-bird",
   "private": true,
   "packageManager": "yarn@3.3.0",
+  "engines": {
+    "node": "18.x"
+  },
   "workspaces": {
     "packages": [
       "packages/*"

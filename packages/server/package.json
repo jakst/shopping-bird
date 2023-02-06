@@ -4,6 +4,9 @@
   "license": "MIT",
   "main": "src/index.ts",
   "private": true,
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "dev": "NODE_ENV=development tsx src/app.ts",
     "auth": "NODE_ENV=production tsx scripts/auth.ts",
