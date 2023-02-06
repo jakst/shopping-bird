@@ -1,7 +1,9 @@
 import { trimAndUppercase, type Bot } from "hello-bird-lib";
 import { ElementHandle, Page } from "puppeteer";
-import { pause } from "./actions";
 import { clearCookies, getPage } from "./browser";
+
+const pause = (time: number) =>
+  new Promise((resolve) => setTimeout(resolve, time));
 
 export async function createGoogleBot(): Promise<Bot> {
   const page = await getPage();

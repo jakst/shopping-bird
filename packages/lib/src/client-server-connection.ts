@@ -12,7 +12,7 @@ export interface ClientServerConnectionDeps {
 export type OnListUpdateCallback = (payload: UpdateMessage) => void;
 
 export interface ClientServerConnection {
-  clientId: string | null; // TEMP? Only needed for logging for now. TODO: check if needed
+  clientId: string | null;
   isConnected: boolean;
   connect(onListUpdate: OnListUpdateCallback): Promise<void>;
   disconnect(): void;

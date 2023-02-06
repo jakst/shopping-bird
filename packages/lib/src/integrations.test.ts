@@ -113,7 +113,11 @@ test("Attempting to add two items with the same name", async () => {
 
   await setup.playOutListSync();
   setup.assertEqualLists();
-  // TODO: Expect both, or one to be added?
+
+  expect(c1.shoppingList.items).toEqual([
+    expect.objectContaining({ name: "Ost" }),
+    expect.objectContaining({ name: "Ost" }),
+  ]);
 });
 
 test("Rename an item before syncing the creation event", async () => {
