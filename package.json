@@ -29,6 +29,6 @@
     "typescript": "^4.9.5"
   },
   "resolutions": {
-    "solid-start@^0.2.6": "patch:solid-start@npm%3A0.2.6#./.yarn/patches/solid-start-npm-0.2.6-671b274161.patch"
+    "solid-start@^0.2.20": "patch:solid-start@npm%3A0.2.20#./.yarn/patches/solid-start-npm-0.2.20-1c62718646.patch"
   }
 }

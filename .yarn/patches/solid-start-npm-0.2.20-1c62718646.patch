@@ -1,0 +1,160 @@
+diff --git a/entry-client/StartClient.tsx b/entry-client/StartClient.tsx
+index c17a8e5f9c61c976730b2cff134ae92c9edc496e..0a3fafd06b6bd4f51616b57b3351b54522f57bf9 100644
+--- a/entry-client/StartClient.tsx
++++ b/entry-client/StartClient.tsx
+@@ -1,83 +1,85 @@
+-import { MetaProvider } from "@solidjs/meta";
+-import { Router, RouterProps } from "@solidjs/router";
++// @ts-nocheck
++
++import { MetaProvider } from '@solidjs/meta'
++import { Router, RouterProps } from '@solidjs/router'
+ // @ts-ignore
+-import Root from "~start/root";
+-import { ServerContext } from "../server/ServerContext";
+-import { FETCH_EVENT, PageEvent } from "../server/types";
++import Root from '~start/root'
++import { ServerContext } from '../server/ServerContext'
++import { FETCH_EVENT, PageEvent } from '../server/types'
+ 
+ const rootData: { default: <T>() => Promise<T> } = Object.values(
+-  import.meta.glob("/src/root.data.(js|ts)", { eager: true })
+-)[0] as any;
+-const dataFn = rootData ? rootData.default : undefined;
++  import.meta.glob('/src/root.data.(js|ts)', { eager: true })
++)[0] as any
++const dataFn = rootData ? rootData.default : undefined
+ 
+ function throwClientError(field: string): any {
+   throw new Error(
+     `"${field}" is not available on the client. Use it within an \`if (isServer)\` block to ensure it only runs on the server`
+-  );
++  )
+ }
+ 
+ export default () => {
+   let mockFetchEvent: PageEvent = {
+     get request() {
+-      if (process.env.NODE_ENV === "development") {
+-        return throwClientError("request");
++      if (process.env.NODE_ENV === 'development') {
++        return throwClientError('request')
+       }
+     },
+     get clientAddress() {
+-      if (process.env.NODE_ENV === "development") {
+-        return throwClientError("clientAddress");
++      if (process.env.NODE_ENV === 'development') {
++        return throwClientError('clientAddress')
+       }
+     },
+     get locals() {
+-      if (process.env.NODE_ENV === "development") {
+-        return throwClientError("locals");
++      if (process.env.NODE_ENV === 'development') {
++        return throwClientError('locals')
+       }
+     },
+     get prevUrl() {
+-      if (process.env.NODE_ENV === "development") {
+-        return throwClientError("prevUrl");
++      if (process.env.NODE_ENV === 'development') {
++        return throwClientError('prevUrl')
+       }
+     },
+     get responseHeaders() {
+-      if (process.env.NODE_ENV === "development") {
+-        return throwClientError("responseHeaders");
++      if (process.env.NODE_ENV === 'development') {
++        return throwClientError('responseHeaders')
+       }
+     },
+     get tags() {
+-      if (process.env.NODE_ENV === "development") {
+-        return throwClientError("tags");
++      if (process.env.NODE_ENV === 'development') {
++        return throwClientError('tags')
+       }
+     },
+     get env() {
+-      if (process.env.NODE_ENV === "development") {
+-        return throwClientError("env");
++      if (process.env.NODE_ENV === 'development') {
++        return throwClientError('env')
+       }
+     },
+     get routerContext() {
+-      if (process.env.NODE_ENV === "development") {
+-        return throwClientError("routerContext");
++      if (process.env.NODE_ENV === 'development') {
++        return throwClientError('routerContext')
+       }
+     },
+     setStatusCode(code: number) {
+-      if (process.env.NODE_ENV === "development") {
+-        return throwClientError("setStatusCode");
++      if (process.env.NODE_ENV === 'development') {
++        return throwClientError('setStatusCode')
+       }
+     },
+     getStatusCode() {
+-      if (process.env.NODE_ENV === "development") {
+-        return throwClientError("getStatusCode");
++      if (process.env.NODE_ENV === 'development') {
++        return throwClientError('getStatusCode')
+       }
+     },
+     $type: FETCH_EVENT,
+-    fetch
+-  };
++    fetch,
++  }
+ 
+   function StartRouter(props: RouterProps) {
+     return (
+       <Router {...props}>
+         <Root />
+       </Router>
+-    );
++    )
+   }
+ 
+   return (
+@@ -88,5 +90,5 @@ export default () => {
+         </StartRouter>
+       </MetaProvider>
+     </ServerContext.Provider>
+-  );
+-};
++  )
++}
+diff --git a/entry-client/mount.tsx b/entry-client/mount.tsx
+index d4194c13e60adbe9fdf22dd421696add5b264e97..8057eb2e7e7638863d9c3806aae01e08089dfc0a 100644
+--- a/entry-client/mount.tsx
++++ b/entry-client/mount.tsx
+@@ -1,3 +1,5 @@
++// @ts-nocheck
++
+ import type { JSX } from "solid-js";
+ import { getOwner } from "solid-js";
+ import { createComponent, getNextElement, hydrate, render } from "solid-js/web";
+diff --git a/islands/router.ts b/islands/router.ts
+index 6ee641e49b7efc64d3ef0bf2992b7d4c9119f981..8b31cfdc72a0c3fff9ec41f3a279bc9358493f74 100644
+--- a/islands/router.ts
++++ b/islands/router.ts
+@@ -1,3 +1,5 @@
++// @ts-nocheck
++
+ import type { Location, Navigator } from "@solidjs/router";
+ import { createSignal } from "solid-js";
+ interface LocationEntry {
+diff --git a/server/responses.ts b/server/responses.ts
+index 194cb45de063007a9c5a7ba942359d586542d953..0146b5cfa7f6159898ad3ea5deca1e486fc466f8 100644
+--- a/server/responses.ts
++++ b/server/responses.ts
+@@ -1,3 +1,5 @@
++// @ts-nocheck
++
+ export const XSolidStartStatusCodeHeader = "x-solidstart-status-code";
+ export const XSolidStartLocationHeader = "x-solidstart-location";
+ export const LocationHeader = "Location";
