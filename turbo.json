@@ -6,16 +6,12 @@
       "dependsOn": ["^build"]
     },
     "start": {
-      "outputs": [],
       "cache": false,
       "dependsOn": ["build"]
     },
     "dev": {
-      "outputs": [],
       "cache": false
     },
-    "test": {
-      "outputs": []
-    }
+    "test": {}
   }
 }
