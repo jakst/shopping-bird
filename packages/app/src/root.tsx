@@ -11,6 +11,7 @@ export default function Root() {
 				<Meta charset="utf-8" />
 				<Meta name="viewport" content="width=device-width, initial-scale=1" />
 
+				<Link rel="manifest" href="/manifest.json" />
 				<Link rel="icon" type="image/png" href="/favicon.png" />
 
 				<Link rel="preload" href="Hubot-Sans-1.0.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
