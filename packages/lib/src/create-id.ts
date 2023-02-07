@@ -1,13 +1,15 @@
-const isNode = !!(
-  typeof process !== "undefined" &&
-  process.versions &&
-  process.versions.node
-);
+// Source: https://github.com/ai/nanoid/blob/4f5544255f3aba912c7662aca0434a4506953c5c/non-secure/index.js
 
-export let createId = (): string => {
-  throw new Error("Module nanoid not loaded");
-};
+const urlAlphabet =
+  "useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict";
 
-(isNode ? import("nanoid") : import("nanoid/non-secure")).then(
-  (m) => (createId = m.nanoid),
-);
+export function createId(size = 21) {
+  let id = "";
+  let i = size;
+
+  while (i--) {
+    id += urlAlphabet[(Math.random() * 64) | 0];
+  }
+
+  return id;
+}
