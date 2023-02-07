@@ -1,4 +1,3 @@
-import cors from "@fastify/cors";
 import fastify from "fastify";
 import FastifySSEPlugin from "fastify-sse-v2";
 import { eventListSchema, UpdateMessage } from "hello-bird-lib";
@@ -17,8 +16,20 @@ const f = fastify({
   maxParamLength: 5000,
 });
 
-f.register(cors, {
-  origin: env.FRONTEND_URL,
+f.addHook("preHandler", (request, reply, done) => {
+  const { origin } = request.headers;
+
+  const isProd = origin === "https://hello-bird-app.vercel.app";
+  const isPreview = Boolean(
+    origin?.match(/^https:\/\/hello-bird-[a-z0-9-]+-jakst.vercel.app$/),
+  );
+
+  // Allow production, PR previews, and local dev environments to make CORS requests
+  if (isProd || isPreview || env.isLocalDev) {
+    reply.headers({ "Access-Control-Allow-Origin": origin });
+  }
+
+  done();
 });
 
 f.get(

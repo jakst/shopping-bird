@@ -1558,16 +1558,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fastify/cors@npm:^8.2.0":
-  version: 8.2.0
-  resolution: "@fastify/cors@npm:8.2.0"
-  dependencies:
-    fastify-plugin: ^4.0.0
-    mnemonist: 0.39.5
-  checksum: b2e30602d3aad7b2170a153b60e2b0dba8ad7df67ac3b7918374d202097f60b8a252baeafbf37f4323190fa87170960a3162aa6120540f825ae7750414c3feea
-  languageName: node
-  linkType: hard
-
 "@fastify/deepmerge@npm:^1.0.0":
   version: 1.2.0
   resolution: "@fastify/deepmerge@npm:1.2.0"
@@ -4317,7 +4307,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fastify-plugin@npm:^4.0.0, fastify-plugin@npm:^4.3.0":
+"fastify-plugin@npm:^4.3.0":
   version: 4.3.0
   resolution: "fastify-plugin@npm:4.3.0"
   checksum: f4831ca6de3db276f6e5c9ae172c175631be07b24b91e1de17d0cd11c1bd29fe7f671deec591a4dfd26169d3de4f9d9ca385d0e7bddccf38c6d21b5764f8b77d
@@ -4805,7 +4795,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "hello-bird-server@workspace:packages/server"
   dependencies:
-    "@fastify/cors": ^8.2.0
     "@trpc/server": ^10.8.1
     "@types/node": ^18.11.18
     dotenv: ^16.0.3
@@ -5660,15 +5649,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mnemonist@npm:0.39.5":
-  version: 0.39.5
-  resolution: "mnemonist@npm:0.39.5"
-  dependencies:
-    obliterator: ^2.0.1
-  checksum: 6669d687a434226924b2c84ee6eb7ce7d0f83dfc5caad8bcc164c73c0c11fb6d43cbe32636e710f068046f4b40a56c3032532554e93e02640aafc6ca3dd222e6
-  languageName: node
-  linkType: hard
-
 "mri@npm:^1.1.0":
   version: 1.2.0
   resolution: "mri@npm:1.2.0"
@@ -5825,13 +5805,6 @@ __metadata:
   version: 3.0.0
   resolution: "object-hash@npm:3.0.0"
   checksum: 80b4904bb3857c52cc1bfd0b52c0352532ca12ed3b8a6ff06a90cd209dfda1b95cee059a7625eb9da29537027f68ac4619363491eedb2f5d3dddbba97494fd6c
-  languageName: node
-  linkType: hard
-
-"obliterator@npm:^2.0.1":
-  version: 2.0.4
-  resolution: "obliterator@npm:2.0.4"
-  checksum: f28ad35b6d812089315f375dc3e6e5f9bebf958ebe4b10ccd471c7115cbcf595e74bdac4783ae758e5b1f47e3096427fdb37cfa7bed566b132df92ff317b9a7c
   languageName: node
   linkType: hard
 
