@@ -2,6 +2,7 @@
 .solid
 .turbo
 .vercel
+.yarn
 
 build
 dist

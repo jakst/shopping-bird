@@ -1,13 +1,13 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "include": ["./src", "scripts/auth.ts"],
-  "compilerOptions": {
-    "outDir": "dist",
+	"extends": "../../tsconfig.base.json",
+	"include": ["./src", "scripts/auth.ts"],
+	"compilerOptions": {
+		"outDir": "dist",
 
-    "types": ["node"],
-    "target": "ES2020" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
-  },
-  "references": [
-    { "path": "../lib" } //
-  ]
+		"types": ["node"],
+		"target": "ES2020" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+	},
+	"references": [
+		{ "path": "../lib" } //
+	]
 }

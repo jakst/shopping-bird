@@ -1,38 +1,38 @@
 {
-  "name": "shopping-bird-app",
-  "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "dev": "dotenv solid-start dev -- --port 3400",
-    "build": "mkdir -p node_modules && solid-start build",
-    "start": "solid-start start --port 3400"
-  },
-  "type": "module",
-  "devDependencies": {
-    "@iconify-json/bi": "^1.1.14",
-    "@iconify-json/ci": "^1.1.7",
-    "@iconify-json/radix-icons": "^1.1.8",
-    "autoprefixer": "^10.4.13",
-    "dotenv-cli": "^7.0.0",
-    "postcss": "^8.4.21",
-    "solid-start-node": "^0.2.20",
-    "tailwindcss": "^3.2.4",
-    "typescript": "^4.9.5",
-    "unplugin-icons": "^0.15.2",
-    "vite": "^4.1.1"
-  },
-  "dependencies": {
-    "@motionone/solid": "^10.15.5",
-    "@solid-primitives/connectivity": "^0.3.6",
-    "@solid-primitives/page-visibility": "^2.0.3",
-    "@solid-primitives/storage": "^1.3.4",
-    "@solidjs/meta": "^0.28.2",
-    "@solidjs/router": "^0.7.0",
-    "shopping-bird-lib": "workspace:^",
-    "solid-js": "^1.6.10",
-    "solid-start": "^0.2.20",
-    "solid-start-vercel": "^0.2.20",
-    "undici": "^5.18.0",
-    "zod": "^3.20.2"
-  }
+	"name": "shopping-bird-app",
+	"version": "1.0.0",
+	"private": true,
+	"scripts": {
+		"dev": "dotenv solid-start dev -- --port 3400",
+		"build": "mkdir -p node_modules && solid-start build",
+		"start": "solid-start start --port 3400"
+	},
+	"type": "module",
+	"devDependencies": {
+		"@iconify-json/bi": "^1.1.14",
+		"@iconify-json/ci": "^1.1.7",
+		"@iconify-json/radix-icons": "^1.1.8",
+		"autoprefixer": "^10.4.13",
+		"dotenv-cli": "^7.0.0",
+		"postcss": "^8.4.21",
+		"solid-start-node": "^0.2.20",
+		"tailwindcss": "^3.2.4",
+		"typescript": "^4.9.5",
+		"unplugin-icons": "^0.15.2",
+		"vite": "^4.1.1"
+	},
+	"dependencies": {
+		"@motionone/solid": "^10.15.5",
+		"@solid-primitives/connectivity": "^0.3.6",
+		"@solid-primitives/page-visibility": "^2.0.3",
+		"@solid-primitives/storage": "^1.3.4",
+		"@solidjs/meta": "^0.28.2",
+		"@solidjs/router": "^0.7.0",
+		"shopping-bird-lib": "workspace:^",
+		"solid-js": "^1.6.10",
+		"solid-start": "^0.2.20",
+		"solid-start-vercel": "^0.2.20",
+		"undici": "^5.18.0",
+		"zod": "^3.20.2"
+	}
 }

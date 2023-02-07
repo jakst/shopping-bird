@@ -1,7 +1,7 @@
 {
-  "editor.codeActionsOnSave": {
-    "source.organizeImports": true
-  },
-  "vitest.commandLine": "yarn lib test",
-  "vitest.showFailMessages": true
+	"editor.codeActionsOnSave": {
+		"source.organizeImports": true
+	},
+	"vitest.commandLine": "yarn lib test",
+	"vitest.showFailMessages": true
 }

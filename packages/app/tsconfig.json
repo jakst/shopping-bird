@@ -1,21 +1,21 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "include": ["./src"],
-  "compilerOptions": {
-    "outDir": "./node_modules/.cache/tsc",
+	"extends": "../../tsconfig.base.json",
+	"include": ["./src"],
+	"compilerOptions": {
+		"outDir": "./node_modules/.cache/tsc",
 
-    "target": "ESNext",
-    "module": "ESNext",
-    "jsxImportSource": "solid-js",
-    "jsx": "preserve",
-    "types": ["vite/client", "unplugin-icons/types/solid"],
-    "baseUrl": "./",
-    "paths": {
-      "~/*": ["./src/*"]
-    }
-  },
-  "references": [
-    { "path": "../lib" }, //
-    { "path": "../server" }
-  ]
+		"target": "ESNext",
+		"module": "ESNext",
+		"jsxImportSource": "solid-js",
+		"jsx": "preserve",
+		"types": ["vite/client", "unplugin-icons/types/solid"],
+		"baseUrl": "./",
+		"paths": {
+			"~/*": ["./src/*"]
+		}
+	},
+	"references": [
+		{ "path": "../lib" }, //
+		{ "path": "../server" }
+	]
 }

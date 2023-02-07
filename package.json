@@ -1,34 +1,34 @@
 {
-  "name": "shopping-bird",
-  "private": true,
-  "packageManager": "yarn@3.3.0",
-  "engines": {
-    "node": "18.x"
-  },
-  "workspaces": {
-    "packages": [
-      "packages/*"
-    ]
-  },
-  "scripts": {
-    "app": "yarn workspace shopping-bird-app",
-    "server": "yarn workspace shopping-bird-server",
-    "lib": "yarn workspace shopping-bird-lib",
-    "format": "prettier --cache --write .",
-    "lint": "yarn eslint -f unix .",
-    "tc": "yarn tsc -b",
-    "check": "yarn tc && yarn lint",
-    "clean": "git clean -xfd packages -e packages/app/.env -e packages/server/.env && yarn"
-  },
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.51.0",
-    "@typescript-eslint/parser": "^5.51.0",
-    "eslint": "^8.33.0",
-    "prettier": "^2.8.3",
-    "turbo": "^1.7.3",
-    "typescript": "^4.9.5"
-  },
-  "resolutions": {
-    "solid-start@^0.2.20": "patch:solid-start@npm%3A0.2.20#./.yarn/patches/solid-start-npm-0.2.20-1c62718646.patch"
-  }
+	"name": "shopping-bird",
+	"private": true,
+	"packageManager": "yarn@3.3.0",
+	"engines": {
+		"node": "18.x"
+	},
+	"workspaces": {
+		"packages": [
+			"packages/*"
+		]
+	},
+	"scripts": {
+		"app": "yarn workspace shopping-bird-app",
+		"server": "yarn workspace shopping-bird-server",
+		"lib": "yarn workspace shopping-bird-lib",
+		"format": "prettier --cache --write .",
+		"lint": "yarn eslint -f unix .",
+		"tc": "yarn tsc -b",
+		"check": "yarn tc && yarn lint",
+		"clean": "git clean -xfd packages -e packages/app/.env -e packages/server/.env && yarn"
+	},
+	"devDependencies": {
+		"@typescript-eslint/eslint-plugin": "^5.51.0",
+		"@typescript-eslint/parser": "^5.51.0",
+		"eslint": "^8.33.0",
+		"prettier": "^2.8.3",
+		"turbo": "^1.7.3",
+		"typescript": "^4.9.5"
+	},
+	"resolutions": {
+		"solid-start@^0.2.20": "patch:solid-start@npm%3A0.2.20#./.yarn/patches/solid-start-npm-0.2.20-1c62718646.patch"
+	}
 }

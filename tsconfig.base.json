@@ -1,15 +1,15 @@
 {
-  "compilerOptions": {
-    "composite": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "emitDeclarationOnly": true,
-    "module": "NodeNext",
-    "moduleResolution": "node",
+	"compilerOptions": {
+		"composite": true,
+		"skipLibCheck": true,
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"emitDeclarationOnly": true,
+		"module": "NodeNext",
+		"moduleResolution": "node",
 
-    // Strictness
-    "strict": true,
-    "forceConsistentCasingInFileNames": true
-  }
+		// Strictness
+		"strict": true,
+		"forceConsistentCasingInFileNames": true
+	}
 }
