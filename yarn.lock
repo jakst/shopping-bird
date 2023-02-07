@@ -5074,7 +5074,6 @@ __metadata:
     autoprefixer: ^10.4.13
     dotenv-cli: ^7.0.0
     hello-bird-lib: "workspace:^"
-    hello-bird-server: "workspace:^"
     postcss: ^8.4.21
     solid-js: ^1.6.8
     solid-start: ^0.2.6
@@ -5101,7 +5100,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"hello-bird-server@workspace:^, hello-bird-server@workspace:packages/server":
+"hello-bird-server@workspace:packages/server":
   version: 0.0.0-use.local
   resolution: "hello-bird-server@workspace:packages/server"
   dependencies:

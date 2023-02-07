@@ -29,7 +29,6 @@
     "@solidjs/meta": "^0.28.2",
     "@solidjs/router": "^0.6.0",
     "hello-bird-lib": "workspace:^",
-    "hello-bird-server": "workspace:^",
     "solid-js": "^1.6.8",
     "solid-start": "^0.2.6",
     "solid-start-vercel": "^0.2.6",
