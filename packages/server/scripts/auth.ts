@@ -44,14 +44,11 @@ async function run() {
     await browser.close();
   }
 
-  const res = await fetch(
-    "https://shopping-bird-production.up.railway.app/auth",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ cookies }),
-    },
-  );
+  const res = await fetch("https://shopping-bird.up.railway.app/auth", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ cookies }),
+  });
 
   await cache.disconnect();
 
