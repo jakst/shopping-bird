@@ -4,7 +4,7 @@ import {
   type ClientServerConnection,
   type OnListUpdateCallback,
   type ShoppingListEvent,
-} from "hello-bird-lib";
+} from "shopping-bird-lib";
 import { env } from "./env";
 
 export class BrowserServerConnection implements ClientServerConnection {

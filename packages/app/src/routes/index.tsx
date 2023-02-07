@@ -6,7 +6,7 @@ import {
   ShoppingListEvent,
   ShoppingListItem,
   trimAndUppercase,
-} from "hello-bird-lib";
+} from "shopping-bird-lib";
 import { createSignal, For, onMount, Show } from "solid-js";
 import { createMutable, reconcile } from "solid-js/store";
 import { ItemRow } from "~/components/ItemRow";
@@ -28,7 +28,7 @@ export default function Shell() {
           class="uppercase text-4xl py-4 text-sky-700"
           style={{ "font-stretch": "condensed" }}
         >
-          Hello Bird!
+          Shopping Bird
         </h1>
       </div>
 

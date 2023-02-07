@@ -1,6 +1,6 @@
 import fastify from "fastify";
 import FastifySSEPlugin from "fastify-sse-v2";
-import { eventListSchema, UpdateMessage } from "hello-bird-lib";
+import { eventListSchema, UpdateMessage } from "shopping-bird-lib";
 import { z } from "zod";
 import { getCookies, setCookies } from "./bot/browser";
 import { cache } from "./cache";
@@ -19,9 +19,9 @@ const f = fastify({
 f.addHook("preHandler", (request, reply, done) => {
   const { origin } = request.headers;
 
-  const isProd = origin === "https://hello-bird-app.vercel.app";
+  const isProd = origin === "https://shopping-bird.vercel.app";
   const isPreview = Boolean(
-    origin?.match(/^https:\/\/hello-bird-[a-z0-9-]+-jakst.vercel.app$/),
+    origin?.match(/^https:\/\/shopping-bird-[a-z0-9-]+-jakst.vercel.app$/),
   );
 
   // Allow production, PR previews, and local dev environments to make CORS requests

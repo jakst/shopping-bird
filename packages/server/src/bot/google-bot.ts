@@ -1,5 +1,5 @@
-import { trimAndUppercase, type Bot } from "hello-bird-lib";
 import { ElementHandle, Page } from "puppeteer";
+import { trimAndUppercase, type Bot } from "shopping-bird-lib";
 import { clearCookies, getPage } from "./browser";
 
 const pause = (time: number) =>

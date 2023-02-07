@@ -5,7 +5,7 @@ import {
   Server,
   ShoppingList,
   shoppingListItemSchema,
-} from "hello-bird-lib";
+} from "shopping-bird-lib";
 import { z } from "zod";
 import { createGoogleBot } from "./bot/google-bot";
 import { createCached } from "./create-cached";

@@ -1,5 +1,5 @@
 {
-  "name": "hello-bird",
+  "name": "shopping-bird",
   "private": true,
   "packageManager": "yarn@3.3.0",
   "engines": {
@@ -11,9 +11,9 @@
     ]
   },
   "scripts": {
-    "app": "yarn workspace hello-bird-app",
-    "server": "yarn workspace hello-bird-server",
-    "lib": "yarn workspace hello-bird-lib",
+    "app": "yarn workspace shopping-bird-app",
+    "server": "yarn workspace shopping-bird-server",
+    "lib": "yarn workspace shopping-bird-lib",
     "format": "prettier --cache --write .",
     "lint": "yarn eslint -f unix .",
     "tc": "yarn tsc -b",
