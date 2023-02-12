@@ -7,9 +7,10 @@ export default function Root() {
 	return (
 		<Html lang="en">
 			<Head>
-				<Title>Shopping Bird - Your shopping list</Title>
+				<Title>Shopping Bird</Title>
 				<Meta charset="utf-8" />
 				<Meta name="viewport" content="width=device-width, initial-scale=1" />
+				<Meta name="description" content="Your shopping list" />
 
 				<Link rel="icon" type="image/png" href="/favicon.png" />
 
