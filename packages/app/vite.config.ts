@@ -7,6 +7,8 @@ import { VitePWA } from "vite-plugin-pwa"
 
 export default defineConfig({
 	plugins: [
+		solid({ adapter: vercel({ edge: true }) }),
+		Icons({ compiler: "solid", autoInstall: true }),
 		VitePWA({
 			registerType: "autoUpdate",
 			manifest: {
@@ -23,7 +25,5 @@ export default defineConfig({
 				],
 			},
 		}),
-		solid({ adapter: vercel({ edge: true }) }),
-		Icons({ compiler: "solid", autoInstall: true }),
 	],
 })
