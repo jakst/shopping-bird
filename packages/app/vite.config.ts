@@ -10,16 +10,17 @@ export default defineConfig({
 		VitePWA({
 			registerType: "autoUpdate",
 			manifest: {
+				name: "Bird",
 				short_name: "Shopping Bird",
-				name: "Shopping Bird",
+				description: "Your shopping list",
+				start_url: "/",
+				display: "minimal-ui",
+				theme_color: "#0369a1",
+				background_color: "#fff",
 				icons: [
 					{ src: "/icon-192x192.png", sizes: "192x192", type: "image/png" },
 					{ src: "/icon-512x512.png", sizes: "512x512", type: "image/png" },
 				],
-				start_url: "/",
-				theme_color: "#0369a1",
-				background_color: "#fff",
-				display: "minimal-ui",
 			},
 		}),
 		solid({ adapter: vercel({ edge: true }) }),
