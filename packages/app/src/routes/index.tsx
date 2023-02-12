@@ -16,45 +16,6 @@ import IconPlus from "~icons/ci/plus"
 import IconCaretRight from "~icons/radix-icons/caret-right"
 import { Button } from "../components/Button"
 
-let deferredPrompt: Event | null = null
-
-//reference to your install button
-
-//We hide the button initially because the PWA will not be available for
-//install until it follows the A2HS criteria.
-// addBtn.style.display = 'none';
-
-let onClick: (event: Event) => void
-
-if (typeof window !== "undefined")
-	window.addEventListener("beforeinstallprompt", (e) => {
-		console.log("[swrkr] beforeInstall")
-		// Prevent Chrome 67 and earlier from automatically showing the prompt
-		e.preventDefault()
-		// Stash the event so it can be triggered later.
-		deferredPrompt = e
-		// Update UI to notify the user they can add to home screen
-		// addBtn.style.display = 'block';
-
-		onClick = (e) => {
-			console.log("[swrkr] onClick")
-			// hide our user interface that shows our A2HS button
-			// addBtn.style.display = "none"
-			// Show the prompt
-			deferredPrompt.prompt()
-			// Wait for the user to respond to the prompt
-			deferredPrompt.userChoice.then((choiceResult) => {
-				console.log("[swrkr] userChoice", choiceResult)
-				if (choiceResult.outcome === "accepted") {
-					console.log("User accepted the A2HS prompt")
-				} else {
-					console.log("User dismissed the A2HS prompt")
-				}
-				deferredPrompt = null
-			})
-		}
-	})
-
 export default function Shell() {
 	const [isMounted, setIsMounted] = createSignal(false)
 
@@ -67,8 +28,6 @@ export default function Shell() {
 					Shopping Bird
 				</h1>
 			</div>
-
-			<button onClick={onClick}>Derp</button>
 
 			<Show when={isMounted()}>
 				<Home />
