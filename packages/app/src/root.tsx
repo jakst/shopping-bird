@@ -22,6 +22,7 @@ export default function Root() {
 				<Link rel="icon" type="image/png" href="/favicon.png" />
 
 				<Link rel="preload" href="Hubot-Sans-1.0.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+				<script src="/registerSW.js" />
 			</Head>
 
 			<Body>
