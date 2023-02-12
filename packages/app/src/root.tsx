@@ -12,6 +12,12 @@ export default function Root() {
 				<Meta name="viewport" content="width=device-width, initial-scale=1" />
 				<Meta name="description" content="Your shopping list" />
 
+				{/* temp */}
+				<Link rel="apple-touch-icon" href="/icon-192x192.png" sizes="180x180" />
+				<Link rel="mask-icon" href="/icon-192x192.png" color="#ffffff" />
+				<Meta name="theme-color" content="#0369a1" />
+				{/* /temp */}
+
 				<Link rel="manifest" type="application/manifest+json" href="/manifest.webmanifest" />
 				<Link rel="icon" type="image/png" href="/favicon.png" />
 
