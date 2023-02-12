@@ -5,7 +5,7 @@ mount(() => <StartClient />, document)
 if ("serviceWorker" in navigator) {
 	console.log("[swrkr] supported")
 	navigator.serviceWorker
-		.register("service-worker.js")
+		.register("service-worker.js", { scope: "./" })
 		.then(
 			(registration) => {
 				// Registration was successful
