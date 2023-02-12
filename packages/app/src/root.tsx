@@ -12,6 +12,7 @@ export default function Root() {
 				<Meta name="viewport" content="width=device-width, initial-scale=1" />
 				<Meta name="description" content="Your shopping list" />
 
+				<Link rel="manifest" type="application/manifest+json" href="/manifest.webmanifest" />
 				<Link rel="icon" type="image/png" href="/favicon.png" />
 
 				<Link rel="preload" href="Hubot-Sans-1.0.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
