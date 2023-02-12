@@ -12,8 +12,8 @@ export default defineConfig({
 		VitePWA({
 			registerType: "autoUpdate",
 			manifest: {
-				name: "Bird",
-				short_name: "Shopping Bird",
+				name: "Shopping Bird",
+				short_name: "Bird",
 				description: "Your shopping list",
 				start_url: "/",
 				display: "minimal-ui",
