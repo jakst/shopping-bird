@@ -11,9 +11,18 @@ export default defineConfig({
 		Icons({ compiler: "solid", autoInstall: true }),
 		VitePWA({
 			registerType: "autoUpdate",
+			workbox: {
+				globPatterns: ["**/*.{js,css,woff2,png,svg}"],
+				navigateFallback: null,
+				runtimeCaching: [
+					{
+						urlPattern: ({ url }) => url.pathname === "/",
+						handler: "StaleWhileRevalidate",
+					},
+				],
+			},
 			manifest: {
 				name: "Shopping Bird",
-				short_name: "Bird",
 				description: "Your shopping list",
 				start_url: "/",
 				display: "minimal-ui",
