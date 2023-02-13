@@ -1,4 +1,5 @@
 import { config } from "dotenv"
+import solidDevTools from "solid-devtools/vite"
 import vercel from "solid-start-vercel"
 import solid from "solid-start/vite"
 import Icons from "unplugin-icons/vite"
@@ -22,6 +23,14 @@ const env = z
 
 export default defineConfig({
 	plugins: [
+		solidDevTools({
+			autoname: true,
+			locator: {
+				targetIDE: "vscode",
+				componentLocation: true,
+				jsxLocation: true,
+			},
+		}),
 		solid(env.isLocalDev ? {} : { adapter: vercel({ edge: true }) }),
 		Icons({ compiler: "solid", autoInstall: true }),
 		VitePWA({
