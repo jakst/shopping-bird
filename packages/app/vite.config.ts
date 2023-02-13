@@ -1,12 +1,28 @@
+import { config } from "dotenv"
 import vercel from "solid-start-vercel"
 import solid from "solid-start/vite"
 import Icons from "unplugin-icons/vite"
 import { defineConfig } from "vite"
 import { VitePWA } from "vite-plugin-pwa"
+import { z } from "zod"
+
+config()
+
+const env = z
+	.object({
+		LOCAL_DEV: z.literal("1").optional(),
+	})
+	.transform(({ LOCAL_DEV, ...rest }) => ({
+		...rest,
+		isLocalDev: LOCAL_DEV === "1",
+	}))
+	.parse({
+		LOCAL_DEV: process.env.LOCAL_DEV,
+	})
 
 export default defineConfig({
 	plugins: [
-		solid({ adapter: vercel({ edge: true }) }),
+		solid(env.isLocalDev ? {} : { adapter: vercel({ edge: true }) }),
 		Icons({ compiler: "solid", autoInstall: true }),
 		VitePWA({
 			registerType: "autoUpdate",

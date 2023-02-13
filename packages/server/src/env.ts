@@ -3,7 +3,7 @@ import { z } from "zod"
 
 config()
 
-const envSchema = z
+export const env = z
 	.object({
 		EMAIL: z.string().email(),
 		PASSWORD: z.string().min(1),
@@ -18,14 +18,10 @@ const envSchema = z
 		REDIS_URL: z.string(),
 		FRONTEND_URL: z.string().url(),
 		FULL_BROWSER: z.literal("1").optional(),
+		LOCAL_DEV: z.literal("1").optional(),
 	})
-	.transform((value) => {
-		const { NODE_ENV, ...rest } = value
-
-		return {
-			...rest,
-			isLocalDev: NODE_ENV === "development",
-		}
-	})
-
-export const env = envSchema.parse(process.env)
+	.transform(({ NODE_ENV, LOCAL_DEV, ...rest }) => ({
+		...rest,
+		isLocalDev: NODE_ENV === "development" || LOCAL_DEV === "1",
+	}))
+	.parse(process.env)
