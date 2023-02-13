@@ -7,11 +7,12 @@ export default function Root() {
 	return (
 		<Html lang="en">
 			<Head>
-				<Title>Shopping Bird - Your shopping list</Title>
+				<Title>Shopping Bird</Title>
 				<Meta charset="utf-8" />
 				<Meta name="viewport" content="width=device-width, initial-scale=1" />
+				<Meta name="description" content="Your shopping list" />
 
-				<Link rel="manifest" href="/manifest.json" />
+				<Link rel="manifest" type="application/manifest+json" href="/manifest.webmanifest" />
 				<Link rel="icon" type="image/png" href="/favicon.png" />
 
 				<Link rel="preload" href="Hubot-Sans-1.0.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
