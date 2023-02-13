@@ -26,7 +26,7 @@ export default defineConfig({
 				short_name: "Shopping Bird",
 				description: "Your shopping list",
 				start_url: "/",
-				display: "fullscreen",
+				display: "standalone",
 				theme_color: "#0369a1",
 				background_color: "#fff",
 				icons: [
