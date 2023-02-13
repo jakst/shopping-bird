@@ -23,6 +23,7 @@ export default defineConfig({
 			},
 			manifest: {
 				name: "Shopping Bird",
+				short_name: "Shopping Bird",
 				description: "Your shopping list",
 				start_url: "/",
 				display: "minimal-ui",
