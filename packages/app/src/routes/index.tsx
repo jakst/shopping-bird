@@ -10,13 +10,14 @@ import {
 import { createSignal, For, onMount, Show } from "solid-js"
 import { createMutable, reconcile } from "solid-js/store"
 import { ItemRow } from "~/components/ItemRow"
+import { ProtectedRoute } from "~/components/ProtectedRoute"
 import { BrowserServerConnection } from "~/lib/browser-server-connection"
 import IconCheck from "~icons/ci/check"
 import IconPlus from "~icons/ci/plus"
 import IconCaretRight from "~icons/radix-icons/caret-right"
 import { Button } from "../components/Button"
 
-export default function Shell() {
+const { routeData, Page: Shell } = ProtectedRoute(() => {
 	const [isMounted, setIsMounted] = createSignal(false)
 
 	onMount(() => setIsMounted(true))
@@ -34,7 +35,10 @@ export default function Shell() {
 			</Show>
 		</main>
 	)
-}
+})
+
+export { routeData }
+export default Shell
 
 function createClient() {
 	const [isConnected, setIsConnected] = createSignal(false)

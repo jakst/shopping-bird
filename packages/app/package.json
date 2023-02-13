@@ -23,7 +23,9 @@
 		"vite-plugin-pwa": "^0.14.4"
 	},
 	"dependencies": {
+		"@auth/core": "^0.4.0",
 		"@motionone/solid": "^10.15.5",
+		"@solid-auth/next": "^0.0.23",
 		"@solid-primitives/connectivity": "^0.3.6",
 		"@solid-primitives/page-visibility": "^2.0.3",
 		"@solid-primitives/storage": "^1.3.4",
