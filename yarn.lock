@@ -1854,17 +1854,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@iconify/utils@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "@iconify/utils@npm:2.1.0"
+"@iconify/utils@npm:^2.1.2":
+  version: 2.1.2
+  resolution: "@iconify/utils@npm:2.1.2"
   dependencies:
     "@antfu/install-pkg": ^0.1.1
     "@antfu/utils": ^0.7.2
     "@iconify/types": ^2.0.0
     debug: ^4.3.4
-    kolorist: ^1.6.0
-    local-pkg: ^0.4.2
-  checksum: 922d5d9b70b2f01770684d58a650ad4559fe66e15b33462a145dbdfa50955fb28b27ad673c545dc19f5a7af9f3ff7f954b4c97d8165ae02856680319d873e783
+    kolorist: ^1.7.0
+    local-pkg: ^0.4.3
+  checksum: a5703539ce5387388a3ee744457422b6f769baed5dffea81044cf034aa9d62909c2728f95d245eb1e4e11c01fe25c40a2526796366c9920cb0b793ef9c9c129d
   languageName: node
   linkType: hard
 
@@ -6391,10 +6391,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"kolorist@npm:^1.6.0":
-  version: 1.6.0
-  resolution: "kolorist@npm:1.6.0"
-  checksum: 4d898b782ceaaac3a51d9820a13563fcd0ed516d5493374a0e04ceda93ed4d74f9e267e8da5fb4453e508099b9f6b22e38ac1bff92fdc227081f460c003401c0
+"kolorist@npm:^1.6.0, kolorist@npm:^1.7.0":
+  version: 1.7.0
+  resolution: "kolorist@npm:1.7.0"
+  checksum: 0eb64d22a204be11ddd7d2017525bf2603de38b15c571f79d6f0c5f1c869b8adfd40c3aa71c12e0cfe5496c25b2bbe891267cbc11f5b3fbc858d74ae79bac293
   languageName: node
   linkType: hard
 
@@ -6454,10 +6454,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"local-pkg@npm:^0.4.2":
-  version: 0.4.2
-  resolution: "local-pkg@npm:0.4.2"
-  checksum: 22be451353c25c4411b552bf01880ebc9e995b93574b2facc7757968d888356df59199cacada14162ab53bbc9da055bb692c907b4171f008dbce45a2afc777c1
+"local-pkg@npm:^0.4.2, local-pkg@npm:^0.4.3":
+  version: 0.4.3
+  resolution: "local-pkg@npm:0.4.3"
+  checksum: 7825aca531dd6afa3a3712a0208697aa4a5cd009065f32e3fb732aafcc42ed11f277b5ac67229222e96f4def55197171cdf3d5522d0381b489d2e5547b407d55
   languageName: node
   linkType: hard
 
@@ -8209,14 +8209,14 @@ __metadata:
     postcss: ^8.4.21
     shopping-bird-lib: "workspace:^"
     solid-devtools: ^0.25.0
-    solid-js: ^1.6.10
-    solid-start: ^0.2.20
-    solid-start-node: ^0.2.20
-    solid-start-vercel: ^0.2.20
+    solid-js: ^1.6.11
+    solid-start: ^0.2.21
+    solid-start-node: ^0.2.21
+    solid-start-vercel: ^0.2.21
     tailwindcss: ^3.2.6
     typescript: ^4.9.5
     undici: ^5.19.1
-    unplugin-icons: ^0.15.2
+    unplugin-icons: ^0.15.3
     vite: ^4.1.1
     vite-plugin-pwa: ^0.14.4
     zod: ^3.20.6
@@ -8373,12 +8373,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"solid-js@npm:^1.6.10":
-  version: 1.6.10
-  resolution: "solid-js@npm:1.6.10"
+"solid-js@npm:^1.6.11":
+  version: 1.6.11
+  resolution: "solid-js@npm:1.6.11"
   dependencies:
     csstype: ^3.1.0
-  checksum: dd4c706d4f1809ea1a5dcea178fa314b01867eecf34ed4b92a5ef73f2b1d09f4a6754c2313d7288c30e8fc9cf2c37d85d8869b7e57ddc6b2d8dea96ceb550298
+  checksum: 5db4ee742934e05072804fd9eb0a02b6471a0d36adb5d7bd6eaf178d440f6a39adb5c769b7583eeed02423558221c7d94e21a9bf8b280fa7e0a4a31af5980199
   languageName: node
   linkType: hard
 
@@ -8395,9 +8395,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"solid-start-node@npm:^0.2.20":
-  version: 0.2.20
-  resolution: "solid-start-node@npm:0.2.20"
+"solid-start-node@npm:^0.2.21":
+  version: 0.2.21
+  resolution: "solid-start-node@npm:0.2.21"
   dependencies:
     "@rollup/plugin-commonjs": ^24.0.0
     "@rollup/plugin-json": ^6.0.0
@@ -8411,13 +8411,13 @@ __metadata:
     solid-start: "*"
     undici: ^5.8.0
     vite: "*"
-  checksum: 52493e10e7ec7d0a2bd7e76e878d5a72d86f1b8f9c4fcb5953f399eae2979944b81844575e5f1adae38696e61a5892c7da947f7c5c2af915c48aece2f33a76e7
+  checksum: 07ae8425199e9d6e157ae76eb3875c9e22e29f92da9ef7908fb9eefb9d2d6771d4137de42c458345c7448a5b3b2053a89c2f7c8ccd67a1abeee4cce734436582
   languageName: node
   linkType: hard
 
-"solid-start-vercel@npm:^0.2.20":
-  version: 0.2.20
-  resolution: "solid-start-vercel@npm:0.2.20"
+"solid-start-vercel@npm:^0.2.21":
+  version: 0.2.21
+  resolution: "solid-start-vercel@npm:0.2.21"
   dependencies:
     "@rollup/plugin-commonjs": ^24.0.0
     "@rollup/plugin-json": ^6.0.0
@@ -8430,13 +8430,13 @@ __metadata:
   peerDependencies:
     solid-start: "*"
     vite: "*"
-  checksum: 9c851615c2b427099fdfaa89293c07753d3f4f9c2e9b59d8ad5f277e32afa815e21ee3ef2fc402bac997573d8a28dcc6d1716fb8efa0583b6be5058767c9b87d
+  checksum: 79d1e9bfe8c3a8d560e424f85dbabe4d10a37c80c24a42a6b9765f9ce609e065092ad436548bd6268ab5c67d2cc9b97a735059bbab44b46a18300400ff669e0d
   languageName: node
   linkType: hard
 
-"solid-start@npm:0.2.20, solid-start@npm:^0.2.11":
-  version: 0.2.20
-  resolution: "solid-start@npm:0.2.20"
+"solid-start@npm:^0.2.11, solid-start@npm:^0.2.21":
+  version: 0.2.21
+  resolution: "solid-start@npm:0.2.21"
   dependencies:
     "@babel/core": ^7.20.12
     "@babel/generator": ^7.20.7
@@ -8503,80 +8503,7 @@ __metadata:
     solid: bin.cjs
     solid-start: bin.cjs
     start: bin.cjs
-  checksum: 197475a78804982e80bba1c6c616327b58c0fb69670b2e2ed29575d0006c90fe4a33df533b66f1a57b720821fbb93757b07f5a17b69d58232147c6799b05f0c2
-  languageName: node
-  linkType: hard
-
-"solid-start@patch:solid-start@npm%3A0.2.20#./.yarn/patches/solid-start-npm-0.2.20-1c62718646.patch::locator=shopping-bird%40workspace%3A.":
-  version: 0.2.20
-  resolution: "solid-start@patch:solid-start@npm%3A0.2.20#./.yarn/patches/solid-start-npm-0.2.20-1c62718646.patch::version=0.2.20&hash=923988&locator=shopping-bird%40workspace%3A."
-  dependencies:
-    "@babel/core": ^7.20.12
-    "@babel/generator": ^7.20.7
-    "@babel/plugin-syntax-jsx": ^7.18.6
-    "@babel/preset-env": ^7.20.2
-    "@babel/preset-typescript": ^7.18.6
-    "@babel/template": ^7.20.7
-    "@types/cookie": ^0.5.1
-    chokidar: ^3.5.3
-    compression: ^1.7.4
-    connect: ^3.7.0
-    debug: ^4.3.4
-    dequal: ^2.0.3
-    dotenv: ^16.0.3
-    es-module-lexer: ^1.1.0
-    esbuild: ^0.14.54
-    esbuild-plugin-solid: ^0.4.2
-    fast-glob: ^3.2.12
-    get-port: ^6.1.2
-    parse-multipart-data: ^1.5.0
-    picocolors: ^1.0.0
-    rollup: ^3.10.0
-    rollup-plugin-visualizer: ^5.9.0
-    rollup-route-manifest: ^1.0.0
-    sade: ^1.8.1
-    set-cookie-parser: ^2.5.1
-    sirv: ^2.0.2
-    terser: ^5.16.1
-    undici: ^5.15.1
-    vite-plugin-inspect: ^0.7.14
-    vite-plugin-solid: ^2.5.0
-    wait-on: ^6.0.1
-  peerDependencies:
-    "@solidjs/meta": ^0.28.0
-    "@solidjs/router": ^0.7.0
-    solid-js: ^1.6.2
-    solid-start-aws: "*"
-    solid-start-cloudflare-pages: "*"
-    solid-start-cloudflare-workers: "*"
-    solid-start-deno: "*"
-    solid-start-netlify: "*"
-    solid-start-node: "*"
-    solid-start-static: "*"
-    solid-start-vercel: "*"
-    vite: ^3.1.8
-  peerDependenciesMeta:
-    solid-start-aws:
-      optional: true
-    solid-start-cloudflare-pages:
-      optional: true
-    solid-start-cloudflare-workers:
-      optional: true
-    solid-start-deno:
-      optional: true
-    solid-start-netlify:
-      optional: true
-    solid-start-node:
-      optional: true
-    solid-start-static:
-      optional: true
-    solid-start-vercel:
-      optional: true
-  bin:
-    solid: bin.cjs
-    solid-start: bin.cjs
-    start: bin.cjs
-  checksum: 7b8033446e5f4237ccfc4c8819ced988cd332419062a845eea547ec1aca1b4df7a25256a3729da208498854e4585b6e2ad5bcda27b773fdacedb001a600d2a5e
+  checksum: 84804b3d0c30e2518e29ea5a21a90f92d18396b6f8fccd6f322edfc417a670b3d9130876c529c3d06dfa0baedaa0015a45d1456a2d7591f1d187d422e1a88b4a
   languageName: node
   linkType: hard
 
@@ -9331,16 +9258,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"unplugin-icons@npm:^0.15.2":
-  version: 0.15.2
-  resolution: "unplugin-icons@npm:0.15.2"
+"unplugin-icons@npm:^0.15.3":
+  version: 0.15.3
+  resolution: "unplugin-icons@npm:0.15.3"
   dependencies:
     "@antfu/install-pkg": ^0.1.1
     "@antfu/utils": ^0.7.2
-    "@iconify/utils": ^2.1.0
+    "@iconify/utils": ^2.1.2
     debug: ^4.3.4
-    kolorist: ^1.6.0
-    local-pkg: ^0.4.2
+    kolorist: ^1.7.0
+    local-pkg: ^0.4.3
     unplugin: ^1.0.1
   peerDependencies:
     "@svgr/core": ">=5.5.0"
@@ -9356,7 +9283,7 @@ __metadata:
       optional: true
     vue-template-es2015-compiler:
       optional: true
-  checksum: 8b94e5937819e96ea25834bea3330a27c05968432bf1d42d123c34fb5366028cf38e89545d1d8d9bae36f477dedfd5e93f3ffa83d50956130377d2b3cd7811fa
+  checksum: 84cfd077a1b8cca831edc2600a307bb000693b65c2be82d60c865f2908ed2d229b944cfdad3e177f75cc99fcf03c9e877f91f2c9fa55da358fd3dffd41e8704a
   languageName: node
   linkType: hard
 
