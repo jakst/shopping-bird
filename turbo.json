@@ -3,7 +3,8 @@
 	"pipeline": {
 		"build": {
 			"outputs": ["dist/**", ".output"],
-			"dependsOn": ["^build"]
+			"dependsOn": ["^build"],
+			"env": ["LOCAL_DEV"]
 		},
 		"start": {
 			"cache": false,
