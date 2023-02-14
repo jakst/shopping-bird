@@ -21,6 +21,11 @@ const env = z
 		LOCAL_DEV: process.env.LOCAL_DEV,
 	})
 
+console.log({
+	"env.isLocalDev": env.isLocalDev,
+	"process.env.LOCAL_DEV": process.env.LOCAL_DEV,
+})
+
 export default defineConfig({
 	plugins: [
 		solidDevTools({
