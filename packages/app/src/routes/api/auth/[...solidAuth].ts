@@ -1,5 +1,7 @@
-import { SolidAuth } from "@solid-auth/next"
-// import { authOptions } from "~/lib/authOptions"
+import { createSolidAuthHandler } from "@solid-auth/core"
+import { authenticator } from "~/lib/auth/authenticator"
 
-// eslint-disable-next-line @typescript-eslint/unbound-method
-export const { GET, POST } = SolidAuth({ providers: [] })
+const handler = createSolidAuthHandler<{ id: string }>(authenticator)
+
+export const POST = handler
+export const GET = handler

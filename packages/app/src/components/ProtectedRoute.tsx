@@ -1,17 +1,16 @@
-import { getSession } from "@solid-auth/next"
 import { Component, Show } from "solid-js"
 import { useRouteData } from "solid-start"
 import { createServerData$, redirect } from "solid-start/server"
-import { authOptions } from "~/lib/authOptions"
+import { authenticator } from "~/lib/auth/authenticator"
 
 export const ProtectedRoute = (ProtectedComponent: Component) => {
 	const routeData = () => {
 		return createServerData$(
 			async (_, event) => {
-				const session = await getSession(event.request, authOptions)
-				if (!session || !session.user) throw redirect("/api/auth/signin?csrf=true")
+				const user = await authenticator.isAuthenticated(event.request)
+				if (!user) throw redirect("/login")
 
-				return session
+				return user
 			},
 			{ key: "auth_user" },
 		)
