@@ -13,7 +13,15 @@ const sessionStorage = createCookieSessionStorage({
 	},
 })
 
-const inputSchema = z.object({ username: z.string(), password: z.string() })
+const trimmedString = z
+	.string()
+	.trim()
+	.transform((v) => v.toLowerCase())
+
+const inputSchema = z.object({
+	username: trimmedString,
+	password: trimmedString,
+})
 
 const strategy = new CredentialsStrategy(async ({ input }) => {
 	const { username, password } = inputSchema.parse(input)
