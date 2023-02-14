@@ -5,6 +5,8 @@ import { type ShoppingListEvent, type ShoppingListItem } from "./schemas"
 import { ShoppingList, validateEvent } from "./shopping-list"
 import { compare } from "./utils/compare"
 
+// TODELOO
+
 interface ClientDeps {
 	shoppingList: ShoppingList
 	remoteShoppingListCopy: ShoppingList
