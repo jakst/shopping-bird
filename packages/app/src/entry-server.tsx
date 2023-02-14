@@ -5,3 +5,5 @@ export default createHandler(
 	createAuthMiddleware(["/"]),
 	renderAsync((event) => <StartServer event={event} />),
 )
+
+//
