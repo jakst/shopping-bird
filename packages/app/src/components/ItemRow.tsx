@@ -11,8 +11,7 @@ interface Actions {
 	renameItem: (id: string, name: string) => void
 }
 
-export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
-	const [isDisappearing, setIsDisappearing] = createSignal(false)
+export function ItemRow(props: { show: boolean; item: ShoppingListItem; actions: Actions }) {
 	const [hovering, setHovering] = createSignal(false)
 	const [focusing, setFocusing] = createSignal(false)
 	const showingActions = () => hovering() || focusing()
@@ -30,10 +29,16 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 
 	return (
 		<Presence initial={false}>
-			<Show when={!isDisappearing()}>
+			<Show when={props.show}>
 				<Motion.li
-					exit={{ opacity: 0, transition: { duration: 0.4 } }}
-					class="flex px-1 items-center justify-between"
+					// initial={{ opacity: 0, height: 0 }}
+					// animate={{ opacity: [0, 0, 1], height: [0, "48px"] }}
+					// exit={{ opacity: [1, 0, 0], height: ["48px", 0] }}
+					initial={{ opacity: 0, height: 0 }}
+					animate={{ opacity: 1, height: "48px" }}
+					exit={{ opacity: 0, height: 0 }}
+					transition={{ duration: 0.3 }}
+					class="flex px-1 items-center justify-between overflow-hidden"
 					onMouseOver={() => setHovering(true)}
 					onMouseLeave={() => setHovering(false)}
 					onFocusIn={() => setFocusing(true)}
@@ -61,8 +66,7 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 									// the item, the name change should also be submitted.
 									if (nameHasChanged()) submitNameChange()
 
-									setIsDisappearing(true)
-									setTimeout(() => props.actions.setChecked(id, checked), 500)
+									props.actions.setChecked(id, checked)
 								}}
 							/>
 						</label>
@@ -92,14 +96,7 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 								<IconCheck height="100%" />
 							</Button>
 
-							<Button
-								onClick={() => {
-									const { id } = props.item
-
-									setIsDisappearing(true)
-									setTimeout(() => props.actions.deleteItem(id), 500)
-								}}
-							>
+							<Button onClick={() => props.actions.deleteItem(props.item.id)}>
 								<IconTrash height="100%" />
 							</Button>
 						</div>

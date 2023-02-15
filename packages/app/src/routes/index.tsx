@@ -86,18 +86,14 @@ function Home() {
 	const { client, items, connectionStatus } = createClient()
 
 	const sortedList = () => {
-		return items
-			.filter((item) => !item.checked)
-			.sort((a, b) => {
-				// TODO: Sort by index
-				// return a.index - b.index;
-				return 0
-			})
+		return items.sort((a, b) => {
+			// TODO: Sort by index
+			// return a.index - b.index;
+			return 0
+		})
 	}
 
-	const checkedList = () => {
-		return items.filter((item) => item.checked)
-	}
+	const numberOfCheckedItems = () => items.filter((item) => item.checked).length
 
 	const [showChecked, setShowChecked] = createSignal(false)
 
@@ -149,19 +145,19 @@ function Home() {
 				style={connectionStatus() === "IN_SYNC" ? "--color: var(--green)" : "--color: var(--yellow)"}
 			/>
 
-			<ul class="flex flex-col gap-2">
-				<For each={sortedList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
+			<ul class="flex flex-col">
+				<For each={sortedList()}>{(item) => <ItemRow show={!item.checked} item={item} actions={actions} />}</For>
 
 				<NewItem onCreate={(name) => void client.addItem(name)} />
 			</ul>
 
-			<Show when={checkedList().length > 0}>
+			<Show when={numberOfCheckedItems() > 0}>
 				<div class="mt-4 mb-2 mx-2 opacity-60 flex justify-between">
 					<button class="flex items-center overflow-hidden" onClick={() => setShowChecked((v) => !v)}>
 						<IconCaretRight class={`transition-transform duration-300 ${showChecked() ? "rotate-90" : "rotate-0"}`} />
 
 						<h2 class="ml-1">
-							{checkedList().length === 1 ? "1 ticked item" : `${checkedList().length} ticked items`}
+							{numberOfCheckedItems() === 1 ? "1 ticked item" : `${numberOfCheckedItems()} ticked items`}
 						</h2>
 					</button>
 
@@ -173,12 +169,12 @@ function Home() {
 				<Presence>
 					<Show when={showChecked()}>
 						<Motion.ul
-							class="flex flex-col gap-2 opacity-60 overflow-hidden"
+							class="flex flex-col opacity-60 overflow-hidden"
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 0.6, transition: { duration: 0.4 } }}
 							exit={{ opacity: 0, transition: { duration: 0.1 } }}
 						>
-							<For each={checkedList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
+							<For each={sortedList()}>{(item) => <ItemRow show={item.checked} item={item} actions={actions} />}</For>
 						</Motion.ul>
 					</Show>
 				</Presence>
