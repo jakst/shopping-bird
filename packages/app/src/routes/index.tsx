@@ -23,12 +23,8 @@ export default function Shell() {
 
 	return (
 		<main class="mx-auto text-gray-700 max-w-lg">
-			<div class="flex px-4 justify-between items-center content-center">
-				<img src="/header-logo.svg" height="60" />
-				{/* <img class="py-4" src="/header-logo.svg" height="60" /> */}
-				{/* <h1 class="uppercase text-4xl py-4 text-sky-700" style={{ "font-stretch": "condensed" }}>
-					Shopping Bird
-				</h1> */}
+			<div class="flex px-4 py-4 justify-between items-center content-center">
+				<img src="/header-logo.svg" alt="Shopping bird logo containing a bird riding in a shopping cart" />
 			</div>
 
 			<Show when={isMounted()}>
