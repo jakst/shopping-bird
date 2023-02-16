@@ -1,7 +1,4 @@
-import { config } from "dotenv"
 import { z } from "zod"
-
-config()
 
 export const secretEnv = z
 	.object({
