@@ -18,6 +18,7 @@ const credentialsSchema = z.object({
 export const authOptions: SolidAuthConfig = {
 	secret: AUTH_SECRET,
 	session: { maxAge: 60 * 60 * 24 * 365 },
+	trustHost: true, // This is required to for the library to work in edge runtimes
 	callbacks: {
 		async redirect() {
 			return "/"
