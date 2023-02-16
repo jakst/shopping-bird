@@ -1,5 +1,5 @@
 import CredentialsProvider from "@auth/core/providers/credentials"
-import { SolidAuthConfig } from "@auth/solid-start"
+import { type SolidAuthConfig } from "@auth/solid-start"
 import { z } from "zod"
 import { secretEnv } from "../secretEnv"
 

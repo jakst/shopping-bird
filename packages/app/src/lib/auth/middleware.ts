@@ -1,6 +1,6 @@
 import { getSession } from "@auth/solid-start"
-import { FetchEvent, redirect } from "solid-start"
-import { MiddlewareInput } from "solid-start/entry-server"
+import { redirect, type FetchEvent } from "solid-start"
+import { type MiddlewareInput } from "solid-start/entry-server"
 import { authOptions } from "./options"
 
 export function createAuthMiddleware(protectedPaths: string[]) {
