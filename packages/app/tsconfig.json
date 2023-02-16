@@ -8,7 +8,7 @@
 		"module": "ESNext",
 		"jsxImportSource": "solid-js",
 		"jsx": "preserve",
-		"types": ["vite/client", "vite-plugin-pwa/client", "unplugin-icons/types/solid"],
+		"types": ["node", "vite/client", "vite-plugin-pwa/client", "unplugin-icons/types/solid"],
 		"baseUrl": "./",
 		"paths": {
 			"~/*": ["./src/*"]
