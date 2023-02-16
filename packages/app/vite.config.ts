@@ -31,7 +31,7 @@ export default defineConfig({
 				jsxLocation: true,
 			},
 		}),
-		solid(env.isLocalDev ? {} : { adapter: vercel({ edge: false }) }),
+		solid(env.isLocalDev ? {} : { adapter: vercel({ edge: true }) }),
 		Icons({ compiler: "solid", autoInstall: true }),
 		VitePWA({
 			registerType: "autoUpdate",
