@@ -1,9 +1,9 @@
 import CredentialsProvider from "@auth/core/providers/credentials"
-import { SolidAuthConfig } from "@auth/solid-start"
+import { type SolidAuthConfig } from "@auth/solid-start"
 import { z } from "zod"
-import { secretEnv } from "../secretEnv"
 
-const { AUTH_INFO, AUTH_SECRET } = secretEnv
+const AUTH_INFO = "herpaderp:flerpflerp"
+const AUTH_SECRET = "derpdeprderp"
 
 const trimmedString = z
 	.string()
