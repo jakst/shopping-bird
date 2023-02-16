@@ -2319,9 +2319,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@solid-devtools/debugger@npm:^0.20.0":
-  version: 0.20.2
-  resolution: "@solid-devtools/debugger@npm:0.20.2"
+"@solid-devtools/debugger@npm:^0.21.0":
+  version: 0.21.0
+  resolution: "@solid-devtools/debugger@npm:0.21.0"
   dependencies:
     "@solid-devtools/shared": ^0.11.0
     "@solid-primitives/bounds": ^0.0.107
@@ -2335,7 +2335,7 @@ __metadata:
     type-fest: ^3.5.7
   peerDependencies:
     solid-js: ^1.6.9
-  checksum: db05a9be4a7baf490fdc40064f882132abcd9ab1ffa949ef9a118d0096ec8304dbbccac4808b62b877d19ef65ae6ed67f65685780b28eaf567033e28b1c144d2
+  checksum: b24aed4f6e29e2a574353fb50b7b5a6e1ac95b760d865a0b2fee175fcfe1d467a55aee5ff0aac5693a408839d00db9eade96e4495712e8a14631629aa88c4546
   languageName: node
   linkType: hard
 
@@ -7977,12 +7977,12 @@ __metadata:
     dotenv-cli: ^7.0.0
     postcss: ^8.4.21
     shopping-bird-lib: "workspace:^"
-    solid-devtools: ^0.25.0
+    solid-devtools: ^0.26.0
     solid-js: ^1.6.11
     solid-start: ^0.2.21
     solid-start-node: ^0.2.21
     solid-start-vercel: ^0.2.21
-    tailwindcss: ^3.2.6
+    tailwindcss: ^3.2.7
     typescript: ^4.9.5
     undici: ^5.19.1
     unplugin-icons: ^0.15.3
@@ -8119,26 +8119,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"solid-devtools@npm:^0.25.0":
-  version: 0.25.0
-  resolution: "solid-devtools@npm:0.25.0"
+"solid-devtools@npm:^0.26.0":
+  version: 0.26.0
+  resolution: "solid-devtools@npm:0.26.0"
   dependencies:
     "@babel/core": ^7.20.12
     "@babel/plugin-syntax-typescript": ^7.18.6
     "@babel/types": ^7.20.7
-    "@solid-devtools/debugger": ^0.20.0
+    "@solid-devtools/debugger": ^0.21.0
     "@solid-devtools/shared": ^0.11.0
     "@solid-primitives/event-bus": ^1.0.0
     "@solid-primitives/utils": ^5.1.0
-    solid-start: ^0.2.11
-    type-fest: ^3.5.1
+    solid-start: ^0.2.20
+    type-fest: ^3.5.7
   peerDependencies:
     solid-js: ^1.6.9
     vite: ^2.2.3 || ^3.0.0 || ^4.0.0
   dependenciesMeta:
     solid-start:
       optional: true
-  checksum: f3fd26f49da934bd35a865538e19dd1e355cfb925665525ddb2706aa2885fc5554840cd04b099f82434587ee09175a59a149372da7b5119433f7714c8e8681b6
+  checksum: b5b67ae535c0054a5369a40f43356ccc010bc1a481d6eb670fc2e88d9f30dd475b0f7a9f7259ecf6ed72a5413f3d03ac999b39bacad0a2eecbf11b2d8bcf26c2
   languageName: node
   linkType: hard
 
@@ -8203,7 +8203,80 @@ __metadata:
   languageName: node
   linkType: hard
 
-"solid-start@npm:^0.2.11, solid-start@npm:^0.2.21":
+"solid-start@npm:0.2.20":
+  version: 0.2.20
+  resolution: "solid-start@npm:0.2.20"
+  dependencies:
+    "@babel/core": ^7.20.12
+    "@babel/generator": ^7.20.7
+    "@babel/plugin-syntax-jsx": ^7.18.6
+    "@babel/preset-env": ^7.20.2
+    "@babel/preset-typescript": ^7.18.6
+    "@babel/template": ^7.20.7
+    "@types/cookie": ^0.5.1
+    chokidar: ^3.5.3
+    compression: ^1.7.4
+    connect: ^3.7.0
+    debug: ^4.3.4
+    dequal: ^2.0.3
+    dotenv: ^16.0.3
+    es-module-lexer: ^1.1.0
+    esbuild: ^0.14.54
+    esbuild-plugin-solid: ^0.4.2
+    fast-glob: ^3.2.12
+    get-port: ^6.1.2
+    parse-multipart-data: ^1.5.0
+    picocolors: ^1.0.0
+    rollup: ^3.10.0
+    rollup-plugin-visualizer: ^5.9.0
+    rollup-route-manifest: ^1.0.0
+    sade: ^1.8.1
+    set-cookie-parser: ^2.5.1
+    sirv: ^2.0.2
+    terser: ^5.16.1
+    undici: ^5.15.1
+    vite-plugin-inspect: ^0.7.14
+    vite-plugin-solid: ^2.5.0
+    wait-on: ^6.0.1
+  peerDependencies:
+    "@solidjs/meta": ^0.28.0
+    "@solidjs/router": ^0.7.0
+    solid-js: ^1.6.2
+    solid-start-aws: "*"
+    solid-start-cloudflare-pages: "*"
+    solid-start-cloudflare-workers: "*"
+    solid-start-deno: "*"
+    solid-start-netlify: "*"
+    solid-start-node: "*"
+    solid-start-static: "*"
+    solid-start-vercel: "*"
+    vite: ^3.1.8
+  peerDependenciesMeta:
+    solid-start-aws:
+      optional: true
+    solid-start-cloudflare-pages:
+      optional: true
+    solid-start-cloudflare-workers:
+      optional: true
+    solid-start-deno:
+      optional: true
+    solid-start-netlify:
+      optional: true
+    solid-start-node:
+      optional: true
+    solid-start-static:
+      optional: true
+    solid-start-vercel:
+      optional: true
+  bin:
+    solid: bin.cjs
+    solid-start: bin.cjs
+    start: bin.cjs
+  checksum: 197475a78804982e80bba1c6c616327b58c0fb69670b2e2ed29575d0006c90fe4a33df533b66f1a57b720821fbb93757b07f5a17b69d58232147c6799b05f0c2
+  languageName: node
+  linkType: hard
+
+"solid-start@npm:^0.2.21":
   version: 0.2.21
   resolution: "solid-start@npm:0.2.21"
   dependencies:
@@ -8273,6 +8346,79 @@ __metadata:
     solid-start: bin.cjs
     start: bin.cjs
   checksum: 84804b3d0c30e2518e29ea5a21a90f92d18396b6f8fccd6f322edfc417a670b3d9130876c529c3d06dfa0baedaa0015a45d1456a2d7591f1d187d422e1a88b4a
+  languageName: node
+  linkType: hard
+
+"solid-start@patch:solid-start@npm%3A0.2.20#./.yarn/patches/solid-start-npm-0.2.20-1c62718646.patch::locator=shopping-bird%40workspace%3A.":
+  version: 0.2.20
+  resolution: "solid-start@patch:solid-start@npm%3A0.2.20#./.yarn/patches/solid-start-npm-0.2.20-1c62718646.patch::version=0.2.20&hash=923988&locator=shopping-bird%40workspace%3A."
+  dependencies:
+    "@babel/core": ^7.20.12
+    "@babel/generator": ^7.20.7
+    "@babel/plugin-syntax-jsx": ^7.18.6
+    "@babel/preset-env": ^7.20.2
+    "@babel/preset-typescript": ^7.18.6
+    "@babel/template": ^7.20.7
+    "@types/cookie": ^0.5.1
+    chokidar: ^3.5.3
+    compression: ^1.7.4
+    connect: ^3.7.0
+    debug: ^4.3.4
+    dequal: ^2.0.3
+    dotenv: ^16.0.3
+    es-module-lexer: ^1.1.0
+    esbuild: ^0.14.54
+    esbuild-plugin-solid: ^0.4.2
+    fast-glob: ^3.2.12
+    get-port: ^6.1.2
+    parse-multipart-data: ^1.5.0
+    picocolors: ^1.0.0
+    rollup: ^3.10.0
+    rollup-plugin-visualizer: ^5.9.0
+    rollup-route-manifest: ^1.0.0
+    sade: ^1.8.1
+    set-cookie-parser: ^2.5.1
+    sirv: ^2.0.2
+    terser: ^5.16.1
+    undici: ^5.15.1
+    vite-plugin-inspect: ^0.7.14
+    vite-plugin-solid: ^2.5.0
+    wait-on: ^6.0.1
+  peerDependencies:
+    "@solidjs/meta": ^0.28.0
+    "@solidjs/router": ^0.7.0
+    solid-js: ^1.6.2
+    solid-start-aws: "*"
+    solid-start-cloudflare-pages: "*"
+    solid-start-cloudflare-workers: "*"
+    solid-start-deno: "*"
+    solid-start-netlify: "*"
+    solid-start-node: "*"
+    solid-start-static: "*"
+    solid-start-vercel: "*"
+    vite: ^3.1.8
+  peerDependenciesMeta:
+    solid-start-aws:
+      optional: true
+    solid-start-cloudflare-pages:
+      optional: true
+    solid-start-cloudflare-workers:
+      optional: true
+    solid-start-deno:
+      optional: true
+    solid-start-netlify:
+      optional: true
+    solid-start-node:
+      optional: true
+    solid-start-static:
+      optional: true
+    solid-start-vercel:
+      optional: true
+  bin:
+    solid: bin.cjs
+    solid-start: bin.cjs
+    start: bin.cjs
+  checksum: 7b8033446e5f4237ccfc4c8819ced988cd332419062a845eea547ec1aca1b4df7a25256a3729da208498854e4585b6e2ad5bcda27b773fdacedb001a600d2a5e
   languageName: node
   linkType: hard
 
@@ -8529,9 +8675,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tailwindcss@npm:^3.2.6":
-  version: 3.2.6
-  resolution: "tailwindcss@npm:3.2.6"
+"tailwindcss@npm:^3.2.7":
+  version: 3.2.7
+  resolution: "tailwindcss@npm:3.2.7"
   dependencies:
     arg: ^5.0.2
     chokidar: ^3.5.3
@@ -8561,7 +8707,7 @@ __metadata:
   bin:
     tailwind: lib/cli.js
     tailwindcss: lib/cli.js
-  checksum: 908451ff7b334b2aec2a0ba5bf426a786a3f190b440a1f8ede206d889448ffda3b77349829f06dc297336fd0b5edc696ae5f23b808d6444bb5c689f218e95323
+  checksum: 819446bf67acea1fc738f345d80f328b7bb6e6ef4b24070249a11219307045881cf97baed6258cbdcede7fa18886e9c9c41fd0fa087b3e987cf2948560a2f164
   languageName: node
   linkType: hard
 
