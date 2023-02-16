@@ -3576,16 +3576,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chromium-bidi@npm:0.4.3":
-  version: 0.4.3
-  resolution: "chromium-bidi@npm:0.4.3"
-  peerDependencies:
-    devtools-protocol: "*"
-    mitt: "*"
-  checksum: 280c3b5c2315847cf25b5e356a43f915dea1205f27a8fb10443fad6832d8e08c1878e3b62104c50a27bf4fd6d07868882187b5226195a5bacb9f572f9940f7fb
-  languageName: node
-  linkType: hard
-
 "clean-stack@npm:^2.0.0":
   version: 2.2.0
   resolution: "clean-stack@npm:2.2.0"
@@ -7323,11 +7313,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"puppeteer-core@npm:19.7.0":
-  version: 19.7.0
-  resolution: "puppeteer-core@npm:19.7.0"
+"puppeteer-core@npm:19.7.1":
+  version: 19.7.1
+  resolution: "puppeteer-core@npm:19.7.1"
   dependencies:
-    chromium-bidi: 0.4.3
     cross-fetch: 3.1.5
     debug: 4.3.4
     devtools-protocol: 0.0.1094867
@@ -7339,11 +7328,14 @@ __metadata:
     unbzip2-stream: 1.4.3
     ws: 8.11.0
   peerDependencies:
+    chromium-bidi: 0.4.3
     typescript: ">= 4.7.4"
   peerDependenciesMeta:
+    chromium-bidi:
+      optional: true
     typescript:
       optional: true
-  checksum: a4d41a1f4b5e4088a2fe11b774efaea0b7634236a6da1f8e27590e1d737bf7fe3593829c8ffca53e7a945bf8c6c174891ba1bc0ed7e73c03af81d077af5da782
+  checksum: 5910357f691d6437e7a80aab08b07003ef3362d30ff030fce4cfceec71e425ba0acb111409040f21c3f620e079cfe5a31bc0fa2a9b2dde414e9b92d63fc9dbee
   languageName: node
   linkType: hard
 
@@ -7447,16 +7439,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"puppeteer@npm:^19.7.0":
-  version: 19.7.0
-  resolution: "puppeteer@npm:19.7.0"
+"puppeteer@npm:^19.7.1":
+  version: 19.7.1
+  resolution: "puppeteer@npm:19.7.1"
   dependencies:
     cosmiconfig: 8.0.0
     https-proxy-agent: 5.0.1
     progress: 2.0.3
     proxy-from-env: 1.1.0
-    puppeteer-core: 19.7.0
-  checksum: 46d8ad795126864a1da58777b60b12671e5c96ece4b2c352fe1cf0b8d4f6db5b4c2fe78bd5dbde69dadc479a3db6138c21e28786d8827996c2f733da0e02074f
+    puppeteer-core: 19.7.1
+  checksum: 4ea02c6f436fe02c393fd617cc4d7f349a0e0b8b707893f4a068ae05fffd37a8e3cca6e0aeaf2f530de1649e9592050784bfdbf44a4d85cffd1f457e731caec1
   languageName: node
   linkType: hard
 
@@ -8022,7 +8014,7 @@ __metadata:
     esbuild-node-tsc: ^2.0.5
     fastify: ^4.13.0
     fastify-sse-v2: ^3.0.0
-    puppeteer: ^19.7.0
+    puppeteer: ^19.7.1
     puppeteer-extra: ^3.3.4
     puppeteer-extra-plugin-stealth: ^2.11.1
     redis: ^4.6.4

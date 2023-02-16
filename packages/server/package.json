@@ -17,7 +17,7 @@
 		"dotenv": "^16.0.3",
 		"fastify": "^4.13.0",
 		"fastify-sse-v2": "^3.0.0",
-		"puppeteer": "^19.7.0",
+		"puppeteer": "^19.7.1",
 		"puppeteer-extra": "^3.3.4",
 		"puppeteer-extra-plugin-stealth": "^2.11.1",
 		"redis": "^4.6.4",
