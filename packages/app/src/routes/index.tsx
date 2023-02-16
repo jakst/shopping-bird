@@ -24,9 +24,11 @@ export default function Shell() {
 	return (
 		<main class="mx-auto text-gray-700 max-w-lg">
 			<div class="flex px-4 justify-between items-center content-center">
-				<h1 class="uppercase text-4xl py-4 text-sky-700" style={{ "font-stretch": "condensed" }}>
+				<img src="/header-logo.svg" height="60" />
+				{/* <img class="py-4" src="/header-logo.svg" height="60" /> */}
+				{/* <h1 class="uppercase text-4xl py-4 text-sky-700" style={{ "font-stretch": "condensed" }}>
 					Shopping Bird
-				</h1>
+				</h1> */}
 			</div>
 
 			<Show when={isMounted()}>
