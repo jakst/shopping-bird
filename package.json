@@ -11,9 +11,9 @@
 		]
 	},
 	"scripts": {
-		"app": "yarn workspace shopping-bird-app",
-		"server": "yarn workspace shopping-bird-server",
-		"lib": "yarn workspace shopping-bird-lib",
+		"app": "yarn workspace app",
+		"server": "yarn workspace server",
+		"lib": "yarn workspace lib",
 		"format": "prettier --cache --write .",
 		"lint": "yarn eslint -f unix .",
 		"tc": "yarn tsc -b",

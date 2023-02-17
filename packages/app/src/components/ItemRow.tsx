@@ -1,5 +1,5 @@
 import { Motion, Presence } from "@motionone/solid"
-import { type ShoppingListItem } from "shopping-bird-lib"
+import { type ShoppingListItem } from "lib"
 import { createSignal, Show } from "solid-js"
 import IconCheck from "~icons/ci/check"
 import IconTrash from "~icons/ci/trash-full"

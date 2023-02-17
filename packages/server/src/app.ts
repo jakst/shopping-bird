@@ -1,6 +1,6 @@
 import fastify from "fastify"
 import FastifySSEPlugin from "fastify-sse-v2"
-import { eventListSchema, UpdateMessage } from "shopping-bird-lib"
+import { eventListSchema, UpdateMessage } from "lib"
 import { z } from "zod"
 import { getCookies, setCookies } from "./bot/browser"
 import { cache } from "./cache"

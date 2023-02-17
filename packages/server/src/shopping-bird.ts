@@ -1,11 +1,4 @@
-import {
-	eventListSchema,
-	EventQueue,
-	ExternalClient,
-	Server,
-	ShoppingList,
-	shoppingListItemSchema,
-} from "shopping-bird-lib"
+import { eventListSchema, EventQueue, ExternalClient, Server, ShoppingList, shoppingListItemSchema } from "lib"
 import { z } from "zod"
 import { createGoogleBot } from "./bot/google-bot"
 import { createCached } from "./create-cached"

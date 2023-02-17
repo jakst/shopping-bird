@@ -1,12 +1,5 @@
 import { Motion, Presence } from "@motionone/solid"
-import {
-	Client,
-	EventQueue,
-	ShoppingList,
-	ShoppingListEvent,
-	ShoppingListItem,
-	trimAndUppercase,
-} from "shopping-bird-lib"
+import { Client, EventQueue, ShoppingList, ShoppingListEvent, ShoppingListItem, trimAndUppercase } from "lib"
 import { createSignal, For, onMount, Show } from "solid-js"
 import { createMutable, reconcile } from "solid-js/store"
 import { ItemRow } from "~/components/ItemRow"

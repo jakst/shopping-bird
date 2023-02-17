@@ -1,5 +1,5 @@
 {
-	"name": "shopping-bird-app",
+	"name": "app",
 	"version": "1.0.0",
 	"private": true,
 	"scripts": {
@@ -31,7 +31,7 @@
 		"@solid-primitives/storage": "^1.3.4",
 		"@solidjs/meta": "^0.28.2",
 		"@solidjs/router": "^0.7.0",
-		"shopping-bird-lib": "workspace:^",
+		"lib": "workspace:^",
 		"solid-js": "^1.6.11",
 		"solid-start": "^0.2.21",
 		"solid-start-node": "^0.2.21",
