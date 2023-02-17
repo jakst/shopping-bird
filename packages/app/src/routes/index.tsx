@@ -189,10 +189,11 @@ function NewItem(props: { onCreate: (name: string) => void }) {
 	}
 
 	return (
-		<li class="h-7 ml-3 flex items-center">
+		<li class="h-7 ml-3 pr-2 flex items-center">
 			<IconPlus />
 
 			<form
+				class="flex-1"
 				onSubmit={(event) => {
 					event.preventDefault()
 					submit()
@@ -200,7 +201,7 @@ function NewItem(props: { onCreate: (name: string) => void }) {
 			>
 				<input
 					ref={inputField}
-					class="ml-2 outline-none text"
+					class="ml-2 outline-none text flex-1"
 					placeholder="New item"
 					value={value()}
 					onInput={(event) => setValue(event.currentTarget.value)}
