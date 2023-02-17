@@ -40,8 +40,26 @@ function createClient() {
 	const list = createMutable({ items: initialShoppingList })
 
 	const shoppingList = new ShoppingList([...initialShoppingList], (newList) => {
-		// This updates the list without losing reactivity, but there could be more elegant ways to do it
-		list.items = reconcile(newList)(list.items)
+		// This updates the list without losing reactivity, but there could be more elegant ways to do it.
+		// The reason we do this big changed/added/removed check is because a reconcile on the whole list
+		// does not maintain referential identity of objects coming after a deleted item.
+		newList.forEach((newItem) => {
+			const existingItemIndex = list.items.findIndex((v) => v.id === newItem.id)
+
+			if (existingItemIndex > -1) {
+				// Changes to existing item
+				list.items[existingItemIndex] = reconcile(newItem)(list.items[existingItemIndex])
+			} else {
+				// Item added
+				list.items.push(newItem)
+			}
+		})
+
+		list.items.forEach((v, i) => {
+			// Item removed
+			if (!newList.some((newItem) => newItem.id === v.id)) list.items.splice(i, 1)
+		})
+
 		localStorage.setItem("main-shopping-list", JSON.stringify(newList))
 	})
 
