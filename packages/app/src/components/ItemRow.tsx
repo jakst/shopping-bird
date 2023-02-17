@@ -47,7 +47,7 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 						}
 					}}
 				>
-					<div class="flex">
+					<div class="flex flex-1">
 						<label class="p-3 h-10 aspect-square flex items-center justify-center">
 							<input
 								class="w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300 "
@@ -68,7 +68,7 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 						</label>
 
 						<form
-							class="flex"
+							class="flex flex-1"
 							onSubmit={(event) => {
 								event.preventDefault()
 								if (nameHasChanged()) submitNameChange()
@@ -78,7 +78,7 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 							<input
 								ref={nameInputField}
 								value={props.item.name}
-								class={`focus:outline-none focus:underline border-slate-800${
+								class={`flex-1 overflow-ellipsis focus:outline-none focus:underline border-slate-800${
 									props.item.checked ? " line-through text-gray-500" : " text-gray-900"
 								}`}
 								onInput={(event) => setNewName(event.currentTarget.value)}
@@ -87,7 +87,7 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 					</div>
 
 					<Show when={showingActions()}>
-						<div class="ml-6 mr-2 flex items-center">
+						<div class="ml-1 mr-2 flex items-center">
 							<Button disabled={!nameHasChanged()} onClick={submitNameChange}>
 								<IconCheck height="100%" />
 							</Button>
