@@ -146,34 +146,40 @@ function Home() {
 				<NewItem onCreate={(name) => void client.addItem(name)} />
 			</ul>
 
-			<Show when={checkedList().length > 0}>
-				<div class="mt-4 mb-2 mx-2 opacity-60 flex justify-between">
-					<button class="flex items-center overflow-hidden" onClick={() => setShowChecked((v) => !v)}>
-						<IconCaretRight class={`transition-transform duration-300 ${showChecked() ? "rotate-90" : "rotate-0"}`} />
+			<Presence initial={false}>
+				<Show when={checkedList().length > 0}>
+					<Motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.6 }} exit={{ opacity: 0 }}>
+						<div class="mt-4 mb-2 mx-2 flex justify-between">
+							<button class="flex items-center overflow-hidden" onClick={() => setShowChecked((v) => !v)}>
+								<IconCaretRight
+									class={`transition-transform duration-300 ${showChecked() ? "rotate-90" : "rotate-0"}`}
+								/>
 
-						<h2 class="ml-1">
-							{checkedList().length === 1 ? "1 ticked item" : `${checkedList().length} ticked items`}
-						</h2>
-					</button>
+								<h2 class="ml-1">
+									{checkedList().length === 1 ? "1 ticked item" : `${checkedList().length} ticked items`}
+								</h2>
+							</button>
 
-					<button class="px-3 py-1" onClick={() => void client.clearCheckedItems()}>
-						Clear all
-					</button>
-				</div>
+							<button class="px-3 py-1" onClick={() => void client.clearCheckedItems()}>
+								Clear all
+							</button>
+						</div>
 
-				<Presence>
-					<Show when={showChecked()}>
-						<Motion.ul
-							class="flex flex-col gap-2 opacity-60 overflow-hidden"
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 0.6, transition: { duration: 0.4 } }}
-							exit={{ opacity: 0, transition: { duration: 0.1 } }}
-						>
-							<For each={checkedList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
-						</Motion.ul>
-					</Show>
-				</Presence>
-			</Show>
+						<Presence>
+							<Show when={showChecked()}>
+								<Motion.ul
+									class="flex flex-col gap-2 overflow-hidden"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1, transition: { duration: 0.4 } }}
+									exit={{ opacity: 0, transition: { duration: 0.1 } }}
+								>
+									<For each={checkedList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
+								</Motion.ul>
+							</Show>
+						</Presence>
+					</Motion.div>
+				</Show>
+			</Presence>
 		</div>
 	)
 }
