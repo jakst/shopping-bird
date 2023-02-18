@@ -1,7 +1,9 @@
 import { Motion, Presence } from "@motionone/solid"
 import { Client, EventQueue, ShoppingList, ShoppingListEvent, ShoppingListItem, trimAndUppercase } from "lib"
-import { createSignal, For, onMount, Show } from "solid-js"
+import { timeline } from "motion"
+import { createSignal, For, JSX, onMount, Show } from "solid-js"
 import { createMutable, reconcile } from "solid-js/store"
+import { TransitionGroup } from "solid-transition-group"
 import { ItemRow } from "~/components/ItemRow"
 import { BrowserServerConnection } from "~/lib/browser-server-connection"
 import IconCheck from "~icons/ci/check"
@@ -91,6 +93,9 @@ function createClient() {
 	return { client, items: list.items, connectionStatus }
 }
 
+const ITEM_HEIGHT = 40
+const ITEM_HEIGHT_PX = `${ITEM_HEIGHT}px`
+
 function Home() {
 	const { client, items, connectionStatus } = createClient()
 
@@ -158,8 +163,17 @@ function Home() {
 				style={connectionStatus() === "IN_SYNC" ? "--color: var(--green)" : "--color: var(--yellow)"}
 			/>
 
-			<ul class="flex flex-col gap-2">
-				<For each={sortedList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
+			<ul class="flex flex-col">
+				<Flerp>
+					<For each={sortedList()}>
+						{(item) => (
+							// {/* TODO: remove wrapper */}
+							<div class="overflow-hidden">
+								<ItemRow item={item} actions={actions} />
+							</div>
+						)}
+					</For>
+				</Flerp>
 
 				<NewItem onCreate={(name) => void client.addItem(name)} />
 			</ul>
@@ -183,13 +197,13 @@ function Home() {
 							</button>
 						</div>
 
-						<Presence>
+						<Presence initial={false}>
 							<Show when={showChecked()}>
 								<Motion.ul
-									class="flex flex-col gap-2 overflow-hidden"
-									initial={{ opacity: 0 }}
-									animate={{ opacity: 1, transition: { duration: 0.4 } }}
-									exit={{ opacity: 0, transition: { duration: 0.1 } }}
+									class="flex flex-col overflow-hidden"
+									animate={{ height: [0, `${checkedList().length * ITEM_HEIGHT}px`, null], opacity: [0, 0, 1] }}
+									exit={{ height: [null, null, 0], opacity: [null, 0, 0] }}
+									transition={{ duration: 0.7 }}
 								>
 									<For each={checkedList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
 								</Motion.ul>
@@ -199,6 +213,38 @@ function Home() {
 				</Show>
 			</Presence>
 		</div>
+	)
+}
+
+function Flerp(props: { children: JSX.Element }) {
+	return (
+		<TransitionGroup
+			onBeforeEnter={(el) => {
+				// @ts-expect-error This works...
+				;(el.style.height = 0), (el.style.opacity = 0)
+			}}
+			onEnter={(el, done) => {
+				timeline([
+					[el, { height: ITEM_HEIGHT_PX }, { duration: 0.3 }],
+					[el, { opacity: 1 }, { duration: 0.5 }],
+				]).finished.then(done)
+			}}
+			onBeforeExit={(el) => {
+				// @ts-expect-error This works...
+				;(el.style.height = ITEM_HEIGHT_PX), (el.style.opacity = 1)
+			}}
+			onExit={(el, done) => {
+				timeline(
+					[
+						[el, { opacity: 0 }, { duration: 0.3 }],
+						[el, { height: 0 }, { duration: 0.3 }],
+					],
+					// { duration },
+				).finished.then(done)
+			}}
+		>
+			{props.children}
+		</TransitionGroup>
 	)
 }
 

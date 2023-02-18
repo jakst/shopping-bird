@@ -32,10 +32,12 @@
 		"@solidjs/meta": "^0.28.2",
 		"@solidjs/router": "^0.7.0",
 		"lib": "workspace:^",
+		"motion": "^10.15.5",
 		"solid-js": "^1.6.11",
 		"solid-start": "^0.2.21",
 		"solid-start-node": "^0.2.21",
 		"solid-start-vercel": "^0.2.21",
+		"solid-transition-group": "^0.0.13",
 		"undici": "^5.19.1",
 		"zod": "^3.20.6"
 	}
