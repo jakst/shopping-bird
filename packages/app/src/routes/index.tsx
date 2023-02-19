@@ -201,10 +201,12 @@ function Home() {
 							<Show when={showChecked()}>
 								<Motion.ul
 									class="flex flex-col overflow-hidden"
-									animate={{ height: [0, `${checkedList().length * ITEM_HEIGHT}px`, null], opacity: [0, 0, 1] }}
-									exit={{ height: [null, null, 0], opacity: [null, 0, 0] }}
+									initial={{ height: 0, opacity: 0 }}
+									animate={{ height: `${checkedList().length * ITEM_HEIGHT}px`, opacity: 1 }}
+									exit={{ height: 0, opacity: 0 }}
 									transition={{ duration: 0.7 }}
 								>
+									{/* TODO: Animate opacity of these fellas. Can we remove the above opacity instead? */}
 									<For each={checkedList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
 								</Motion.ul>
 							</Show>
