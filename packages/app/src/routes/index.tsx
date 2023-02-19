@@ -164,9 +164,9 @@ function Home() {
 			/>
 
 			<ul class="flex flex-col">
-				<Flerp>
+				<RowAnimator>
 					<For each={sortedList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
-				</Flerp>
+				</RowAnimator>
 
 				<NewItem onCreate={(name) => void client.addItem(name)} />
 			</ul>
@@ -198,9 +198,9 @@ function Home() {
 									animate={{ opacity: 1, transition: { duration: 0.5 } }}
 									exit={{ opacity: 0, transition: { duration: 0.2 } }}
 								>
-									<Flerp>
+									<RowAnimator>
 										<For each={checkedList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
-									</Flerp>
+									</RowAnimator>
 								</Motion.ul>
 							</Show>
 						</Presence>
@@ -211,7 +211,7 @@ function Home() {
 	)
 }
 
-function Flerp(props: { children: JSX.Element }) {
+function RowAnimator(props: { children: JSX.Element }) {
 	return (
 		<TransitionGroup
 			onBeforeEnter={(el) => {
