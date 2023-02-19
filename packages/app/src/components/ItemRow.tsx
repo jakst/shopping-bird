@@ -1,4 +1,3 @@
-import { Motion, Presence } from "@motionone/solid"
 import { type ShoppingListItem } from "lib"
 import { createSignal, Show } from "solid-js"
 import IconCheck from "~icons/ci/check"
@@ -12,7 +11,6 @@ interface Actions {
 }
 
 export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
-	const [isDisappearing, setIsDisappearing] = createSignal(false)
 	const [hovering, setHovering] = createSignal(false)
 	const [focusing, setFocusing] = createSignal(false)
 	const showingActions = () => hovering() || focusing()
@@ -29,83 +27,67 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 	let nameInputField: HTMLInputElement | undefined
 
 	return (
-		<Presence initial={false}>
-			<Show when={!isDisappearing()}>
-				<Motion.li
-					exit={{ opacity: 0, transition: { duration: 0.4 } }}
-					class="flex px-1 items-center justify-between"
-					onMouseOver={() => setHovering(true)}
-					onMouseLeave={() => setHovering(false)}
-					onFocusIn={() => setFocusing(true)}
-					onFocusOut={(event) => {
-						if (!(event.relatedTarget && event.currentTarget.contains(event.relatedTarget as any))) {
-							setFocusing(false)
+		<li
+			class="flex px-1 items-center justify-between overflow-hidden shrink-0"
+			onMouseOver={() => setHovering(true)}
+			onMouseLeave={() => setHovering(false)}
+			onFocusIn={() => setFocusing(true)}
+			onFocusOut={(event) => {
+				if (!(event.relatedTarget && event.currentTarget.contains(event.relatedTarget as any))) {
+					setFocusing(false)
 
-							// Reset unsubmitted name changes when we stop focusing the row
-							setNewName(props.item.name)
-							if (nameInputField) nameInputField.value = props.item.name
-						}
+					// Reset unsubmitted name changes when we stop focusing the row
+					setNewName(props.item.name)
+					if (nameInputField) nameInputField.value = props.item.name
+				}
+			}}
+		>
+			<div class="flex flex-1">
+				<label class="p-3 h-10 aspect-square flex items-center justify-center">
+					<input
+						class="w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300 "
+						type="checkbox"
+						checked={props.item.checked}
+						onChange={(event) => {
+							// If the user types a new name, and then checks/unchecks
+							// the item, the name change should also be submitted.
+							if (nameHasChanged()) submitNameChange()
+
+							props.actions.setChecked(props.item.id, event.currentTarget.checked)
+						}}
+					/>
+				</label>
+
+				<form
+					class="flex flex-1"
+					onSubmit={(event) => {
+						event.preventDefault()
+						if (nameHasChanged()) submitNameChange()
+						;(event.currentTarget[0] as HTMLInputElement)?.blur()
 					}}
 				>
-					<div class="flex flex-1">
-						<label class="p-3 h-10 aspect-square flex items-center justify-center">
-							<input
-								class="w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300 "
-								type="checkbox"
-								checked={props.item.checked}
-								onChange={(event) => {
-									const { id } = props.item
-									const { checked } = event.currentTarget
+					<input
+						ref={nameInputField}
+						value={props.item.name}
+						class={`flex-1 bg-transparent overflow-ellipsis focus:outline-none focus:underline border-slate-800${
+							props.item.checked ? " line-through text-gray-500" : " text-gray-900"
+						}`}
+						onInput={(event) => setNewName(event.currentTarget.value)}
+					/>
+				</form>
+			</div>
 
-									// If the user types a new name, and then checks/unchecks
-									// the item, the name change should also be submitted.
-									if (nameHasChanged()) submitNameChange()
+			<Show when={showingActions()}>
+				<div class="ml-1 mr-2 flex items-center">
+					<Button disabled={!nameHasChanged()} onClick={submitNameChange}>
+						<IconCheck height="100%" />
+					</Button>
 
-									setIsDisappearing(true)
-									setTimeout(() => props.actions.setChecked(id, checked), 500)
-								}}
-							/>
-						</label>
-
-						<form
-							class="flex flex-1"
-							onSubmit={(event) => {
-								event.preventDefault()
-								if (nameHasChanged()) submitNameChange()
-								;(event.currentTarget[0] as HTMLInputElement)?.blur()
-							}}
-						>
-							<input
-								ref={nameInputField}
-								value={props.item.name}
-								class={`flex-1 overflow-ellipsis focus:outline-none focus:underline border-slate-800${
-									props.item.checked ? " line-through text-gray-500" : " text-gray-900"
-								}`}
-								onInput={(event) => setNewName(event.currentTarget.value)}
-							/>
-						</form>
-					</div>
-
-					<Show when={showingActions()}>
-						<div class="ml-1 mr-2 flex items-center">
-							<Button disabled={!nameHasChanged()} onClick={submitNameChange}>
-								<IconCheck height="100%" />
-							</Button>
-
-							<Button
-								onClick={() => {
-									const { id } = props.item
-
-									setIsDisappearing(true)
-									setTimeout(() => props.actions.deleteItem(id), 500)
-								}}
-							>
-								<IconTrash height="100%" />
-							</Button>
-						</div>
-					</Show>
-				</Motion.li>
+					<Button onClick={() => props.actions.deleteItem(props.item.id)}>
+						<IconTrash height="100%" />
+					</Button>
+				</div>
 			</Show>
-		</Presence>
+		</li>
 	)
 }

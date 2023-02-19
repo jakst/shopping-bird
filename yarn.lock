@@ -2006,6 +2006,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@motionone/svelte@npm:^10.15.5":
+  version: 10.15.5
+  resolution: "@motionone/svelte@npm:10.15.5"
+  dependencies:
+    "@motionone/dom": ^10.15.5
+    tslib: ^2.3.1
+  checksum: 17c7cf75f9c2635b1f11204fc4944a62b6febe19d9ffca50b15b45019e98d74cb9c7b9c1a780d8dbd945d8f397ebc3ff97a765d16cad7aae99d1ec979c3aa5ad
+  languageName: node
+  linkType: hard
+
 "@motionone/types@npm:^10.15.1":
   version: 10.15.1
   resolution: "@motionone/types@npm:10.15.1"
@@ -2021,6 +2031,16 @@ __metadata:
     hey-listen: ^1.0.8
     tslib: ^2.3.1
   checksum: 6ef13cd6637ec87c340e5536f849f8c40d30cc90139a3856d11cd70d78e3740f8815b0e63564fefd23c05a060da7a0ea5395390549606ed8801a7b832b74e04e
+  languageName: node
+  linkType: hard
+
+"@motionone/vue@npm:^10.15.5":
+  version: 10.15.5
+  resolution: "@motionone/vue@npm:10.15.5"
+  dependencies:
+    "@motionone/dom": ^10.15.5
+    tslib: ^2.3.1
+  checksum: c87c019edfa1224aed7f2edf3f0f764829eeebbc6efefeca2235a5cabbd1553b7516376c744a39e1f7e6b13a7699bceac02c7cb59091d4d1019d5e9dd11c8cf2
   languageName: node
   linkType: hard
 
@@ -3110,12 +3130,14 @@ __metadata:
     autoprefixer: ^10.4.13
     dotenv-cli: ^7.0.0
     lib: "workspace:^"
+    motion: ^10.15.5
     postcss: ^8.4.21
     solid-devtools: ^0.26.0
     solid-js: ^1.6.11
     solid-start: ^0.2.21
     solid-start-node: ^0.2.21
     solid-start-vercel: ^0.2.21
+    solid-transition-group: ^0.0.13
     tailwindcss: ^3.2.7
     typescript: ^4.9.5
     undici: ^5.19.1
@@ -6603,6 +6625,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"motion@npm:^10.15.5":
+  version: 10.15.5
+  resolution: "motion@npm:10.15.5"
+  dependencies:
+    "@motionone/animation": ^10.15.1
+    "@motionone/dom": ^10.15.5
+    "@motionone/svelte": ^10.15.5
+    "@motionone/types": ^10.15.1
+    "@motionone/utils": ^10.15.1
+    "@motionone/vue": ^10.15.5
+  checksum: 43e7883d95da6e4949b2e5ca01732bce28214f4978bf940511a3fbd8e00943ab7c00fcb28f3f1ce1ed099a404016f784243330be161c4805958deaf60d1b0571
+  languageName: node
+  linkType: hard
+
 "mri@npm:^1.1.0":
   version: 1.2.0
   resolution: "mri@npm:1.2.0"
@@ -8419,6 +8455,15 @@ __metadata:
     solid-start: bin.cjs
     start: bin.cjs
   checksum: 7b8033446e5f4237ccfc4c8819ced988cd332419062a845eea547ec1aca1b4df7a25256a3729da208498854e4585b6e2ad5bcda27b773fdacedb001a600d2a5e
+  languageName: node
+  linkType: hard
+
+"solid-transition-group@npm:^0.0.13":
+  version: 0.0.13
+  resolution: "solid-transition-group@npm:0.0.13"
+  peerDependencies:
+    solid-js: ^1.5.0
+  checksum: 5ec659cd835ba6397e2665b39ca77a942eccaa7339030cb45b4720ed2c18d0fab5224c7a73d3d434d7881caa2c5a506978b2e277e95bc7e952d8ee4612cc9bb5
   languageName: node
   linkType: hard
 
