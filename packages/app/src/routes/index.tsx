@@ -197,7 +197,7 @@ function Home() {
 							</button>
 						</div>
 
-						<Presence initial={false}>
+						<Presence>
 							<Show when={showChecked()}>
 								<Motion.ul
 									class="flex flex-col overflow-hidden"
