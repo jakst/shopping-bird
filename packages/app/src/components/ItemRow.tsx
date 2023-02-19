@@ -28,7 +28,7 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 
 	return (
 		<li
-			class="flex px-1 items-center justify-between"
+			class="flex px-1 items-center justify-between overflow-hidden shrink-0"
 			onMouseOver={() => setHovering(true)}
 			onMouseLeave={() => setHovering(false)}
 			onFocusIn={() => setFocusing(true)}

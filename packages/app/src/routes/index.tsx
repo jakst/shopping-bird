@@ -165,14 +165,7 @@ function Home() {
 
 			<ul class="flex flex-col">
 				<Flerp>
-					<For each={sortedList()}>
-						{(item) => (
-							// {/* TODO: remove wrapper */}
-							<div class="overflow-hidden">
-								<ItemRow item={item} actions={actions} />
-							</div>
-						)}
-					</For>
+					<For each={sortedList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
 				</Flerp>
 
 				<NewItem onCreate={(name) => void client.addItem(name)} />
@@ -197,17 +190,17 @@ function Home() {
 							</button>
 						</div>
 
-						<Presence>
+						<Presence exitBeforeEnter>
 							<Show when={showChecked()}>
 								<Motion.ul
 									class="flex flex-col overflow-hidden"
-									initial={{ height: 0, opacity: 0 }}
-									animate={{ height: `${checkedList().length * ITEM_HEIGHT}px`, opacity: 1 }}
-									exit={{ height: 0, opacity: 0 }}
-									transition={{ duration: 0.7 }}
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1, transition: { duration: 0.5 } }}
+									exit={{ opacity: 0, transition: { duration: 0.2 } }}
 								>
-									{/* TODO: Animate opacity of these fellas. Can we remove the above opacity instead? */}
-									<For each={checkedList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
+									<Flerp>
+										<For each={checkedList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
+									</Flerp>
 								</Motion.ul>
 							</Show>
 						</Presence>
@@ -227,8 +220,8 @@ function Flerp(props: { children: JSX.Element }) {
 			}}
 			onEnter={(el, done) => {
 				timeline([
-					[el, { height: ITEM_HEIGHT_PX }, { duration: 0.3 }],
-					[el, { opacity: 1 }, { duration: 0.5 }],
+					[el, { height: ITEM_HEIGHT_PX }, { duration: 0.2 }],
+					[el, { opacity: 1 }, { duration: 0.3 }],
 				]).finished.then(done)
 			}}
 			onBeforeExit={(el) => {
@@ -236,13 +229,10 @@ function Flerp(props: { children: JSX.Element }) {
 				;(el.style.height = ITEM_HEIGHT_PX), (el.style.opacity = 1)
 			}}
 			onExit={(el, done) => {
-				timeline(
-					[
-						[el, { opacity: 0 }, { duration: 0.3 }],
-						[el, { height: 0 }, { duration: 0.3 }],
-					],
-					// { duration },
-				).finished.then(done)
+				timeline([
+					[el, { opacity: 0 }, { duration: 0.3 }],
+					[el, { height: 0 }, { duration: 0.2 }],
+				]).finished.then(done)
 			}}
 		>
 			{props.children}
