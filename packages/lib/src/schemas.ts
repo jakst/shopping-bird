@@ -4,6 +4,7 @@ export const shoppingListItemSchema = z.object({
 	id: z.string(),
 	name: z.string(),
 	checked: z.boolean(),
+	position: z.number().optional(),
 })
 
 export type ShoppingListItem = z.infer<typeof shoppingListItemSchema>
@@ -38,7 +39,16 @@ const RenameItem = z.object({
 	}),
 })
 
-export const eventSchema = z.discriminatedUnion("name", [AddItem, DeleteItem, SetChecked, RenameItem])
+const MoveItem = z.object({
+	name: z.literal("MOVE_ITEM"),
+	data: z.object({
+		id: z.string(),
+		fromIndex: z.number(),
+		toIndex: z.number(),
+	}),
+})
+
+export const eventSchema = z.discriminatedUnion("name", [AddItem, DeleteItem, SetChecked, RenameItem, MoveItem])
 
 export type ShoppingListEvent = z.infer<typeof eventSchema>
 

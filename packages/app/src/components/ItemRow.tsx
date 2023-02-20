@@ -1,3 +1,4 @@
+import { createSortable, useDragDropContext } from "@thisbeyond/solid-dnd"
 import { type ShoppingListItem } from "lib"
 import { createSignal, Show } from "solid-js"
 import IconCheck from "~icons/ci/check"
@@ -13,7 +14,6 @@ interface Actions {
 export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 	const [hovering, setHovering] = createSignal(false)
 	const [focusing, setFocusing] = createSignal(false)
-	const showingActions = () => hovering() || focusing()
 
 	const [newName, setNewName] = createSignal(props.item.name)
 
@@ -26,9 +26,17 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 
 	let nameInputField: HTMLInputElement | undefined
 
+	const dragDropContext = useDragDropContext()
+	const sortable = dragDropContext ? createSortable(props.item.id, props.item) : undefined
+
+	const showingActions = () => (hovering() || focusing()) && !sortable?.isActiveDraggable
+
 	return (
 		<li
+			ref={(ref) => sortable?.(ref)}
 			class="flex px-1 items-center justify-between overflow-hidden shrink-0"
+			classList={{ "transition-transform": dragDropContext ? !!dragDropContext[0].active.draggable : false }}
+			style={sortable?.isActiveDraggable ? { opacity: 0.25 } : undefined}
 			onMouseOver={() => setHovering(true)}
 			onMouseLeave={() => setHovering(false)}
 			onFocusIn={() => setFocusing(true)}

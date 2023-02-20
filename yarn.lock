@@ -2776,6 +2776,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@thisbeyond/solid-dnd@npm:^0.7.4":
+  version: 0.7.4
+  resolution: "@thisbeyond/solid-dnd@npm:0.7.4"
+  peerDependencies:
+    solid-js: ^1.5
+  checksum: 2b3e54734002c89c817d39730431a831a86d8a77f36f1759137afced0d41a0be1ea8063d46848366a821555afc947945a9928a07ffe0e0b2f033f379b129f829
+  languageName: node
+  linkType: hard
+
 "@tootallnate/once@npm:2":
   version: 2.0.0
   resolution: "@tootallnate/once@npm:2.0.0"
@@ -8330,6 +8339,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "shopping-bird@workspace:."
   dependencies:
+    "@thisbeyond/solid-dnd": ^0.7.4
     "@typescript-eslint/eslint-plugin": ^5.53.0
     "@typescript-eslint/parser": ^5.53.0
     eslint: ^8.34.0

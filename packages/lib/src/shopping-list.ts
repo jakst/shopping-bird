@@ -46,7 +46,7 @@ export class ShoppingList {
 export function applyEvent(list: ShoppingListItem[], event: ShoppingListEvent) {
 	switch (event.name) {
 		case "ADD_ITEM": {
-			list.push({ ...event.data, checked: false })
+			list.push({ ...event.data, checked: false, position: list.length })
 			break
 		}
 
@@ -67,6 +67,22 @@ export function applyEvent(list: ShoppingListItem[], event: ShoppingListEvent) {
 			if (item) item.name = event.data.newName
 			break
 		}
+
+		case "MOVE_ITEM": {
+			const { id, fromIndex, toIndex } = event.data
+			list.forEach((item) => {
+				const currentPosition = item.position ?? -1
+
+				if (item.id === id) {
+					item.position = toIndex
+				} else if (typeof item.position === "number" && currentPosition > fromIndex && currentPosition <= toIndex) {
+					item.position--
+				} else if (typeof item.position === "number" && currentPosition < fromIndex && currentPosition >= toIndex) {
+					item.position++
+				}
+			})
+			break
+		}
 	}
 }
 
@@ -78,6 +94,7 @@ export function validateEvent(list: ShoppingListItem[], event: ShoppingListEvent
 		case "DELETE_ITEM":
 		case "SET_ITEM_CHECKED":
 		case "RENAME_ITEM":
+		case "MOVE_ITEM":
 			return list.some(({ id }) => event.data.id === id)
 	}
 }

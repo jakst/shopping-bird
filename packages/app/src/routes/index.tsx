@@ -1,4 +1,12 @@
 import { Motion, Presence } from "@motionone/solid"
+import {
+	closestCenter,
+	DragDropProvider,
+	DragDropSensors,
+	DragOverlay,
+	SortableProvider,
+	type DragEvent,
+} from "@thisbeyond/solid-dnd"
 import { Client, EventQueue, ShoppingList, ShoppingListEvent, ShoppingListItem, trimAndUppercase } from "lib"
 import { timeline } from "motion"
 import { createSignal, For, JSX, Show } from "solid-js"
@@ -80,11 +88,15 @@ function Home() {
 	const sortedList = () => {
 		return items
 			.filter((item) => !item.checked)
-			.sort((a, b) => {
-				// TODO: Sort by index
-				// return a.index - b.index;
-				return 0
+			.map((item, index) => [index, item] as const)
+			.sort(([aIndex, a], [bIndex, b]) => {
+				// Fall back to index for legacy items without a position
+				const posA = a.position ?? aIndex
+				const posB = b.position ?? bIndex
+
+				return posA - posB
 			})
+			.map(([, item]) => item)
 	}
 
 	const checkedList = () => {
@@ -98,6 +110,26 @@ function Home() {
 		setChecked: client.setItemChecked.bind(client),
 		renameItem: client.renameItem.bind(client),
 	}
+
+	const [activeItem, setActiveItem] = createSignal<ShoppingListItem | null>(null)
+
+	const onDragStart = ({ draggable }: DragEvent) => {
+		setActiveItem(draggable.data as ShoppingListItem)
+	}
+
+	const onDragEnd = ({ draggable, droppable }: DragEvent) => {
+		if (draggable && droppable) {
+			const currentIds = ids()
+			const fromIndex = currentIds.indexOf(draggable.id as string)
+			const toIndex = currentIds.indexOf(droppable.id as string)
+
+			if (fromIndex !== toIndex) {
+				client.moveItem(draggable.id as string, { fromIndex, toIndex })
+			}
+		}
+	}
+
+	const ids = () => sortedList().map(({ id }) => id)
 
 	return (
 		<div class="text-lg">
@@ -141,13 +173,23 @@ function Home() {
 				style={connectionStatus() === "IN_SYNC" ? "--color: var(--green)" : "--color: var(--yellow)"}
 			/>
 
-			<ul class="flex flex-col">
-				<RowAnimator>
-					<For each={sortedList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
-				</RowAnimator>
+			<DragDropProvider onDragStart={onDragStart} onDragEnd={onDragEnd} collisionDetector={closestCenter}>
+				<DragDropSensors />
 
-				<NewItem onCreate={(name) => void client.addItem(name)} />
-			</ul>
+				<ul class="flex flex-col">
+					<SortableProvider ids={ids()}>
+						<RowAnimator>
+							<For each={sortedList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
+						</RowAnimator>
+
+						<NewItem onCreate={(name) => void client.addItem(name)} />
+					</SortableProvider>
+				</ul>
+
+				<DragOverlay>
+					<div style={{ height: ITEM_HEIGHT_PX }}>{activeItem()?.name}</div>
+				</DragOverlay>
+			</DragDropProvider>
 
 			<Presence initial={false}>
 				<Show when={checkedList().length > 0}>
