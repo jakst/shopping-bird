@@ -1,9 +1,10 @@
 import { Motion, Presence } from "@motionone/solid"
 import { Client, EventQueue, ShoppingList, ShoppingListEvent, ShoppingListItem, trimAndUppercase } from "lib"
 import { timeline } from "motion"
-import { createSignal, For, JSX, onMount, Show } from "solid-js"
+import { createSignal, For, JSX, Show } from "solid-js"
 import { createStore, reconcile } from "solid-js/store"
 import { TransitionGroup } from "solid-transition-group"
+import { ClientOnly } from "~/components/ClientOnly"
 import { ItemRow } from "~/components/ItemRow"
 import { BrowserServerConnection } from "~/lib/browser-server-connection"
 import IconCheck from "~icons/ci/check"
@@ -12,19 +13,15 @@ import IconCaretRight from "~icons/radix-icons/caret-right"
 import { Button } from "../components/Button"
 
 export default function Shell() {
-	const [isMounted, setIsMounted] = createSignal(false)
-
-	onMount(() => setIsMounted(true))
-
 	return (
 		<main class="mx-auto text-gray-700 max-w-lg">
 			<div class="flex px-4 py-4 justify-between items-center content-center">
 				<img src="/header-logo.svg" alt="Shopping bird logo containing a bird riding in a shopping cart" />
 			</div>
 
-			<Show when={isMounted()}>
+			<ClientOnly>
 				<Home />
-			</Show>
+			</ClientOnly>
 		</main>
 	)
 }
