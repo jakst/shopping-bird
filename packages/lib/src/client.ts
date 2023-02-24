@@ -92,6 +92,10 @@ export class Client {
 		await this.applyEvent({ name: "RENAME_ITEM", data: { id, newName } })
 	}
 
+	async moveItem(id: string, options: { fromPosition: number; toPosition: number }) {
+		await this.applyEvent({ name: "MOVE_ITEM", data: { id, ...options } })
+	}
+
 	async clearCheckedItems() {
 		const checkedItems = this.$d.shoppingList.items.filter(({ checked }) => checked)
 
