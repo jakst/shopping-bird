@@ -46,7 +46,11 @@ export class ShoppingList {
 export function applyEvent(list: ShoppingListItem[], event: ShoppingListEvent) {
 	switch (event.name) {
 		case "ADD_ITEM": {
-			list.push({ ...event.data, checked: false, position: list.length })
+			list.push({
+				...event.data,
+				checked: false,
+				position: list.reduce((prev, curr) => (curr.position ? Math.max(prev, curr.position) : prev), 0) + 1,
+			})
 			break
 		}
 
