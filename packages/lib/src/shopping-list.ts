@@ -62,23 +62,11 @@ export function applyEvent(list: ShoppingListItem[], event: ShoppingListEvent) {
 			break
 		}
 
-		case "RENAME_ITEM":
-			{
-				const item = list.find((item) => item.id === event.data.id)
-				if (item) item.name = event.data.newName
-				break
-			}
-
-			;[
-				{ id: "IR2z3iHVumSmeKlJR0Xvg", name: "1Dsfsfg", checked: false },
-				{ id: "F5jZFWUp2zVDNCbxgoEQA", name: "2Gh rty ergf", checked: false },
-				{ id: "sUJDvOgeL1rNNrGHuQAth", name: "3Trhfa", checked: false },
-				{ id: "RybZzAqKaV2AOgI7BoJwI", name: "4G dfy rty", checked: false },
-				{ id: "7t-v-Fw7vNa8JicNiIOql", name: "5Rfhf fc", checked: false },
-				{ id: "WNb4EeyPgxbg-e1JKlakx", name: "6Fvbdf gre", checked: false },
-				{ id: "s4U9P82VvZz1MxViAT881", name: "7G 213", checked: false },
-			]
-
+		case "RENAME_ITEM": {
+			const item = list.find((item) => item.id === event.data.id)
+			if (item) item.name = event.data.newName
+			break
+		}
 		case "MOVE_ITEM": {
 			const { id, fromPosition, toPosition } = event.data
 
