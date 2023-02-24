@@ -87,7 +87,6 @@ function Home() {
 
 	const sortedList = () => {
 		return items
-			.filter((item) => !item.checked)
 			.map((item, index) => [index, item] as const)
 			.sort(([aIndex, a], [bIndex, b]) => {
 				// Fall back to index for legacy items without a position
@@ -99,9 +98,8 @@ function Home() {
 			.map(([, item]) => item)
 	}
 
-	const checkedList = () => {
-		return items.filter((item) => item.checked)
-	}
+	const activeList = () => sortedList().filter((item) => !item.checked)
+	const checkedList = () => sortedList().filter((item) => item.checked)
 
 	const [showChecked, setShowChecked] = createSignal(false)
 
@@ -123,13 +121,16 @@ function Home() {
 			const fromIndex = currentIds.indexOf(draggable.id as string)
 			const toIndex = currentIds.indexOf(droppable.id as string)
 
+			const fromPosition = activeList()[fromIndex].position ?? fromIndex
+			const toPosition = activeList()[toIndex].position ?? toIndex
+
 			if (fromIndex !== toIndex) {
-				client.moveItem(draggable.id as string, { fromIndex, toIndex })
+				client.moveItem(draggable.id as string, { fromPosition, toPosition })
 			}
 		}
 	}
 
-	const ids = () => sortedList().map(({ id }) => id)
+	const ids = () => activeList().map(({ id }) => id)
 
 	return (
 		<div class="text-lg">
@@ -179,16 +180,24 @@ function Home() {
 				<ul class="flex flex-col">
 					<SortableProvider ids={ids()}>
 						<RowAnimator>
-							<For each={sortedList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
+							<For each={activeList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
 						</RowAnimator>
 
 						<NewItem onCreate={(name) => void client.addItem(name)} />
 					</SortableProvider>
 				</ul>
 
-				<DragOverlay>
-					<div style={{ height: ITEM_HEIGHT_PX }}>{activeItem()?.name}</div>
-				</DragOverlay>
+				<Presence>
+					<DragOverlay>
+						<Motion.div
+							exit={{ opacity: 0 }}
+							style={{ height: ITEM_HEIGHT_PX, "padding-left": ITEM_HEIGHT_PX }}
+							class="flex items-center shadow-md bg-white border-gray-100 border-[0.5px] rounded-lg"
+						>
+							{activeItem()?.name}
+						</Motion.div>
+					</DragOverlay>
+				</Presence>
 			</DragDropProvider>
 
 			<Presence initial={false}>

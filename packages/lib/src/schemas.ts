@@ -43,8 +43,8 @@ const MoveItem = z.object({
 	name: z.literal("MOVE_ITEM"),
 	data: z.object({
 		id: z.string(),
-		fromIndex: z.number(),
-		toIndex: z.number(),
+		fromPosition: z.number(),
+		toPosition: z.number(),
 	}),
 })
 

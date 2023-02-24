@@ -34,7 +34,7 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 	return (
 		<li
 			ref={(ref) => sortable?.(ref)}
-			class="flex px-1 items-center justify-between overflow-hidden shrink-0"
+			class="flex px-1 items-center justify-between overflow-hidden shrink-0 cursor-move touch-none"
 			classList={{ "transition-transform": dragDropContext ? !!dragDropContext[0].active.draggable : false }}
 			style={sortable?.isActiveDraggable ? { opacity: 0.25 } : undefined}
 			onMouseOver={() => setHovering(true)}

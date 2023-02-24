@@ -69,15 +69,24 @@ export function applyEvent(list: ShoppingListItem[], event: ShoppingListEvent) {
 		}
 
 		case "MOVE_ITEM": {
-			const { id, fromIndex, toIndex } = event.data
+			const { id, fromPosition, toPosition } = event.data
+
 			list.forEach((item) => {
 				const currentPosition = item.position ?? -1
 
 				if (item.id === id) {
-					item.position = toIndex
-				} else if (typeof item.position === "number" && currentPosition > fromIndex && currentPosition <= toIndex) {
+					item.position = toPosition
+				} else if (
+					typeof item.position === "number" &&
+					currentPosition > fromPosition &&
+					currentPosition <= toPosition
+				) {
 					item.position--
-				} else if (typeof item.position === "number" && currentPosition < fromIndex && currentPosition >= toIndex) {
+				} else if (
+					typeof item.position === "number" &&
+					currentPosition < fromPosition &&
+					currentPosition >= toPosition
+				) {
 					item.position++
 				}
 			})
