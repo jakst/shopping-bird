@@ -62,32 +62,37 @@ export function applyEvent(list: ShoppingListItem[], event: ShoppingListEvent) {
 			break
 		}
 
-		case "RENAME_ITEM": {
-			const item = list.find((item) => item.id === event.data.id)
-			if (item) item.name = event.data.newName
-			break
-		}
+		case "RENAME_ITEM":
+			{
+				const item = list.find((item) => item.id === event.data.id)
+				if (item) item.name = event.data.newName
+				break
+			}
+
+			;[
+				{ id: "IR2z3iHVumSmeKlJR0Xvg", name: "1Dsfsfg", checked: false },
+				{ id: "F5jZFWUp2zVDNCbxgoEQA", name: "2Gh rty ergf", checked: false },
+				{ id: "sUJDvOgeL1rNNrGHuQAth", name: "3Trhfa", checked: false },
+				{ id: "RybZzAqKaV2AOgI7BoJwI", name: "4G dfy rty", checked: false },
+				{ id: "7t-v-Fw7vNa8JicNiIOql", name: "5Rfhf fc", checked: false },
+				{ id: "WNb4EeyPgxbg-e1JKlakx", name: "6Fvbdf gre", checked: false },
+				{ id: "s4U9P82VvZz1MxViAT881", name: "7G 213", checked: false },
+			]
 
 		case "MOVE_ITEM": {
 			const { id, fromPosition, toPosition } = event.data
 
-			list.forEach((item) => {
-				const currentPosition = item.position ?? -1
+			const activeList = list.filter(({ checked }) => !checked)
+
+			list.forEach((item, index) => {
+				const currentPosition = item.position ?? activeList.indexOf(item) ?? index
 
 				if (item.id === id) {
 					item.position = toPosition
-				} else if (
-					typeof item.position === "number" &&
-					currentPosition > fromPosition &&
-					currentPosition <= toPosition
-				) {
-					item.position--
-				} else if (
-					typeof item.position === "number" &&
-					currentPosition < fromPosition &&
-					currentPosition >= toPosition
-				) {
-					item.position++
+				} else if (currentPosition > fromPosition && currentPosition <= toPosition) {
+					item.position = currentPosition - 1
+				} else if (currentPosition < fromPosition && currentPosition >= toPosition) {
+					item.position = currentPosition + 1
 				}
 			})
 			break
