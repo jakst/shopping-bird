@@ -37,8 +37,8 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 			class="flex px-1 items-center justify-between overflow-hidden shrink-0 cursor-move touch-none"
 			classList={{ "transition-transform": dragDropContext ? !!dragDropContext[0].active.draggable : false }}
 			style={sortable?.isActiveDraggable ? { opacity: 0.25 } : undefined}
-			onMouseOver={() => setHovering(true)}
-			onMouseLeave={() => setHovering(false)}
+			onPointerEnter={() => setHovering(true)}
+			onPointerLeave={() => setHovering(false)}
 			onFocusIn={() => setFocusing(true)}
 			onFocusOut={(event) => {
 				if (!(event.relatedTarget && event.currentTarget.contains(event.relatedTarget as any))) {
