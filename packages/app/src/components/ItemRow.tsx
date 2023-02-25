@@ -1,7 +1,6 @@
 import { createSortable, useDragDropContext } from "@thisbeyond/solid-dnd"
 import { type ShoppingListItem } from "lib"
 import { createSignal, Show } from "solid-js"
-import IconCheck from "~icons/ci/check"
 import IconTrash from "~icons/ci/trash-full"
 import { Button } from "./Button"
 
@@ -20,8 +19,7 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 	const nameHasChanged = () => newName() !== props.item.name
 
 	function submitNameChange() {
-		props.actions.renameItem(props.item.id, newName())
-		setFocusing(false)
+		if (nameHasChanged()) props.actions.renameItem(props.item.id, newName())
 	}
 
 	let nameInputField: HTMLInputElement | undefined
@@ -41,12 +39,12 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 			onPointerLeave={() => setHovering(false)}
 			onFocusIn={() => setFocusing(true)}
 			onFocusOut={(event) => {
-				if (!(event.relatedTarget && event.currentTarget.contains(event.relatedTarget as any))) {
-					setFocusing(false)
+				submitNameChange()
 
-					// Reset unsubmitted name changes when we stop focusing the row
-					setNewName(props.item.name)
-					if (nameInputField) nameInputField.value = props.item.name
+				if (!(event.relatedTarget && event.currentTarget.contains(event.relatedTarget as any))) {
+					// Drop focus on a delay to fix issue with press on delete button
+					// not being registered on mobile Safari.
+					setTimeout(() => setFocusing(false), 100)
 				}
 			}}
 		>
@@ -57,10 +55,6 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 						type="checkbox"
 						checked={props.item.checked}
 						onChange={(event) => {
-							// If the user types a new name, and then checks/unchecks
-							// the item, the name change should also be submitted.
-							if (nameHasChanged()) submitNameChange()
-
 							props.actions.setChecked(props.item.id, event.currentTarget.checked)
 						}}
 					/>
@@ -70,7 +64,7 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 					class="flex flex-1"
 					onSubmit={(event) => {
 						event.preventDefault()
-						if (nameHasChanged()) submitNameChange()
+						// Blur will trigger lost focus, and therefore submit the name change
 						;(event.currentTarget[0] as HTMLInputElement)?.blur()
 					}}
 				>
@@ -87,10 +81,6 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 
 			<Show when={showingActions()}>
 				<div class="ml-1 mr-2 flex items-center">
-					<Button disabled={!nameHasChanged()} onClick={submitNameChange}>
-						<IconCheck height="100%" />
-					</Button>
-
 					<Button onClick={() => props.actions.deleteItem(props.item.id)}>
 						<IconTrash height="100%" />
 					</Button>
