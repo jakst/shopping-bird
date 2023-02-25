@@ -71,6 +71,7 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 					<input
 						ref={nameInputField}
 						value={props.item.name}
+						spellcheck={false}
 						class={`flex-1 bg-transparent overflow-ellipsis focus:outline-none focus:underline border-slate-800${
 							props.item.checked ? " line-through text-gray-500" : " text-gray-900"
 						}`}
