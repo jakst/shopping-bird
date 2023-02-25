@@ -22,6 +22,9 @@ const env = z
 	})
 
 export default defineConfig({
+	server: {
+		host: process.env.HOST,
+	},
 	plugins: [
 		solidDevTools({
 			autoname: true,
