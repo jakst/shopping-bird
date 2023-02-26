@@ -18,7 +18,7 @@ export default function Root() {
 				<Link rel="preload" href="Hubot-Sans-1.0.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
 			</Head>
 
-			<Body>
+			<Body class="bg-color1">
 				<Suspense>
 					<ErrorBoundary>
 						<Routes>

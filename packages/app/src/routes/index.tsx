@@ -22,7 +22,7 @@ import { Button } from "../components/Button"
 
 export default function Shell() {
 	return (
-		<main class="mx-auto text-gray-700 max-w-lg">
+		<main class="mx-auto text-color12 max-w-lg">
 			<div class="flex px-4 py-4 justify-between items-center content-center">
 				<img src="/header-logo.svg" alt="Shopping bird logo containing a bird riding in a shopping cart" />
 			</div>
@@ -192,7 +192,7 @@ function Home() {
 						<Motion.div
 							exit={{ opacity: 0 }}
 							style={{ height: ITEM_HEIGHT_PX, "padding-left": ITEM_HEIGHT_PX }}
-							class="flex items-center shadow-md bg-white border-gray-100 border-[0.5px] rounded-lg"
+							class="flex items-center shadow-md bg-color1 border-color6 text-color12 text-lg border-[0.5px] rounded-lg"
 						>
 							{activeItem()?.name}
 						</Motion.div>
@@ -202,7 +202,7 @@ function Home() {
 
 			<Presence initial={false}>
 				<Show when={checkedList().length > 0}>
-					<Motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.6 }} exit={{ opacity: 0 }}>
+					<Motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.5 }} exit={{ opacity: 0 }}>
 						<div class="mt-4 mb-2 mx-2 flex justify-between">
 							<button class="flex items-center overflow-hidden" onClick={() => setShowChecked((v) => !v)}>
 								<IconCaretRight
@@ -280,7 +280,7 @@ function NewItem(props: { onCreate: (name: string) => void }) {
 	}
 
 	return (
-		<li class="h-7 ml-3 pr-2 flex items-center">
+		<li class="h-7 ml-3 pr-2 flex items-center text-color11">
 			<IconPlus />
 
 			<form
@@ -292,7 +292,7 @@ function NewItem(props: { onCreate: (name: string) => void }) {
 			>
 				<input
 					ref={inputField}
-					class="ml-2 outline-none text flex-1"
+					class="ml-2 outline-none flex-1 bg-transparent text-color12 placeholder:text-color11 "
 					placeholder="New item"
 					value={value()}
 					onInput={(event) => setValue(event.currentTarget.value)}

@@ -51,7 +51,7 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 			<div class="flex flex-1">
 				<label class="p-3 h-10 aspect-square flex items-center justify-center">
 					<input
-						class="w-5 h-5 text-blue-600 bg-gray-100 rounded border-gray-300 "
+						class="w-5 h-5"
 						type="checkbox"
 						checked={props.item.checked}
 						onChange={(event) => {
@@ -73,9 +73,10 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 						value={props.item.name}
 						style={{ "-webkit-tap-highlight-color": "transparent" }}
 						spellcheck={false}
-						class={`flex-1 bg-transparent overflow-ellipsis focus:outline-none focus:underline border-slate-800${
-							props.item.checked ? " line-through text-gray-500" : " text-gray-900"
-						}`}
+						class="flex-1 bg-transparent overflow-ellipsis focus:outline-none focus:underline"
+						classList={{
+							"line-through": props.item.checked,
+						}}
 						onInput={(event) => setNewName(event.currentTarget.value)}
 					/>
 				</form>
