@@ -1,4 +1,5 @@
 {
+	"files": ["./reset.d.ts"],
 	"compilerOptions": {
 		"composite": true,
 		"skipLibCheck": true,

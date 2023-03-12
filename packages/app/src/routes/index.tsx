@@ -42,7 +42,10 @@ function createClient() {
 
 	const serverConnection = new BrowserServerConnection((value) => setIsConnected(value))
 
-	const initialShoppingList: ShoppingListItem[] = JSON.parse(localStorage.getItem("main-shopping-list") ?? "[]")
+	const initialShoppingListString = localStorage.getItem("main-shopping-list")
+	const initialShoppingList = initialShoppingListString
+		? (JSON.parse(initialShoppingListString) as ShoppingListItem[])
+		: []
 
 	const [list, setStore] = createStore({ items: initialShoppingList })
 
@@ -51,20 +54,20 @@ function createClient() {
 		localStorage.setItem("main-shopping-list", JSON.stringify(newList))
 	})
 
-	const remoteShoppingListCopy = new ShoppingList(
-		JSON.parse(localStorage.getItem("remote-shopping-list") ?? "[]"),
-		(newList) => {
-			localStorage.setItem("remote-shopping-list", JSON.stringify(newList))
-		},
-	)
+	const storedRemoteShoppingListCopyString = localStorage.getItem("remote-shopping-list")
+	const storedRemoteShoppingListCopy = storedRemoteShoppingListCopyString
+		? (JSON.parse(storedRemoteShoppingListCopyString) as ShoppingListItem[])
+		: []
+	const remoteShoppingListCopy = new ShoppingList(storedRemoteShoppingListCopy, (newList) => {
+		localStorage.setItem("remote-shopping-list", JSON.stringify(newList))
+	})
 
-	const eventQueue = new EventQueue<ShoppingListEvent>(
-		JSON.parse(localStorage.getItem("event-queue") ?? "[]"),
-		(events) => {
-			setIsEventQueueEmpty(events.length === 0)
-			localStorage.setItem("event-queue", JSON.stringify(events))
-		},
-	)
+	const storedEventQueueString = localStorage.getItem("event-queue")
+	const storedEventQueue = storedEventQueueString ? (JSON.parse(storedEventQueueString) as ShoppingListEvent[]) : []
+	const eventQueue = new EventQueue<ShoppingListEvent>(storedEventQueue, (events) => {
+		setIsEventQueueEmpty(events.length === 0)
+		localStorage.setItem("event-queue", JSON.stringify(events))
+	})
 
 	const client = new Client({
 		shoppingList,

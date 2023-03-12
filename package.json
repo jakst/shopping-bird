@@ -21,6 +21,7 @@
 		"clean": "git clean -xfd packages -e packages/app/.env -e packages/server/.env && yarn"
 	},
 	"devDependencies": {
+		"@total-typescript/ts-reset": "^0.4.2",
 		"@typescript-eslint/eslint-plugin": "^5.53.0",
 		"@typescript-eslint/parser": "^5.53.0",
 		"eslint": "^8.34.0",

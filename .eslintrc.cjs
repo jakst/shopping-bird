@@ -43,7 +43,7 @@ module.exports = {
 	root: true,
 	parserOptions: {
 		tsconfigRootDir: ".",
-		project: ["./packages/*/tsconfig.json"],
+		project: ["./tsconfig.json", "./packages/*/tsconfig.json"],
 	},
 	rules: {
 		"object-shorthand": "warn",
