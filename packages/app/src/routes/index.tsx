@@ -54,6 +54,8 @@ function createClient() {
 		localStorage.setItem("main-shopping-list", JSON.stringify(newList))
 	})
 
+	const asd = [1, null].filter(Boolean).map((v) => v * 2)
+
 	const storedRemoteShoppingListCopyString = localStorage.getItem("remote-shopping-list")
 	const storedRemoteShoppingListCopy = storedRemoteShoppingListCopyString
 		? (JSON.parse(storedRemoteShoppingListCopyString) as ShoppingListItem[])
