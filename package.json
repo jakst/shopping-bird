@@ -18,7 +18,7 @@
 		"lint": "yarn eslint -f unix .",
 		"tc": "yarn tsc -b",
 		"check": "yarn tc && yarn lint",
-		"clean": "git clean -xfd packages -e packages/app/.env -e packages/server/.env && yarn"
+		"clean": "git clean -xfd node_modules packages -e packages/app/.env -e packages/server/.env && yarn"
 	},
 	"devDependencies": {
 		"@total-typescript/ts-reset": "^0.4.2",
