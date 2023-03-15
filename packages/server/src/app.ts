@@ -78,7 +78,8 @@ async function startApp() {
 	await shoppingBird.refreshDataFromExternalClient()
 }
 
-async function run() {
+let started = false
+export async function run() {
 	try {
 		console.log("[app] Starting web server", {
 			GIT_REVISION: env.GIT_REVISION,
@@ -93,14 +94,26 @@ async function run() {
 		if (cookies.length > 0) await startApp()
 		else console.log("No cookies found. Waiting for auth...")
 
+		if (started) await f.close()
 		await f.listen({
 			port: env.PORT,
 			host: env.HOST,
 		})
+		started = true
 	} catch (err) {
 		console.log(err)
 		f.log.error(err)
 		process.exit(1)
+	}
+
+	if (import.meta.hot) {
+		import.meta.hot.on("vite:beforeFullReload", () => {
+			f.close()
+		})
+
+		import.meta.hot.dispose(() => {
+			f.close()
+		})
 	}
 }
 

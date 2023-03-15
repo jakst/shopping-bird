@@ -2,21 +2,13 @@
 	"$schema": "https://turbo.build/schema.json",
 	"pipeline": {
 		"build": {
-			"outputs": ["dist/**"],
-			"dependsOn": ["^build"]
-		},
-		"hello-bird-app#build": {
-			"outputs": ["dist/**", ".solid/**", ".output/**", ".vercel/output/**"],
-			"dependsOn": ["^build"],
-			"env": ["LOCAL_DEV"]
+			"outputs": ["dist/**"]
 		},
 		"start": {
-			"cache": false,
-			"dependsOn": ["build"]
+			"cache": false
 		},
 		"dev": {
-			"cache": false,
-			"dependsOn": ["^build"]
+			"cache": false
 		},
 		"test": {}
 	}
