@@ -10,7 +10,7 @@
 		"lint": "pnpm eslint -f unix .",
 		"tc": "pnpm tsc -b",
 		"check": "pnpm tc && pnpm lint",
-		"clean": "git clean -xfd node_modules packages -e packages/app/.env -e packages/server/.env && yarn"
+		"clean": "git clean -xfd node_modules packages -e packages/app/.env -e packages/server/.env && pnpm install"
 	},
 	"devDependencies": {
 		"@total-typescript/ts-reset": "^0.4.2",
