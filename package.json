@@ -2,32 +2,24 @@
 	"name": "shopping-bird",
 	"private": true,
 	"packageManager": "pnpm@7.30.0",
-	"engines": {
-		"node": "18.x"
-	},
-	"workspaces": {
-		"packages": [
-			"packages/*"
-		]
-	},
 	"scripts": {
-		"app": "yarn workspace app",
-		"server": "yarn workspace server",
-		"lib": "yarn workspace lib",
+		"app": "pnpm --filter app",
+		"server": "pnpm --filter server",
+		"lib": "pnpm --filter lib",
 		"format": "prettier --cache --write .",
-		"lint": "yarn eslint -f unix .",
-		"tc": "yarn tsc -b",
-		"check": "yarn tc && yarn lint",
+		"lint": "pnpm eslint -f unix .",
+		"tc": "pnpm tsc -b",
+		"check": "pnpm tc && pnpm lint",
 		"clean": "git clean -xfd node_modules packages -e packages/app/.env -e packages/server/.env && yarn"
 	},
 	"devDependencies": {
 		"@total-typescript/ts-reset": "^0.4.2",
-		"@typescript-eslint/eslint-plugin": "^5.53.0",
-		"@typescript-eslint/parser": "^5.53.0",
-		"eslint": "^8.34.0",
-		"prettier": "^2.8.4",
-		"turbo": "^1.8.2",
-		"typescript": "^4.9.5"
+		"@typescript-eslint/eslint-plugin": "^5.56.0",
+		"@typescript-eslint/parser": "^5.56.0",
+		"eslint": "^8.36.0",
+		"prettier": "^2.8.6",
+		"turbo": "^1.8.5",
+		"typescript": "^5.0.2"
 	},
 	"dependencies": {
 		"@thisbeyond/solid-dnd": "^0.7.4"
