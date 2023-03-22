@@ -1,6 +1,9 @@
 lockfileVersion: 5.4
 
 patchedDependencies:
+  '@motionone/solid@10.15.5':
+    hash: 37derlinjazh5cxord2k5dv5qm
+    path: patches/@motionone__solid@10.15.5.patch
   solid-start@0.2.23:
     hash: y4ffmmxxcsixjnm7xgeumug7yy
     path: patches/solid-start@0.2.23.patch
@@ -66,7 +69,7 @@ importers:
     dependencies:
       '@auth/core': 0.5.1
       '@auth/solid-start': 0.1.1_oloxfstrtiw4pjtajiqixosyzm
-      '@motionone/solid': 10.15.5_solid-js@1.6.15
+      '@motionone/solid': 10.15.5_37derlinjazh5cxord2k5dv5qm_solid-js@1.6.15
       '@radix-ui/colors': 0.1.8
       '@solid-primitives/connectivity': 0.3.10_solid-js@1.6.15
       '@solid-primitives/page-visibility': 2.0.7_solid-js@1.6.15
@@ -1685,7 +1688,7 @@ packages:
       tslib: 2.5.0
     dev: false
 
-  /@motionone/solid/10.15.5_solid-js@1.6.15:
+  /@motionone/solid/10.15.5_37derlinjazh5cxord2k5dv5qm_solid-js@1.6.15:
     resolution: {integrity: sha512-fMOyPkLKznFURBfn2WaYUDyBqlQVsyJMIaFSiQI3PnuAv8IXbDR9OSpOT9MyiEvFj/cMprdYwDdYTDoq+vDROg==}
     peerDependencies:
       solid-js: ^1.5.0
@@ -1696,6 +1699,7 @@ packages:
       solid-js: 1.6.15
       tslib: 2.5.0
     dev: false
+    patched: true
 
   /@motionone/svelte/10.15.5:
     resolution: {integrity: sha512-Xyxtgp7BlVnSBwcoFmXGHUVnpNktzeXsEifu2NJJWc7VGuxutDsBZxNdz80qvpLIC5MeBa1wh7GGegZzTm1msg==}

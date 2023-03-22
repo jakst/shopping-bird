@@ -26,7 +26,8 @@
 	},
 	"pnpm": {
 		"patchedDependencies": {
-			"solid-start@0.2.23": "patches/solid-start@0.2.23.patch"
+			"solid-start@0.2.23": "patches/solid-start@0.2.23.patch",
+			"@motionone/solid@10.15.5": "patches/@motionone__solid@10.15.5.patch"
 		}
 	}
 }
