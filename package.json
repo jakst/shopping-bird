@@ -1,7 +1,7 @@
 {
 	"name": "shopping-bird",
 	"private": true,
-	"packageManager": "yarn@3.4.1",
+	"packageManager": "pnpm@7.30.0",
 	"engines": {
 		"node": "18.x"
 	},
@@ -28,9 +28,6 @@
 		"prettier": "^2.8.4",
 		"turbo": "^1.8.2",
 		"typescript": "^4.9.5"
-	},
-	"resolutions": {
-		"solid-start@^0.2.20": "patch:solid-start@npm%3A0.2.20#./.yarn/patches/solid-start-npm-0.2.20-1c62718646.patch"
 	},
 	"dependencies": {
 		"@thisbeyond/solid-dnd": "^0.7.4"
