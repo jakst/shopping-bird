@@ -15,7 +15,7 @@ async function run() {
 	} catch {}
 
 	if (!cookies.length) {
-		puppeteer.use(StealthPlugin())
+		puppeteer.use(StealthPlugin() as any)
 
 		const browser = await puppeteer.launch({
 			headless: false,

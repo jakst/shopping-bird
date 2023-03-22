@@ -5,8 +5,9 @@
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
 		"emitDeclarationOnly": true,
-		"module": "NodeNext",
-		"moduleResolution": "node",
+		"module": "ESNext",
+		"target": "ESNext",
+		"moduleResolution": "bundler",
 
 		// Strictness
 		"strict": true,

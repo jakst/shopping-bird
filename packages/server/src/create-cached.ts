@@ -7,7 +7,7 @@ export function createCached<Schema extends z.ZodType, Value = z.infer<Schema>>(
 	defaultValue: z.infer<Schema>,
 ) {
 	async function get(): Promise<Value> {
-		const queue = await cache.get(key).then((str) => (str ? schema.parse(JSON.parse(str)) : defaultValue))
+		const queue = await cache.get(key).then((str: string) => (str ? schema.parse(JSON.parse(str)) : defaultValue))
 
 		return queue
 	}

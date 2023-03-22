@@ -4,7 +4,7 @@ import StealthPlugin from "puppeteer-extra-plugin-stealth"
 import { env } from "../env"
 import { deleteCookies, loadCookies, saveCookies } from "./cookies"
 
-puppeteer.use(StealthPlugin())
+puppeteer.use(StealthPlugin() as any)
 
 function cache<T>(fn: () => Promise<T>) {
 	let value: T

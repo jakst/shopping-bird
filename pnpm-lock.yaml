@@ -37,6 +37,7 @@ importers:
       '@solid-primitives/storage': ^1.3.7
       '@solidjs/meta': ^0.28.2
       '@solidjs/router': ^0.8.1
+      '@types/node': ^18.15.5
       autoprefixer: ^10.4.14
       dotenv: ^16.0.3
       dotenv-cli: ^7.1.0
@@ -67,6 +68,7 @@ importers:
       '@solid-primitives/storage': 1.3.7_solid-js@1.6.15
       '@solidjs/meta': 0.28.2_solid-js@1.6.15
       '@solidjs/router': 0.8.1_solid-js@1.6.15
+      '@types/node': 18.15.5
       dotenv: 16.0.3
       lib: link:../lib
       motion: 10.15.5
@@ -89,7 +91,7 @@ importers:
       tailwindcss: 3.2.7_postcss@8.4.21
       typescript: 5.0.2
       unplugin-icons: 0.15.3
-      vite: 4.2.1
+      vite: 4.2.1_@types+node@18.15.5
       vite-plugin-pwa: 0.14.5_2zwjfzulkrffi34qjwvtq6zb6a
 
   packages/lib:
@@ -115,6 +117,7 @@ importers:
       puppeteer-extra-plugin-stealth: ^2.11.2
       redis: ^4.6.5
       typescript: ^5.0.2
+      vite: ^4.2.1
       vite-node: ^0.29.7
       zod: ^3.21.4
     dependencies:
@@ -130,6 +133,7 @@ importers:
     devDependencies:
       '@types/node': 18.15.5
       typescript: 5.0.2
+      vite: 4.2.1_@types+node@18.15.5
       vite-node: 0.29.7_@types+node@18.15.5
 
 packages:
@@ -5798,7 +5802,7 @@ packages:
       '@solid-primitives/utils': 5.5.0_solid-js@1.6.15
       solid-js: 1.6.15
       type-fest: 3.6.1
-      vite: 4.2.1
+      vite: 4.2.1_@types+node@18.15.5
     optionalDependencies:
       solid-start: 0.2.23_iba5tui4eac3egldlo4yjtxeem
     transitivePeerDependencies:
@@ -5847,7 +5851,7 @@ packages:
       solid-start: 0.2.23_iba5tui4eac3egldlo4yjtxeem
       terser: 5.16.6
       undici: 5.21.0
-      vite: 4.2.1
+      vite: 4.2.1_@types+node@18.15.5
     transitivePeerDependencies:
       - supports-color
 
@@ -5866,7 +5870,7 @@ packages:
       rollup: 3.20.0
       solid-start: 0.2.23_iba5tui4eac3egldlo4yjtxeem
       terser: 5.16.6
-      vite: 4.2.1
+      vite: 4.2.1_@types+node@18.15.5
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -5938,7 +5942,7 @@ packages:
       solid-start-vercel: 0.2.23_56rdvx36cvogm7gqo4fl2sycqq
       terser: 5.16.6
       undici: 5.21.0
-      vite: 4.2.1
+      vite: 4.2.1_@types+node@18.15.5
       vite-plugin-inspect: 0.7.18_rollup@3.20.0+vite@4.2.1
       vite-plugin-solid: 2.6.1_solid-js@1.6.15+vite@4.2.1
       wait-on: 6.0.1_debug@4.3.4
@@ -6566,7 +6570,7 @@ packages:
       kolorist: 1.7.0
       sirv: 2.0.2
       ufo: 1.1.1
-      vite: 4.2.1
+      vite: 4.2.1_@types+node@18.15.5
     transitivePeerDependencies:
       - rollup
       - supports-color
@@ -6582,7 +6586,7 @@ packages:
       fast-glob: 3.2.12
       pretty-bytes: 6.1.0
       rollup: 3.20.0
-      vite: 4.2.1
+      vite: 4.2.1_@types+node@18.15.5
       workbox-build: 6.5.4
       workbox-window: 6.5.4
     transitivePeerDependencies:
@@ -6603,42 +6607,10 @@ packages:
       merge-anything: 5.1.4
       solid-js: 1.6.15
       solid-refresh: 0.5.2_solid-js@1.6.15
-      vite: 4.2.1
+      vite: 4.2.1_@types+node@18.15.5
       vitefu: 0.2.4_vite@4.2.1
     transitivePeerDependencies:
       - supports-color
-
-  /vite/4.2.1:
-    resolution: {integrity: sha512-7MKhqdy0ISo4wnvwtqZkjke6XN4taqQ2TBaTccLIpOKv7Vp2h4Y+NpmWCnGDeSvvn45KxvWgGyb0MkHvY1vgbg==}
-    engines: {node: ^14.18.0 || >=16.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': '>= 14'
-      less: '*'
-      sass: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.4.0
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      less:
-        optional: true
-      sass:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
-        optional: true
-    dependencies:
-      esbuild: 0.17.12
-      postcss: 8.4.21
-      resolve: 1.22.1
-      rollup: 3.20.0
-    optionalDependencies:
-      fsevents: 2.3.2
 
   /vite/4.2.1_@types+node@18.15.5:
     resolution: {integrity: sha512-7MKhqdy0ISo4wnvwtqZkjke6XN4taqQ2TBaTccLIpOKv7Vp2h4Y+NpmWCnGDeSvvn45KxvWgGyb0MkHvY1vgbg==}
@@ -6672,7 +6644,6 @@ packages:
       rollup: 3.20.0
     optionalDependencies:
       fsevents: 2.3.2
-    dev: true
 
   /vitefu/0.2.4_vite@4.2.1:
     resolution: {integrity: sha512-fanAXjSaf9xXtOOeno8wZXIhgia+CZury481LsDaV++lSvcU2R9Ch2bPh3PYFyoHW+w9LqAeYRISVQjUIew14g==}
@@ -6682,7 +6653,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.2.1
+      vite: 4.2.1_@types+node@18.15.5
 
   /vitest/0.29.7:
     resolution: {integrity: sha512-aWinOSOu4jwTuZHkb+cCyrqQ116Q9TXaJrNKTHudKBknIpR0VplzeaOUuDF9jeZcrbtQKZQt6yrtd+eakbaxHg==}

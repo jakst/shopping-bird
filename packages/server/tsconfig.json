@@ -3,10 +3,10 @@
 	"include": ["./src", "scripts/auth.ts"],
 	"files": ["./reset.d.ts"],
 	"compilerOptions": {
+		"preserveSymlinks": true,
 		"outDir": "dist",
 
-		"types": ["node"],
-		"target": "ES2020" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+		"types": ["node", "vite/client"]
 	},
 	"references": [
 		{ "path": "../lib" } //
