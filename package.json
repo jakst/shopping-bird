@@ -2,6 +2,9 @@
 	"name": "shopping-bird",
 	"private": true,
 	"packageManager": "pnpm@7.30.0",
+	"engines": {
+		"node": "18.x"
+	},
 	"scripts": {
 		"app": "pnpm --filter app",
 		"server": "pnpm --filter server",
