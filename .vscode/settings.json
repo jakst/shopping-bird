@@ -2,6 +2,6 @@
 	"editor.codeActionsOnSave": {
 		"source.organizeImports": true
 	},
-	"vitest.commandLine": "yarn lib test",
+	"vitest.commandLine": "pnpm --filter lib test",
 	"vitest.showFailMessages": true
 }
