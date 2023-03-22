@@ -23,5 +23,10 @@
 	},
 	"dependencies": {
 		"@thisbeyond/solid-dnd": "^0.7.4"
+	},
+	"pnpm": {
+		"patchedDependencies": {
+			"solid-start@0.2.23": "patches/solid-start@0.2.23.patch"
+		}
 	}
 }

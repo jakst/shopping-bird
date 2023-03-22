@@ -1,5 +1,10 @@
 lockfileVersion: 5.4
 
+patchedDependencies:
+  solid-start@0.2.23:
+    hash: y4ffmmxxcsixjnm7xgeumug7yy
+    path: patches/solid-start@0.2.23.patch
+
 importers:
 
   .:
@@ -73,7 +78,7 @@ importers:
       lib: link:../lib
       motion: 10.15.5
       solid-js: 1.6.15
-      solid-start: 0.2.23_iba5tui4eac3egldlo4yjtxeem
+      solid-start: 0.2.23_y4ffmmxxcsixjnm7xgeumug7yy_iba5tui4eac3egldlo4yjtxeem
       solid-start-node: 0.2.23_k6fpiapxngvdu4b43olgdxlo44
       solid-start-vercel: 0.2.23_56rdvx36cvogm7gqo4fl2sycqq
       solid-transition-group: 0.2.0_solid-js@1.6.15
@@ -192,7 +197,7 @@ packages:
     dependencies:
       '@auth/core': 0.5.1
       solid-js: 1.6.15
-      solid-start: 0.2.23_iba5tui4eac3egldlo4yjtxeem
+      solid-start: 0.2.23_y4ffmmxxcsixjnm7xgeumug7yy_iba5tui4eac3egldlo4yjtxeem
     dev: false
 
   /@babel/code-frame/7.18.6:
@@ -5804,7 +5809,7 @@ packages:
       type-fest: 3.6.1
       vite: 4.2.1_@types+node@18.15.5
     optionalDependencies:
-      solid-start: 0.2.23_iba5tui4eac3egldlo4yjtxeem
+      solid-start: 0.2.23_y4ffmmxxcsixjnm7xgeumug7yy_iba5tui4eac3egldlo4yjtxeem
     transitivePeerDependencies:
       - '@solidjs/meta'
       - '@solidjs/router'
@@ -5848,7 +5853,7 @@ packages:
       polka: 1.0.0-next.22
       rollup: 3.20.0
       sirv: 2.0.2
-      solid-start: 0.2.23_iba5tui4eac3egldlo4yjtxeem
+      solid-start: 0.2.23_y4ffmmxxcsixjnm7xgeumug7yy_iba5tui4eac3egldlo4yjtxeem
       terser: 5.16.6
       undici: 5.21.0
       vite: 4.2.1_@types+node@18.15.5
@@ -5868,14 +5873,14 @@ packages:
       fast-glob: 3.2.12
       micromatch: 4.0.5
       rollup: 3.20.0
-      solid-start: 0.2.23_iba5tui4eac3egldlo4yjtxeem
+      solid-start: 0.2.23_y4ffmmxxcsixjnm7xgeumug7yy_iba5tui4eac3egldlo4yjtxeem
       terser: 5.16.6
       vite: 4.2.1_@types+node@18.15.5
     transitivePeerDependencies:
       - encoding
       - supports-color
 
-  /solid-start/0.2.23_iba5tui4eac3egldlo4yjtxeem:
+  /solid-start/0.2.23_y4ffmmxxcsixjnm7xgeumug7yy_iba5tui4eac3egldlo4yjtxeem:
     resolution: {integrity: sha512-dKTRFtpjskHFyLq9n6oJxqWHYL7H8w14y4+OgIR+57+lqb1N7289kZLTHrzWxWyzDkIG9V1s2MQtiDfIaBP/MQ==}
     hasBin: true
     peerDependencies:
@@ -5948,6 +5953,7 @@ packages:
       wait-on: 6.0.1_debug@4.3.4
     transitivePeerDependencies:
       - supports-color
+    patched: true
 
   /solid-transition-group/0.2.0_solid-js@1.6.15:
     resolution: {integrity: sha512-+u6rHLmfHMYoQanWlrU6CvVTMETjRfVvM2gbqtq7vz1OWq2Y7pNdAMErqpeYWZcA6OnbDNJprFRwTj35WFBfMw==}
