@@ -12,7 +12,8 @@
 		"types": ["node", "vite/client", "vite-plugin-pwa/client", "unplugin-icons/types/solid"],
 		"baseUrl": "./",
 		"paths": {
-			"~/*": ["./src/*"]
+			"~/components/*": ["./src/components/*"],
+			"~/lib/*": ["./src/lib/*"]
 		}
 	},
 	"references": [

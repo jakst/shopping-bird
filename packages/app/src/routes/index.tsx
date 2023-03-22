@@ -1,15 +1,15 @@
 import { Motion, Presence } from "@motionone/solid"
 import {
-	closestCenter,
 	DragDropProvider,
 	DragDropSensors,
 	DragOverlay,
 	SortableProvider,
+	closestCenter,
 	type DragEvent,
 } from "@thisbeyond/solid-dnd"
 import { Client, EventQueue, ShoppingList, ShoppingListEvent, ShoppingListItem, trimAndUppercase } from "lib"
 import { timeline } from "motion"
-import { createSignal, For, JSX, Show } from "solid-js"
+import { For, JSX, Show, createSignal } from "solid-js"
 import { createStore, reconcile } from "solid-js/store"
 import { TransitionGroup } from "solid-transition-group"
 import { ClientOnly } from "~/components/ClientOnly"

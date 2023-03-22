@@ -1,6 +1,6 @@
 import { createSortable, useDragDropContext } from "@thisbeyond/solid-dnd"
 import { type ShoppingListItem } from "lib"
-import { createSignal, Show } from "solid-js"
+import { Show, createSignal } from "solid-js"
 import IconTrash from "~icons/ci/trash-full"
 import { Button } from "./Button"
 
