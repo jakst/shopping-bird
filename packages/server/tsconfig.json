@@ -3,7 +3,6 @@
 	"include": ["./src", "scripts/auth.ts"],
 	"files": ["./reset.d.ts"],
 	"compilerOptions": {
-		"preserveSymlinks": true,
 		"outDir": "dist",
 
 		"types": ["node", "vite/client"]
