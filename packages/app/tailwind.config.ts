@@ -1,5 +1,6 @@
-const defaultTheme = require("tailwindcss/defaultTheme")
-const { slate } = require("@radix-ui/colors")
+import { slate } from "@radix-ui/colors"
+import { type Config } from "tailwindcss"
+import defaultTheme from "tailwindcss/defaultTheme"
 
 const colorsSlate = {
 	color1: slate.slate1,
@@ -16,8 +17,7 @@ const colorsSlate = {
 	color12: slate.slate12,
 }
 
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+const config: Config = {
 	content: ["./src/**/*.{html,js,jsx,ts,tsx}"],
 	theme: {
 		colors: {
@@ -32,3 +32,5 @@ module.exports = {
 	},
 	plugins: [],
 }
+
+export default config
