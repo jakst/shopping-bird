@@ -4,5 +4,12 @@
 	},
 	"vitest.commandLine": "pnpm --filter lib test",
 	"vitest.showFailMessages": true,
-	"typescript.tsdk": "node_modules/typescript/lib"
+	"typescript.tsdk": "node_modules/typescript/lib",
+
+	"[javascript][typescript][typescriptreact][json]": {
+		"editor.defaultFormatter": "rome.rome"
+	},
+	"[jsonc][html][markdown][yaml]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	}
 }

@@ -1,0 +1,17 @@
+{
+	"formatter": {
+		"enabled": true,
+		"lineWidth": 120
+	},
+	"javascript": {
+		"formatter": {
+			"semicolons": "asNeeded"
+		}
+	},
+	"linter": {
+		"enabled": false
+	},
+	"files": {
+		"ignore": ["dist", ".vercel", ".solid", "tsconfig.base.json"]
+	}
+}

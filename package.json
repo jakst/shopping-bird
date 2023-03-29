@@ -9,7 +9,7 @@
 		"app": "pnpm --filter app",
 		"server": "pnpm --filter server",
 		"lib": "pnpm --filter lib",
-		"format": "prettier --cache --write .",
+		"format": "rome format --write .",
 		"lint": "pnpm eslint -f unix .",
 		"tc": "pnpm tsc -b",
 		"check": "pnpm tc && pnpm lint",
@@ -21,6 +21,7 @@
 		"@typescript-eslint/parser": "^5.56.0",
 		"eslint": "^8.36.0",
 		"prettier": "^2.8.6",
+		"rome": "^12.0.0",
 		"turbo": "^1.8.5",
 		"typescript": "^5.0.2"
 	},
