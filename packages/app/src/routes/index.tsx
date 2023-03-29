@@ -15,6 +15,7 @@ import { TransitionGroup } from "solid-transition-group"
 import { ClientOnly } from "~/components/ClientOnly"
 import { ItemRow } from "~/components/ItemRow"
 import { BrowserServerConnection } from "~/lib/browser-server-connection"
+import { isInputField } from "~/lib/type-guards"
 import IconCheck from "~icons/ci/check"
 import IconPlus from "~icons/ci/plus"
 import IconCaretRight from "~icons/radix-icons/caret-right"
@@ -116,6 +117,11 @@ function Home() {
 
 	const onDragStart = ({ draggable }: DragEvent) => {
 		setActiveItem(draggable.data as ShoppingListItem)
+
+		// Drop focus from any input field when we start dragging
+		if (isInputField(document.activeElement)) {
+			document.activeElement.blur()
+		}
 	}
 
 	const onDragEnd = ({ draggable, droppable }: DragEvent) => {
