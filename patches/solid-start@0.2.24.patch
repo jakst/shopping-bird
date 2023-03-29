@@ -35,11 +35,27 @@ index 610d050a9e9005ceb7f45a24c6596381e5b80718..5185ebdbedf60d5fd7fdf2d10080a5d6
  import { Middleware as ServerMiddleware } from "../entry-server/StartServer";
  import { ContentTypeHeader, XSolidStartContentTypeHeader, XSolidStartOrigin } from "./responses";
 diff --git a/server/server-functions/server.ts b/server/server-functions/server.ts
-index d09165c339aa0db4c865ca83da65505c1e9234da..bb7646665a34e30b2fde90366040e69db7a7acff 100644
+index d09165c339aa0db4c865ca83da65505c1e9234da..2cfca762fc0fa131e6ae1736613f01e57d6bbc6b 100644
 --- a/server/server-functions/server.ts
 +++ b/server/server-functions/server.ts
-@@ -1,3 +1,4 @@
+@@ -1,17 +1,16 @@
 +// @ts-nocheck
  import { sharedConfig } from "solid-js";
  import { internalFetch } from "../../api/internalFetch";
  import { FormError } from "../../data";
+ import { ServerError } from "../../data/FormError";
+ import {
+-  ContentTypeHeader,
+-  JSONResponseType,
++  ContentTypeHeader, isRedirectResponse, JSONResponseType,
+   LocationHeader,
+   ResponseError,
+   XSolidStartContentTypeHeader,
+   XSolidStartLocationHeader,
+   XSolidStartOrigin,
+-  XSolidStartResponseTypeHeader,
+-  isRedirectResponse
++  XSolidStartResponseTypeHeader
+ } from "../responses";
+ import { PageEvent, ServerFunctionEvent } from "../types";
+ import { CreateServerFunction } from "./types";
