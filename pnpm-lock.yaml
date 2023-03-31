@@ -11,10 +11,6 @@ patchedDependencies:
 importers:
 
   .:
-    dependencies:
-      '@thisbeyond/solid-dnd':
-        specifier: ^0.7.4
-        version: 0.7.4(solid-js@1.6.16)
     devDependencies:
       '@total-typescript/ts-reset':
         specifier: ^0.4.2
@@ -70,6 +66,9 @@ importers:
       '@solidjs/router':
         specifier: ^0.8.2
         version: 0.8.2(solid-js@1.6.16)
+      '@thisbeyond/solid-dnd':
+        specifier: ^0.7.4
+        version: 0.7.4(solid-js@1.6.16)
       '@types/node':
         specifier: ^18.15.11
         version: 18.15.11

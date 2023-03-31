@@ -25,9 +25,6 @@
 		"turbo": "^1.8.8",
 		"typescript": "^5.0.2"
 	},
-	"dependencies": {
-		"@thisbeyond/solid-dnd": "^0.7.4"
-	},
 	"pnpm": {
 		"patchedDependencies": {
 			"solid-start@0.2.24": "patches/solid-start@0.2.24.patch",
