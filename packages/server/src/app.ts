@@ -31,11 +31,9 @@ f.addHook("preHandler", (request, reply, done) => {
 })
 
 f.get(
-	"/ping",
-	async () => `pong
-    git commit: ${env.GIT_REVISION}
-    cookies: ${(await getCookies())?.length ?? "no cookies"}
-  `,
+	"/",
+	async () => `git commit: ${env.GIT_REVISION}
+cookies: ${(await getCookies())?.length ?? "no cookies"}`,
 )
 
 f.post("/auth", async (req, reply) => {
