@@ -30,11 +30,12 @@ f.addHook("preHandler", (request, reply, done) => {
 	done()
 })
 
-f.get(
-	"/",
-	async () => `git commit: ${env.GIT_REVISION}
-cookies: ${(await getCookies())?.length ?? "no cookies"}`,
-)
+f.get("/", async (_req, reply) => {
+	reply.send({
+		commit: env.GIT_REVISION,
+		authenticated: ((await getCookies()) ?? []).length > 0,
+	})
+})
 
 f.post("/auth", async (req, reply) => {
 	const { cookies } = req.body as { cookies: any[] }
