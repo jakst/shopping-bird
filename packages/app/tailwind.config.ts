@@ -20,11 +20,10 @@ const colorsSlate = {
 const config: Config = {
 	content: ["./src/**/*.{html,js,jsx,ts,tsx}"],
 	theme: {
-		colors: {
-			transparent: "transparent",
-			...colorsSlate,
-		},
 		extend: {
+			colors: {
+				...colorsSlate,
+			},
 			fontFamily: {
 				sans: ["Hubot Sans", ...defaultTheme.fontFamily.sans],
 			},

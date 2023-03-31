@@ -14,6 +14,7 @@ import { For, JSX, Show, createEffect, createSignal } from "solid-js"
 import { createStore, reconcile } from "solid-js/store"
 import { TransitionGroup } from "solid-transition-group"
 import { ClientOnly } from "~/components/ClientOnly"
+import { ConnectionWarning } from "~/components/ConnectionWarning"
 import { ItemRow } from "~/components/ItemRow"
 import { BrowserServerConnection } from "~/lib/browser-server-connection"
 import { isInputField } from "~/lib/type-guards"
@@ -38,9 +39,6 @@ export default function Shell() {
 
 function createClient() {
 	const [isConnected, setIsConnected] = createSignal(false)
-	const [isEventQueueEmpty, setIsEventQueueEmpty] = createSignal(true)
-
-	const connectionStatus = () => (isConnected() ? (isEventQueueEmpty() ? "IN_SYNC" : "OUT_OF_SYNC") : "OFFLINE")
 
 	const serverConnection = new BrowserServerConnection((value) => setIsConnected(value))
 
@@ -67,7 +65,6 @@ function createClient() {
 	const storedEventQueueString = localStorage.getItem("event-queue")
 	const storedEventQueue = storedEventQueueString ? (JSON.parse(storedEventQueueString) as ShoppingListEvent[]) : []
 	const eventQueue = new EventQueue<ShoppingListEvent>(storedEventQueue, (events) => {
-		setIsEventQueueEmpty(events.length === 0)
 		localStorage.setItem("event-queue", JSON.stringify(events))
 	})
 
@@ -85,14 +82,14 @@ function createClient() {
 		else serverConnection.disconnect()
 	})
 
-	return { client, items: list.items, connectionStatus }
+	return { client, items: list.items }
 }
 
 const ITEM_HEIGHT = 40
 const ITEM_HEIGHT_PX = `${ITEM_HEIGHT}px`
 
 function Home() {
-	const { client, items, connectionStatus } = createClient()
+	const { client, items } = createClient()
 
 	const sortedList = () => {
 		return items
@@ -148,45 +145,7 @@ function Home() {
 
 	return (
 		<div class="text-lg pb-8">
-			<style>
-				{`
-        .dot {
-          position: absolute;
-          border-radius: 50%;
-
-          --yellow: #bbd028;
-          --green: #1adf22;
-        }
-
-        .dot-online {
-          top: 32px;
-          left: 6px;
-
-          width: 4px;
-          height: 4px;
-
-          background-color: var(--color);
-          box-shadow:
-            0 0 2px 1px var(--color),
-            0 0 4px 2px var(--color);
-        }
-
-        .dot-offline {
-          top: 31px;
-          left: 5px;
-
-          width: 7px;
-          height: 7px;
-
-          background-color: #ccc;
-        }
-        `}
-			</style>
-
-			<div
-				class={connectionStatus() === "OFFLINE" ? "dot dot-offline" : "dot dot-online"}
-				style={connectionStatus() === "IN_SYNC" ? "--color: var(--green)" : "--color: var(--yellow)"}
-			/>
+			<ConnectionWarning />
 
 			<DragDropProvider onDragStart={onDragStart} onDragEnd={onDragEnd} collisionDetector={closestCenter}>
 				<DragDropSensors />
