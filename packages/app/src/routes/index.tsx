@@ -142,7 +142,7 @@ function Home() {
 	const ids = () => activeList().map(({ id }) => id)
 
 	return (
-		<div class="text-lg">
+		<div class="text-lg pb-8">
 			<style>
 				{`
         .dot {
