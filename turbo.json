@@ -4,6 +4,11 @@
 		"build": {
 			"outputs": ["dist/**"]
 		},
+		"app#build": {
+			"outputs": ["dist/**", ".solid/**", ".output/**", ".vercel/output/**"],
+			"dependsOn": ["^build"],
+			"env": ["LOCAL_DEV"]
+		},
 		"start": {
 			"cache": false
 		},
