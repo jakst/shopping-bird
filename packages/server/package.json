@@ -7,6 +7,7 @@
 	"scripts": {
 		"dev": "NODE_ENV=development vite-node --watch src/app.ts",
 		"auth": "NODE_ENV=production vite-node scripts/auth.ts",
+		"build": "node node_modules/puppeteer/install.js",
 		"start": "NODE_ENV=production vite-node src/app.ts"
 	},
 	"dependencies": {

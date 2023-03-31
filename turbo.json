@@ -2,11 +2,10 @@
 	"$schema": "https://turbo.build/schema.json",
 	"pipeline": {
 		"build": {
-			"outputs": ["dist/**"]
+			"outputs": ["dist/**", ".cache/**"]
 		},
 		"app#build": {
 			"outputs": ["dist/**", ".solid/**", ".output/**", ".vercel/output/**"],
-			"dependsOn": ["^build"],
 			"env": ["LOCAL_DEV"]
 		},
 		"start": {
