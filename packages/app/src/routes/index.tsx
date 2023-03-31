@@ -1,4 +1,5 @@
 import { Motion, Presence } from "@motionone/solid"
+import { useConnectivitySignal } from "@solid-primitives/connectivity"
 import {
 	DragDropProvider,
 	DragDropSensors,
@@ -9,7 +10,7 @@ import {
 } from "@thisbeyond/solid-dnd"
 import { Client, EventQueue, ShoppingList, ShoppingListEvent, ShoppingListItem, trimAndUppercase } from "lib"
 import { timeline } from "motion"
-import { For, JSX, Show, createSignal } from "solid-js"
+import { For, JSX, Show, createEffect, createSignal } from "solid-js"
 import { createStore, reconcile } from "solid-js/store"
 import { TransitionGroup } from "solid-transition-group"
 import { ClientOnly } from "~/components/ClientOnly"
@@ -77,8 +78,12 @@ function createClient() {
 		eventQueue,
 	})
 
-	// TODO: Handle connections either in client or fully through solid with reconnections
-	client.connect()
+	const isOnline = useConnectivitySignal()
+
+	createEffect(() => {
+		if (isOnline()) client.connect()
+		else serverConnection.disconnect()
+	})
 
 	return { client, items: list.items, connectionStatus }
 }

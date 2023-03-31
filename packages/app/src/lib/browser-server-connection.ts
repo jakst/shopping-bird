@@ -17,6 +17,11 @@ export class BrowserServerConnection implements ClientServerConnection {
 
 	constructor(private onConnectionStatusChanged: (connected: boolean) => void) {}
 
+	#onConnectionClosed() {
+		this.clientId = null
+		this.onConnectionStatusChanged(false)
+	}
+
 	async connect(onListUpdate: OnListUpdateCallback) {
 		if (this.isConnected) return
 
@@ -33,18 +38,14 @@ export class BrowserServerConnection implements ClientServerConnection {
 				resolve()
 			}
 
-			const errorListener = () => {
-				this.clientId = null
-				this.onConnectionStatusChanged(false)
-			}
-
 			eventSource.addEventListener("update", listUpdateListener)
-			eventSource.addEventListener("error", errorListener)
+			eventSource.addEventListener("error", () => this.#onConnectionClosed())
 		})
 	}
 
 	disconnect() {
 		this.eventSource?.close()
+		this.#onConnectionClosed()
 	}
 
 	async pushEvents(events: ShoppingListEvent[]) {
