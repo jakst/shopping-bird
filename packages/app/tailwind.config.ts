@@ -21,6 +21,7 @@ const config: Config = {
 	content: ["./src/**/*.{html,js,jsx,ts,tsx}"],
 	theme: {
 		colors: {
+			transparent: "transparent",
 			...colorsSlate,
 			...red,
 			...amber,
