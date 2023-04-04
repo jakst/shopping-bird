@@ -1,4 +1,4 @@
-import { slate } from "@radix-ui/colors"
+import { amber, red, slate } from "@radix-ui/colors"
 import { type Config } from "tailwindcss"
 import defaultTheme from "tailwindcss/defaultTheme"
 
@@ -20,10 +20,12 @@ const colorsSlate = {
 const config: Config = {
 	content: ["./src/**/*.{html,js,jsx,ts,tsx}"],
 	theme: {
+		colors: {
+			...colorsSlate,
+			...red,
+			...amber,
+		},
 		extend: {
-			colors: {
-				...colorsSlate,
-			},
 			fontFamily: {
 				sans: ["Hubot Sans", ...defaultTheme.fontFamily.sans],
 			},

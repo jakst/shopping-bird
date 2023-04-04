@@ -9,7 +9,7 @@ export function ConnectionWarning() {
 	return (
 		<Show when={isOnline()} fallback={<Offline />}>
 			{/* TODO: Add some mechanism other than refreshing to recover from this. */}
-			<ErrorBoundary fallback={<ConnectionError />}>
+			<ErrorBoundary fallback={<NoConnection />}>
 				<ConnectionStatus />
 			</ErrorBoundary>
 		</Show>
@@ -53,12 +53,9 @@ function ConnectionStatus() {
 	)
 }
 
-function ConnectionError() {
+function NoConnection() {
 	return (
-		<div
-			class="mx-2 mb-4 bg-red-100 border border-red-400 text-sm text-red-700 px-4 py-3 rounded relative"
-			role="alert"
-		>
+		<div class="mx-2 mb-4 bg-red2 border border-red6 text-sm text-red9 px-4 py-3 rounded relative" role="alert">
 			<strong class="font-bold">Connection error!</strong>
 			<span class="block">Your changes will be synced when the server is back up again.</span>
 		</div>
@@ -67,10 +64,7 @@ function ConnectionError() {
 
 function NoAuth() {
 	return (
-		<div
-			class="mx-2 mb-4 bg-yellow-100 border border-yellow-400 text-sm text-yellow-700 px-4 py-3 rounded relative"
-			role="alert"
-		>
+		<div class="mx-2 mb-4 bg-amber2 border border-amber7 text-sm text-amber11 px-4 py-3 rounded relative" role="alert">
 			<strong class="font-bold">Whoppa!</strong>
 			<span class="block">
 				Looks like the server has lost its authentication info. Contact your system admin to re-authenticate.
@@ -83,7 +77,7 @@ function Offline() {
 	return (
 		<div class="flex justify-end mx-2 mb-4">
 			<span
-				class="bg-gray-50 border border-gray-300 text-gray-500 px-2 py-1 rounded text-xs font-semibold"
+				class="bg-color2 border border-color8 text-color10 px-2 pt-1 pb-[2px] rounded text-xs font-semibold"
 				role="alert"
 			>
 				Working offline
