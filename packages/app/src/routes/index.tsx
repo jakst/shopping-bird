@@ -18,10 +18,7 @@ import { ConnectionWarning } from "~/components/ConnectionWarning"
 import { ItemRow } from "~/components/ItemRow"
 import { BrowserServerConnection } from "~/lib/browser-server-connection"
 import { isInputField } from "~/lib/type-guards"
-import IconCheck from "~icons/ci/check"
-import IconPlus from "~icons/ci/plus"
 import IconCaretRight from "~icons/radix-icons/caret-right"
-import { Button } from "../components/Button"
 
 export default function Shell() {
 	return (
@@ -144,7 +141,7 @@ function Home() {
 	const ids = () => activeList().map(({ id }) => id)
 
 	return (
-		<div class="text-lg pb-8">
+		<div class="text-lg mb-24">
 			<ConnectionWarning />
 
 			<DragDropProvider onDragStart={onDragStart} onDragEnd={onDragEnd} collisionDetector={closestCenter}>
@@ -155,8 +152,6 @@ function Home() {
 						<RowAnimator>
 							<For each={activeList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
 						</RowAnimator>
-
-						<NewItem onCreate={(name) => void client.addItem(name)} />
 					</SortableProvider>
 				</ul>
 
@@ -209,6 +204,8 @@ function Home() {
 					</Motion.div>
 				</Show>
 			</Presence>
+
+			<NewItem onCreate={(name) => void client.addItem(name)} />
 		</div>
 	)
 }
@@ -253,30 +250,26 @@ function NewItem(props: { onCreate: (name: string) => void }) {
 	}
 
 	return (
-		<li class="h-7 ml-3 pr-2 flex items-center text-color11">
-			<IconPlus />
+		<form
+			class="fixed -bottom-1 backdrop-blur bg-color1/40 px-2 pb-5 pt-1 border-t-4 border-opacity-10 border-color7 max-w-lg w-full flex flex-row"
+			onSubmit={(event) => {
+				event.preventDefault()
+				submit()
+			}}
+		>
+			<input
+				ref={inputField}
+				class="bg-color7/30 backdrop-blur max-w-lg h-14 pl-4 pr-20 rounded-xl flex-1 text-color12 placeholder:text-color11 focus:outline-none focus:ring-2 focus:ring-color5 transition-shadow ease-in-out duration-200"
+				placeholder="Add new item..."
+				value={value()}
+				onInput={(event) => setValue(event.currentTarget.value)}
+			/>
 
-			<form
-				class="flex-1"
-				onSubmit={(event) => {
-					event.preventDefault()
-					submit()
-				}}
-			>
-				<input
-					ref={inputField}
-					class="ml-2 outline-none flex-1 bg-transparent text-color12 placeholder:text-color11 "
-					placeholder="New item"
-					value={value()}
-					onInput={(event) => setValue(event.currentTarget.value)}
-				/>
-			</form>
-
-			<Show when={value().length > 0}>
-				<Button onClick={submit}>
-					<IconCheck />
-				</Button>
-			</Show>
-		</li>
+			<input
+				type="submit"
+				value="Add"
+				class="bg-transparent px-4 h-14 rounded-r-xl text-color11 right-2 absolute focus:outline-none focus:ring-2 focus:ring-color5 transition-shadow ease-in-out duration-200"
+			/>
+		</form>
 	)
 }
