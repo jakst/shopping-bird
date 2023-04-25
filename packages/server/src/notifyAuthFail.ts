@@ -14,5 +14,3 @@ const fetchOptions: RequestInit = {
 export async function notifyAuthFail() {
 	fetch(PUSH_URL, fetchOptions).catch((err) => console.error(err))
 }
-
-notifyAuthFail()
