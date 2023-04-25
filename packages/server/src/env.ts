@@ -17,6 +17,7 @@ export const env = z
 		HOST: z.string().default("localhost"),
 		REDIS_URL: z.string(),
 		FRONTEND_URL: z.string().url(),
+		PUSH_TOKEN: z.string(),
 		FULL_BROWSER: z.literal("1").optional(),
 		LOCAL_DEV: z.literal("1").optional(),
 	})

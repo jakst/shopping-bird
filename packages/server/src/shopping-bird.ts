@@ -2,10 +2,11 @@ import { eventListSchema, EventQueue, ExternalClient, Server, ShoppingList, shop
 import { z } from "zod"
 import { createGoogleBot } from "./bot/google-bot"
 import { createCached } from "./create-cached"
+import { notifyAuthFail } from "./notifyAuthFail"
 
 export async function createShoppingBird() {
 	const [bot, initialExternalClientQueue, initialExternalClientStore, initialServerShoppingList] = await Promise.all([
-		createGoogleBot(),
+		createGoogleBot({ onAuthFail: notifyAuthFail }),
 		externalClientQueueCache.get(),
 		externalClientStoreCache.get(),
 		serverShoppingListCache.get(),

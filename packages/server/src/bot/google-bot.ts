@@ -4,14 +4,25 @@ import { clearCookies, getPage } from "./browser"
 
 const pause = (time: number) => new Promise((resolve) => setTimeout(resolve, time))
 
-export async function createGoogleBot(): Promise<Bot> {
+interface CreateGoogleBotDeps {
+	onAuthFail: () => Promise<void>
+}
+
+export async function createGoogleBot({ onAuthFail }: CreateGoogleBotDeps): Promise<Bot> {
 	const page = await getPage()
 
 	return {
 		async refreshList() {
 			await pause(1000)
 
-			await goToShoppingListPage(page)
+			const { isLoggedIn } = await goToShoppingListPage(page)
+
+			if (!isLoggedIn) {
+				await onAuthFail()
+				await clearCookies()
+				throw new Error("You need to authenticate")
+			}
+
 			const list = await getList(page)
 
 			for (const item of list) {
@@ -67,10 +78,7 @@ async function goToShoppingListPage(page: Page) {
 
 	const isLoggedIn = (await page.$x('//*[contains(text(), "Min inköpslista")]')).length > 0
 
-	if (!isLoggedIn) {
-		await clearCookies()
-		throw new Error("You need to authenticate")
-	}
+	return { isLoggedIn }
 }
 
 async function getList(page: Page) {
