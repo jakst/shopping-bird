@@ -10,12 +10,21 @@ export function compare(oldList: ShoppingListItem[], newList: ShoppingListItem[]
 				name: "ADD_ITEM",
 				data: { id: newItem.id, name: newItem.name },
 			})
+			events.push({
+				name: "SET_ITEM_POSITION",
+				data: { id: newItem.id, position: newItem.position },
+			})
 			if (newItem.checked)
 				events.push({
 					name: "SET_ITEM_CHECKED",
 					data: { id: newItem.id, checked: true },
 				})
 		} else {
+			if (newItem.position !== oldItem.position)
+				events.push({
+					name: "SET_ITEM_POSITION",
+					data: { id: newItem.id, position: newItem.position },
+				})
 			if (newItem.checked !== oldItem.checked)
 				events.push({
 					name: "SET_ITEM_CHECKED",

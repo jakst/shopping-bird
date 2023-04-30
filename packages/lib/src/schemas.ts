@@ -48,7 +48,22 @@ const MoveItem = z.object({
 	}),
 })
 
-export const eventSchema = z.discriminatedUnion("name", [AddItem, DeleteItem, SetChecked, RenameItem, MoveItem])
+const SetItemPosition = z.object({
+	name: z.literal("SET_ITEM_POSITION"),
+	data: z.object({
+		id: z.string(),
+		position: z.number(),
+	}),
+})
+
+export const eventSchema = z.discriminatedUnion("name", [
+	AddItem,
+	DeleteItem,
+	SetChecked,
+	RenameItem,
+	MoveItem,
+	SetItemPosition,
+])
 
 export type ShoppingListEvent = z.infer<typeof eventSchema>
 

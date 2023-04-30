@@ -16,16 +16,16 @@ test("Only calls bot once per incoming event [regression test]", async () => {
 
 	const spy = vi.spyOn(externalClient["$d"].bot, "ADD_ITEM")
 
-	externalClient.sync([{ id: "1", name: "Ost", checked: false }])
+	externalClient.sync([{ id: "1", name: "Ost", checked: false, position: 1 }])
 	await pause(1)
 	externalClient.sync([
-		{ id: "1", name: "Ost", checked: false },
-		{ id: "2", name: "Skinka", checked: false },
+		{ id: "1", name: "Ost", checked: false, position: 1 },
+		{ id: "2", name: "Skinka", checked: false, position: 2 },
 	])
 	externalClient.sync([
-		{ id: "1", name: "Ost", checked: false },
-		{ id: "2", name: "Skinka", checked: false },
-		{ id: "3", name: "Bröd", checked: false },
+		{ id: "1", name: "Ost", checked: false, position: 1 },
+		{ id: "2", name: "Skinka", checked: false, position: 2 },
+		{ id: "3", name: "Bröd", checked: false, position: 3 },
 	])
 
 	await externalClient.flush()
@@ -43,7 +43,7 @@ test("Only generates events from items once", async () => {
 
 	const mock = (externalClient.onEventsReturned = vi.fn())
 
-	const list = [{ id: "1", name: "Skinka", checked: false }]
+	const list = [{ id: "1", name: "Skinka", checked: false, position: 1 }]
 
 	externalClient.sync(list)
 	await externalClient.flush()
@@ -55,14 +55,14 @@ test("Only generates events from items once", async () => {
 
 	mock.mockReset()
 
-	list.push({ id: "2", name: "Kaviar", checked: false })
+	list.push({ id: "2", name: "Kaviar", checked: false, position: 2 })
 	externalClient.sync(list)
 	await externalClient.flush()
 
 	expect(externalClient.onEventsReturned).toHaveBeenCalledTimes(0)
 })
 
-type Item = Omit<ShoppingListItem, "id">
+type Item = Omit<ShoppingListItem, "id" | "position">
 
 function createExternalClient() {
 	const shoppingList: Item[] = []

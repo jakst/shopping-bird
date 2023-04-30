@@ -71,8 +71,13 @@ export function applyEvent(list: ShoppingListItem[], event: ShoppingListEvent) {
 			if (item) item.name = event.data.newName
 			break
 		}
+
 		case "MOVE_ITEM": {
-			const { id, fromPosition, toPosition } = event.data
+			const item = list.find((item) => item.id === event.data.id)
+			if (!item) break
+
+			const fromPosition = item.position
+			const { id, toPosition } = event.data
 
 			list.forEach((item) => {
 				if (item.id === id) {
@@ -85,6 +90,11 @@ export function applyEvent(list: ShoppingListItem[], event: ShoppingListEvent) {
 			})
 			break
 		}
+
+		case "SET_ITEM_POSITION": {
+			const item = list.find((item) => item.id === event.data.id)
+			if (item) item.position = event.data.position
+		}
 	}
 }
 
@@ -92,6 +102,9 @@ export function validateEvent(list: ShoppingListItem[], event: ShoppingListEvent
 	switch (event.name) {
 		case "ADD_ITEM":
 			return !list.some(({ id }) => event.data.id === id)
+
+		case "SET_ITEM_POSITION":
+			return event.data.position > 0 && list.some(({ id }) => event.data.id === id)
 
 		case "DELETE_ITEM":
 		case "SET_ITEM_CHECKED":

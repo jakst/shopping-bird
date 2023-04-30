@@ -87,7 +87,7 @@ test("Events are idempotent", async () => {
 
 	await setup.playOutListSync()
 
-	expect(c1.shoppingList.items).toEqual([{ id: "123", name: "Ost", checked: false }])
+	expect(c1.shoppingList.items).toEqual([{ id: "123", name: "Ost", checked: false, position: 1 }])
 	setup.assertEqualLists()
 })
 
@@ -211,4 +211,21 @@ describe("client.clearCheckedItems()", () => {
 		// This should only have cleared the item that was created on the client
 		expect(setup.externalList).toHaveLength(1)
 	})
+})
+
+test("Server enforces ordering", async () => {
+	const setup = setupTest()
+
+	const c1 = setup.createClient()
+
+	setup.externalList.push({ name: "Kex", checked: false })
+
+	await c1.client.addItem("Ost")
+
+	await setup.externalClient.flush()
+	await c1.client.connect()
+
+	await setup.playOutListSync()
+
+	setup.assertEqualLists()
 })
