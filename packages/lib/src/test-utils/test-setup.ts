@@ -71,7 +71,9 @@ export function setupTest() {
 
 		sortedLists.forEach((list, i) => {
 			if (i === sortedLists.length - 1 && externalList) {
-				expect(externalList.sort((a, b) => a.name.localeCompare(b.name))).toEqual(list.map(({ id, ...rest }) => rest))
+				expect(externalList.sort((a, b) => a.name.localeCompare(b.name))).toEqual(
+					list.map(({ id, position, ...rest }) => rest),
+				)
 			} else {
 				expect(list).toEqual(sortedLists[i + 1])
 			}
