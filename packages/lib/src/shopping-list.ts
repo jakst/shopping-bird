@@ -49,7 +49,7 @@ export function applyEvent(list: ShoppingListItem[], event: ShoppingListEvent) {
 			list.push({
 				...event.data,
 				checked: false,
-				position: list.reduce((prev, curr) => (curr.position ? Math.max(prev, curr.position) : prev), 0) + 1,
+				position: list.reduce((prev, curr) => Math.max(prev, curr.position), 0) + 1,
 			})
 			break
 		}
@@ -74,17 +74,13 @@ export function applyEvent(list: ShoppingListItem[], event: ShoppingListEvent) {
 		case "MOVE_ITEM": {
 			const { id, fromPosition, toPosition } = event.data
 
-			const activeList = list.filter(({ checked }) => !checked)
-
-			list.forEach((item, index) => {
-				const currentPosition = item.position ?? activeList.indexOf(item) ?? index
-
+			list.forEach((item) => {
 				if (item.id === id) {
 					item.position = toPosition
-				} else if (currentPosition > fromPosition && currentPosition <= toPosition) {
-					item.position = currentPosition - 1
-				} else if (currentPosition < fromPosition && currentPosition >= toPosition) {
-					item.position = currentPosition + 1
+				} else if (item.position > fromPosition && item.position <= toPosition) {
+					item.position--
+				} else if (item.position < fromPosition && item.position >= toPosition) {
+					item.position++
 				}
 			})
 			break
