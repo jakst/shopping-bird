@@ -19,7 +19,7 @@ test("Random", async () => {
 		try {
 			setup.assertEqualLists()
 		} catch (e) {
-			const logString = `ActionLog (${i} rounds, ${actionLog.length} actions)}:\n${actionLog.join("\n")}`
+			const logString = `ActionLog (${i} rounds, ${actionLog.length} actions):\n${actionLog.join("\n")}`
 			writeFileSync("action-log.txt", logString)
 			console.log(logString)
 			console.log("ServerShoppingList", setup.serverShoppingList.items)
