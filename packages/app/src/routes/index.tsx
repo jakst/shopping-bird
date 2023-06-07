@@ -89,7 +89,7 @@ function Home() {
 	const { client, items } = createClient()
 
 	const sortedList = () => {
-		return items.sort((a, b) => a.position - b.position)
+		return [...items].sort((a, b) => a.position - b.position)
 	}
 
 	const activeList = () => sortedList().filter((item) => !item.checked)
