@@ -20,10 +20,11 @@ f.addHook("preHandler", (request, reply, done) => {
 	const { origin } = request.headers
 
 	const isProd = origin === "https://shopping-bird.vercel.app"
-	const isPreview = Boolean(origin?.match(/^https:\/\/shopping-bird-[a-z0-9-]*jakst.vercel.app$/))
+	const isPreview = Boolean(origin?.match(/^https:\/\/shopping-bird-[a-z0-9-]*jakst\.vercel\.app$/))
+	const isLocalClient = Boolean(origin?.match(/^https?:\/\/norlin\d*(\.local)?(:\d+)?$/))
 
 	// Allow production, PR previews, and local dev environments to make CORS requests
-	if (isProd || isPreview || env.isLocalDev) {
+	if (isProd || isPreview || isLocalClient || env.isLocalDev) {
 		reply.headers({ "Access-Control-Allow-Origin": origin })
 	}
 
