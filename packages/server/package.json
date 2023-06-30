@@ -11,6 +11,8 @@
 		"start": "NODE_ENV=production vite-node src/app.ts"
 	},
 	"dependencies": {
+		"@effect/data": "^0.12.9",
+		"@effect/io": "^0.27.1",
 		"dotenv": "^16.0.3",
 		"fastify": "^4.15.0",
 		"fastify-sse-v2": "^3.1.0",
