@@ -22,7 +22,7 @@ function retryPolicyWithSideEffect<R>(logName: string, retries: number, fn: Effe
 		Schedule.addDelay(() => Duration.seconds(1)),
 		Schedule.tapOutput((iteration) =>
 			iteration < retries
-				? Effect.all(fn, Effect.logWarning(`[BOT] ${logName} failed. Retry #${iteration + 1}`))
+				? Effect.all(Effect.logWarning(`[BOT] ${logName} failed. Retry #${iteration + 1}`), fn)
 				: Effect.logWarning(`[BOT] ${logName} failed. No more retries.`),
 		),
 	)
