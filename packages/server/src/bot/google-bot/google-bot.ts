@@ -1,6 +1,10 @@
+import { pipe } from "@effect/data/Function"
+import * as Effect from "@effect/io/Effect"
 import { trimAndUppercase, type Bot } from "lib"
 import { ElementHandle, Page } from "puppeteer"
-import { clearCookies, getPage } from "./browser"
+import { clearCookies, getPage } from "../browser"
+import { PageDep } from "./PageDep"
+import { removeItemAtPosition } from "./removeItemAtPosition"
 
 const pause = (time: number) => new Promise((resolve) => setTimeout(resolve, time))
 
@@ -59,7 +63,8 @@ export async function createGoogleBot({ onAuthFail }: CreateGoogleBotDeps): Prom
 			if (checked) await setItemCheckedAtPosition(page, 0, true)
 		},
 		async DELETE_ITEM(index) {
-			await removeItemAtPosition(page, index)
+			const program = pipe(removeItemAtPosition(index), Effect.provideService(PageDep, PageDep.of(page)))
+			await Effect.runPromise(program)
 		},
 		async SET_ITEM_CHECKED(index, value) {
 			await setItemCheckedAtPosition(page, index, value)
@@ -130,21 +135,4 @@ async function setItemCheckedAtPosition(page: Page, index: number, value: boolea
 			await pause(1000)
 		}
 	}
-}
-
-async function removeItemAtPosition(page: Page, index: number) {
-	const nameDisplay = (await page.$x(`//ul/li//div[@role="button"]`))[index] as ElementHandle<HTMLDivElement>
-
-	const name = await nameDisplay.evaluate((el) => el.textContent)
-
-	console.log(`[BOT]: Removing item "${name}" at index ${index}`)
-	await nameDisplay.click()
-
-	// Press the trash button, two tabs away from the input field
-	await page.keyboard.press("Tab")
-	await page.keyboard.press("Tab")
-	await page.keyboard.press("Enter")
-
-	await page.waitForXPath('//*[text()="Varan har raderats"]')
-	await pause(1000)
 }

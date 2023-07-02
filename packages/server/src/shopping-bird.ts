@@ -1,6 +1,6 @@
 import { eventListSchema, EventQueue, ExternalClient, Server, ShoppingList, shoppingListItemSchema } from "lib"
 import { z } from "zod"
-import { createGoogleBot } from "./bot/google-bot"
+import { createGoogleBot } from "./bot/google-bot/google-bot"
 import { createCached } from "./create-cached"
 import { notifyAuthFail } from "./notifyAuthFail"
 
