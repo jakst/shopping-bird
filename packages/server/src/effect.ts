@@ -19,7 +19,7 @@ async function run() {
 
 	const { isLoggedIn } = await goToShoppingListPage(page)
 
-	const program = pipe(removeItemAtPosition(10000), Effect.provideService(PageDep, PageDep.of(page)))
+	const program = pipe(removeItemAtPosition(1), Effect.provideService(PageDep, PageDep.of(page)))
 	await Effect.runPromise(program)
 
 	const browser = await getBrowser()
