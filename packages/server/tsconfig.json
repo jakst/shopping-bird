@@ -1,7 +1,12 @@
 {
 	"extends": "../../tsconfig.base.json",
 	"include": ["./src", "scripts/auth.ts"],
-	"files": ["./reset.d.ts"],
+	"files": [
+		"./reset.d.ts",
+		"./src/bot/effect/pageRefresh.ts",
+		"./src/bot/effect/refreshPage.ts",
+		"./src/bot/effect/PageDep.ts"
+	],
 	"compilerOptions": {
 		"outDir": "dist",
 
