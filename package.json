@@ -1,7 +1,7 @@
 {
 	"name": "shopping-bird",
 	"private": true,
-	"packageManager": "pnpm@8.6.1",
+	"packageManager": "pnpm@8.6.6",
 	"engines": {
 		"node": "18.x"
 	},
