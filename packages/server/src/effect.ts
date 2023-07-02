@@ -1,3 +1,4 @@
+import * as Context from "@effect/data/Context"
 import * as Duration from "@effect/data/Duration"
 import { pipe } from "@effect/data/Function"
 import * as Effect from "@effect/io/Effect"
@@ -5,7 +6,7 @@ import * as Logger from "@effect/io/Logger"
 import * as LoggerLevel from "@effect/io/Logger/Level"
 import * as Schedule from "@effect/io/Schedule"
 import { exit } from "process"
-import { ElementHandle } from "puppeteer"
+import { ElementHandle, Page } from "puppeteer"
 import { getBrowser, getPage } from "./bot/browser"
 import { goToShoppingListPage } from "./bot/google-bot"
 import { cache } from "./cache"
@@ -22,14 +23,16 @@ class DeleteItemError {
 	readonly _tag = "DeleteItemError"
 }
 
+const PageDep = Context.Tag<Page>()
+
 function retryPolicyWithSideEffect(logName: string, retries: number, fn: Effect.Effect<never, never, void>) {
 	return pipe(
 		Schedule.recurs(retries),
 		Schedule.addDelay(() => Duration.seconds(1)),
 		Schedule.tapOutput((iteration) =>
 			iteration < retries
-				? Effect.all(fn, Effect.logDebug(`[BOT] ${logName} failed. Retry #${iteration + 1}`))
-				: Effect.logDebug(`[BOT] ${logName} failed. No more retries.`),
+				? Effect.all(fn, Effect.logWarning(`[BOT] ${logName} failed. Retry #${iteration + 1}`))
+				: Effect.logWarning(`[BOT] ${logName} failed. No more retries.`),
 		),
 	)
 }
@@ -38,6 +41,16 @@ interface NameDisplay {
 	name: string
 	element: ElementHandle<HTMLDivElement>
 }
+
+const refreshPage = pipe(
+	Effect.logDebug(`[BOT] Refreshing page`),
+	Effect.flatMap(() => PageDep),
+	Effect.flatMap((page) =>
+		Effect.promise(async () => {
+			await goToShoppingListPage(page)
+		}),
+	),
+)
 
 async function run() {
 	await cache.connect()
@@ -69,15 +82,6 @@ async function run() {
 		await pause(1000)
 	}
 
-	const refreshPage = pipe(
-		Effect.logDebug(`[BOT] Refreshing page`),
-		Effect.flatMap(() =>
-			Effect.promise(async () => {
-				await goToShoppingListPage(page)
-			}),
-		),
-	)
-
 	function removeItemAtPosition2(position: number) {
 		return pipe(
 			Effect.logDebug(`[BOT] Looking for item at position ${position}`),
@@ -89,7 +93,9 @@ async function run() {
 					),
 				),
 			),
-			Effect.retry(retryPolicyWithSideEffect("locateItem", 2, refreshPage)),
+			Effect.retry(
+				retryPolicyWithSideEffect("locateItem", 2, pipe(refreshPage, Effect.provideService(PageDep, PageDep.of(page)))),
+			),
 			Effect.tap(({ name }) => Effect.logDebug(`[BOT] Found item '${name}' at position ${position}`)),
 			Effect.tap(({ name }) => Effect.logInfo(`[BOT] Deleting item '${name}' at position ${position}`)),
 			Effect.flatMap((nameDisplay) =>
