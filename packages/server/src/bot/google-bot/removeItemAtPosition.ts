@@ -1,8 +1,6 @@
 import * as Duration from "@effect/data/Duration"
 import { pipe } from "@effect/data/Function"
 import * as Effect from "@effect/io/Effect"
-import * as Logger from "@effect/io/Logger"
-import * as LoggerLevel from "@effect/io/Logger/Level"
 import * as Schedule from "@effect/io/Schedule"
 import { ElementHandle, Page } from "puppeteer"
 import { PageDep } from "./PageDep"
@@ -14,6 +12,10 @@ class LocateItemError {
 
 class DeleteItemError {
 	readonly _tag = "DeleteItemError"
+}
+
+function sleepWithSpan(duration: Duration.Duration) {
+	return pipe(Effect.sleep(duration), Effect.withSpan("sleep", { attributes: { duration: `${duration.millis} ms` } }))
 }
 
 function retryPolicyWithSideEffect<R>(logName: string, retries: number, fn: Effect.Effect<R, never, void>) {
@@ -68,19 +70,25 @@ export function removeItemAtPosition(position: number) {
 				),
 				Effect.retry(retryPolicyWithSideEffect("locateItem", 2, refreshPage)),
 				Effect.tap(({ name }) => Effect.logDebug(`[BOT] Found item '${name}' at position ${position}`)),
-				Effect.tap(({ name }) => Effect.logInfo(`[BOT] Deleting item '${name}' at position ${position}`)),
+				Effect.withSpan("locateItem"),
 				Effect.flatMap((nameDisplay) =>
-					Effect.tryCatchPromise(
-						() => deleteItem(page, nameDisplay.element),
-						() => new DeleteItemError(),
+					pipe(
+						Effect.logInfo(`[BOT] Deleting item '${nameDisplay.name}' at position ${position}`),
+						Effect.flatMap(() =>
+							Effect.tryCatchPromise(
+								() => deleteItem(page, nameDisplay.element),
+								() => new DeleteItemError(),
+							),
+						),
+						Effect.withSpan("deleteItem", { attributes: { itemName: nameDisplay.name } }),
 					),
 				),
 				Effect.catchTags({
 					LocateItemError: () => Effect.logError(`[BOT] Couldn't locate item at position ${position}`),
 					DeleteItemError: () => Effect.logError(`[BOT] Couldn't delete item at position ${position}`),
 				}),
-				Effect.tap(() => Effect.sleep(Duration.seconds(2))),
-				Logger.withMinimumLogLevel(LoggerLevel.Debug),
+				Effect.tap(() => sleepWithSpan(Duration.seconds(2))),
+				Effect.withSpan("removeItemAtPosition", { attributes: { position: String(position) } }),
 			),
 		),
 	)
