@@ -68,6 +68,7 @@ export function removeItemAtPosition(position: number) {
 						() => new LocateItemError(),
 					),
 				),
+				Effect.withSpan("locateItemAttempt"),
 				Effect.retry(retryPolicyWithSideEffect("locateItem", 2, refreshPage)),
 				Effect.tap(({ name }) => Effect.logDebug(`[BOT] Found item '${name}' at position ${position}`)),
 				Effect.withSpan("locateItem"),
