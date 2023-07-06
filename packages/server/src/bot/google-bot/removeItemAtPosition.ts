@@ -88,7 +88,7 @@ export function removeItemAtPosition(position: number) {
 					LocateItemError: () => Effect.logError(`[BOT] Couldn't locate item at position ${position}`),
 					DeleteItemError: () => Effect.logError(`[BOT] Couldn't delete item at position ${position}`),
 				}),
-				Effect.tap(() => sleepWithSpan(Duration.seconds(2))),
+				Effect.tap(() => sleepWithSpan(Duration.seconds(1))),
 				Effect.withSpan("removeItemAtPosition", { attributes: { position: String(position) } }),
 			),
 		),
