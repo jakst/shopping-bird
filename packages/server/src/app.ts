@@ -6,6 +6,7 @@ import { getCookies, setCookies } from "./bot/browser"
 import { cache } from "./cache"
 import { env } from "./env"
 import { createShoppingBird } from "./shopping-bird"
+import { traceExporter } from "./traceExporter"
 
 const eventsEndpointSchema = z.object({
 	clientId: z.string(),
@@ -99,6 +100,7 @@ export async function run() {
 			port: env.PORT,
 			host: env.HOST,
 		})
+		sendStartedEvent()
 		started = true
 	} catch (err) {
 		console.log(err)
@@ -118,3 +120,49 @@ export async function run() {
 }
 
 run()
+
+const start = Date.now()
+
+function sendStartedEvent() {
+	console.log("Send started event!")
+	const end = Date.now()
+
+	traceExporter.send(
+		[
+			{
+				instrumentationLibrary: { name: "custom" },
+				spanContext: () => ({
+					spanId: generate32HexaDecimalChars(16),
+					traceId: generate32HexaDecimalChars(32),
+					traceFlags: 0,
+				}),
+				duration: [start / 1000, end / 1000],
+				startTime: [start / 1000, 0],
+				endTime: [end / 1000, 0],
+				ended: true,
+				links: [],
+				status: { code: 1 },
+				kind: 0,
+				events: [],
+				droppedLinksCount: 0,
+				droppedEventsCount: 0,
+				droppedAttributesCount: 0,
+				name: "Startup",
+				attributes: {},
+				resource: {
+					attributes: { "service.name": "backend" },
+					merge: (resource) => resource!,
+				},
+			},
+		],
+		() => console.log("sent"),
+		(err) => console.log("err", err),
+	)
+}
+
+function generate32HexaDecimalChars(n: number) {
+	const chars = "0123456789abcdef"
+	let result = ""
+	for (let i = n; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)]
+	return result
+}
