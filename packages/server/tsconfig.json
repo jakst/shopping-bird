@@ -1,7 +1,7 @@
 {
 	"extends": "../../tsconfig.base.json",
 	"include": ["./src", "scripts/auth.ts"],
-	"files": ["./reset.d.ts", "./src/makeCustomRuntime.ts"],
+	"files": ["./reset.d.ts"],
 	"compilerOptions": {
 		"outDir": "dist",
 
