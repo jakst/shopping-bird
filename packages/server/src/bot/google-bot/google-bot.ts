@@ -4,8 +4,6 @@ import * as Logger from "@effect/io/Logger"
 import * as LoggerLevel from "@effect/io/Logger/Level"
 import { trimAndUppercase, type Bot } from "lib"
 import { ElementHandle, Page } from "puppeteer"
-import { makeCustomRuntime } from "../../makeCustomRuntime"
-import { TracingLive } from "../../otel"
 import { clearCookies, getPage } from "../browser"
 import { PageDep } from "./PageDep"
 import { removeItemAtPosition } from "./removeItemAtPosition"
@@ -67,14 +65,12 @@ export async function createGoogleBot({ onAuthFail }: CreateGoogleBotDeps): Prom
 			if (checked) await setItemCheckedAtPosition(page, 0, true)
 		},
 		async DELETE_ITEM(index) {
-			const { close, runPromise } = await makeCustomRuntime(TracingLive)
 			const program = pipe(
 				removeItemAtPosition(index),
 				Effect.provideService(PageDep, PageDep.of(page)),
 				Logger.withMinimumLogLevel(LoggerLevel.Debug),
 			)
-			await runPromise(program)
-			await close()
+			await Effect.runPromise(program)
 		},
 		async SET_ITEM_CHECKED(index, value) {
 			await setItemCheckedAtPosition(page, index, value)
