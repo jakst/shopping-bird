@@ -27,7 +27,8 @@
 	},
 	"pnpm": {
 		"patchedDependencies": {
-			"@motionone/solid@10.16.0": "patches/@motionone__solid@10.16.0.patch"
+			"@motionone/solid@10.16.0": "patches/@motionone__solid@10.16.0.patch",
+			"@opentelemetry/resources@1.15.0": "patches/@opentelemetry__resources@1.15.0.patch"
 		}
 	}
 }
