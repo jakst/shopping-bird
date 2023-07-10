@@ -1,6 +1,7 @@
 const disableOverZealousRules = {
 	"no-empty": "off",
 	"no-unused-vars": "off",
+	"no-mixed-spaces-and-tabs": "off",
 
 	"@typescript-eslint/no-extra-semi": "off",
 	"@typescript-eslint/no-unused-vars": "off",
