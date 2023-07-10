@@ -1,5 +1,7 @@
 import { pipe } from "@effect/data/Function"
 import * as Effect from "@effect/io/Effect"
+import * as Logger from "@effect/io/Logger"
+import * as LoggerLevel from "@effect/io/Logger/Level"
 import { trimAndUppercase, type Bot } from "lib"
 import { ElementHandle, Page } from "puppeteer"
 import { clearCookies, getPage } from "../browser"
@@ -63,7 +65,11 @@ export async function createGoogleBot({ onAuthFail }: CreateGoogleBotDeps): Prom
 			if (checked) await setItemCheckedAtPosition(page, 0, true)
 		},
 		async DELETE_ITEM(index) {
-			const program = pipe(removeItemAtPosition(index), Effect.provideService(PageDep, PageDep.of(page)))
+			const program = pipe(
+				removeItemAtPosition(index),
+				Effect.provideService(PageDep, PageDep.of(page)),
+				Logger.withMinimumLogLevel(LoggerLevel.Debug),
+			)
 			await Effect.runPromise(program)
 		},
 		async SET_ITEM_CHECKED(index, value) {
@@ -72,7 +78,7 @@ export async function createGoogleBot({ onAuthFail }: CreateGoogleBotDeps): Prom
 	}
 }
 
-async function goToShoppingListPage(page: Page) {
+export async function goToShoppingListPage(page: Page) {
 	if (page.url() !== "https://shoppinglist.google.com/") {
 		await page.goto("https://shoppinglist.google.com/", {
 			waitUntil: "networkidle2",

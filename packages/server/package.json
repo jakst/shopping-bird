@@ -11,8 +11,12 @@
 		"start": "NODE_ENV=production vite-node src/app.ts"
 	},
 	"dependencies": {
-		"@effect/data": "^0.12.10",
-		"@effect/io": "^0.27.2",
+		"@effect/data": "0.12.10",
+		"@effect/io": "0.27.2",
+		"@effect/opentelemetry": "0.1.1",
+		"@opentelemetry/exporter-trace-otlp-http": "^0.40.0",
+		"@opentelemetry/sdk-node": "^0.40.0",
+		"@opentelemetry/sdk-trace-base": "^1.14.0",
 		"dotenv": "^16.0.3",
 		"fastify": "^4.15.0",
 		"fastify-sse-v2": "^3.1.0",

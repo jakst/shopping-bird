@@ -14,7 +14,7 @@ function cache<T>(fn: () => Promise<T>) {
 	}
 }
 
-const getBrowser = cache(() => {
+export const getBrowser = cache(() => {
 	console.log("[setup] Setting up browser...")
 	return puppeteer.launch({
 		executablePath: executablePath(),

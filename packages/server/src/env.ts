@@ -20,6 +20,8 @@ export const env = z
 		PUSH_TOKEN: z.string(),
 		FULL_BROWSER: z.literal("1").optional(),
 		LOCAL_DEV: z.literal("1").optional(),
+		USE_LOCAL_EXPORTER: z.literal("1").optional(),
+		BASELIME_API_KEY: z.string(),
 	})
 	.transform(({ NODE_ENV, LOCAL_DEV, ...rest }) => ({
 		...rest,
