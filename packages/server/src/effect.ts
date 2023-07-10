@@ -21,7 +21,7 @@ async function main() {
 	const { isLoggedIn } = await goToShoppingListPage(page)
 
 	const program = pipe(
-		removeItemAtPosition(0),
+		removeItemAtPosition(1000),
 		Effect.provideService(PageDep, PageDep.of(page)),
 		Logger.withMinimumLogLevel(LoggerLevel.Debug),
 	)
