@@ -15,7 +15,7 @@ export interface ExternalListItem {
 }
 
 export class ExternalClient {
-	onEventsReturned: null | ((events: ShoppingListEvent[]) => void) = null
+	onEventsReturned: null | ((events: ShoppingListEvent[]) => Promise<void>) = null
 
 	/** Containst the resulting store, with mapped IDs, from the last sync */
 	#previousStore: ShoppingListItem[]
@@ -56,7 +56,7 @@ export class ExternalClient {
 
 		const eventsToReturn = generateEvents(latestListFromBot, this.#previousStore)
 		if (eventsToReturn.length > 0) {
-			this.onEventsReturned?.(eventsToReturn)
+			await this.onEventsReturned?.(eventsToReturn)
 			eventsToReturn.forEach((event) => applyEvent(workingStoreCopy, event))
 		}
 

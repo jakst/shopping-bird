@@ -31,7 +31,9 @@ export function setupTest() {
 		},
 	})
 
-	externalClient.onEventsReturned = (events) => server.pushEvents(events)
+	externalClient.onEventsReturned = async (events) => {
+		server.pushEvents(events)
+	}
 
 	const clients: Client[] = []
 	const testLists: ShoppingListItem[][] = [serverShoppingList.items]
