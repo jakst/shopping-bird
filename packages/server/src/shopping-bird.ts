@@ -19,7 +19,15 @@ export async function createShoppingBird() {
 		},
 	})
 
-	const shoppingList = new ShoppingList(initialServerShoppingList, (v) => void serverShoppingListCache.set(v))
+	const shoppingList = new ShoppingList(initialServerShoppingList, (v) => {
+		serverShoppingListCache.set(v)
+
+		fetch("https://shopping-bot.jakst.workers.dev/target", {
+			method: "POST",
+			body: JSON.stringify(v),
+			headers: { "Content-Type": "application/json" },
+		}).catch((err) => console.error("FAILED TO UPDATE TARGET", err))
+	})
 
 	return new Server({
 		externalClient,
