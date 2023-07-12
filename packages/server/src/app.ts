@@ -151,7 +151,7 @@ function sendStartedEvent() {
 				attributes: {},
 				resource: {
 					attributes: { "service.name": "backend" },
-					merge: (resource) => resource!,
+					merge: (resource: any) => resource,
 				},
 			},
 		],
