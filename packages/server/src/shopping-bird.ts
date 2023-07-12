@@ -14,8 +14,8 @@ export async function createShoppingBird() {
 	const externalClient = new ExternalClient({
 		bot,
 		initialStore: initialExternalClientStore,
-		onStoreChanged(store) {
-			externalClientStoreCache.set(store)
+		async onStoreChanged(store) {
+			await externalClientStoreCache.set(store)
 		},
 	})
 
@@ -29,10 +29,16 @@ export async function createShoppingBird() {
 		}).catch((err) => console.error("FAILED TO UPDATE TARGET", err))
 	})
 
-	return new Server({
-		externalClient,
+	const server = new Server({
 		shoppingList,
+		async onSyncRequest(items) {
+			await externalClient.sync(items)
+		},
 	})
+
+	externalClient.onEventsReturned = (events) => server.pushEvents(events)
+
+	return server
 }
 
 const externalClientStoreCache = createCached("external-client-store", z.array(shoppingListItemSchema), [])

@@ -8,7 +8,7 @@ import { pause } from "./test-utils/pause"
 test("Only calls bot once per incoming event [regression test]", async () => {
 	const externalClient = new ExternalClient({
 		initialStore: [],
-		onStoreChanged: () => {},
+		onStoreChanged: async () => {},
 		bot: new MockBot([]),
 	})
 
@@ -34,7 +34,7 @@ test("Only calls bot once per incoming event [regression test]", async () => {
 test("Only generates events from items once", async () => {
 	const externalClient = new ExternalClient({
 		initialStore: [],
-		onStoreChanged: () => {},
+		onStoreChanged: async () => {},
 		bot: new MockBot([{ name: "Ost", checked: false }]),
 	})
 
@@ -66,7 +66,7 @@ function createExternalClient() {
 	const bot = new MockBot(shoppingList)
 	const externalClient = new ExternalClient({
 		initialStore: [],
-		onStoreChanged: () => {},
+		onStoreChanged: async () => {},
 		bot,
 	})
 

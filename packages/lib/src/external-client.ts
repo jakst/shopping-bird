@@ -5,7 +5,7 @@ import { equalsList } from "./utils/equals-list"
 
 interface ExternalClientDeps {
 	initialStore: ShoppingListItem[]
-	onStoreChanged: (store: ShoppingListItem[]) => void
+	onStoreChanged(store: ShoppingListItem[]): Promise<void>
 	bot: Bot
 }
 

@@ -20,14 +20,18 @@ export function setupTest() {
 
 	const externalClient = new ExternalClient({
 		initialStore: [],
-		onStoreChanged: () => {},
+		onStoreChanged: async () => {},
 		bot: new MockBot(externalList),
 	})
 
 	const server = new Server({
 		shoppingList: serverShoppingList,
-		externalClient,
+		async onSyncRequest(items) {
+			await externalClient.sync(items)
+		},
 	})
+
+	externalClient.onEventsReturned = (events) => server.pushEvents(events)
 
 	const clients: Client[] = []
 	const testLists: ShoppingListItem[][] = [serverShoppingList.items]
