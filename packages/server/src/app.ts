@@ -9,7 +9,7 @@ import { createShoppingBird } from "./shopping-bird"
 import { traceExporter } from "./traceExporter"
 
 const eventsEndpointSchema = z.object({
-	clientId: z.string(),
+	clientId: z.string().optional(),
 	events: eventListSchema,
 })
 
