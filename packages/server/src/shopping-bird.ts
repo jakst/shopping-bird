@@ -1,22 +1,18 @@
-import { eventListSchema, EventQueue, ExternalClient, Server, ShoppingList, shoppingListItemSchema } from "lib"
+import { ExternalClient, Server, ShoppingList, shoppingListItemSchema } from "lib"
 import { z } from "zod"
 import { createGoogleBot } from "./bot/google-bot/google-bot"
 import { createCached } from "./create-cached"
 import { notifyAuthFail } from "./notifyAuthFail"
 
 export async function createShoppingBird() {
-	const [bot, initialExternalClientQueue, initialExternalClientStore, initialServerShoppingList] = await Promise.all([
+	const [bot, initialExternalClientStore, initialServerShoppingList] = await Promise.all([
 		createGoogleBot({ onAuthFail: notifyAuthFail }),
-		externalClientQueueCache.get(),
 		externalClientStoreCache.get(),
 		serverShoppingListCache.get(),
 	])
 
-	const eventQueue = new EventQueue(initialExternalClientQueue, (queue) => void externalClientQueueCache.set(queue))
-
 	const externalClient = new ExternalClient({
 		bot,
-		eventQueue,
 		initialStore: initialExternalClientStore,
 		onStoreChanged(store) {
 			externalClientStoreCache.set(store)
@@ -30,13 +26,6 @@ export async function createShoppingBird() {
 		shoppingList,
 	})
 }
-
-const externalClientQueueCache = createCached(
-	"external-client-queue",
-	// Array of event arrays... 😐
-	z.array(eventListSchema),
-	[],
-)
 
 const externalClientStoreCache = createCached("external-client-store", z.array(shoppingListItemSchema), [])
 

@@ -1,5 +1,4 @@
 import { expect, test, vi } from "vitest"
-import { EventQueue } from "./event-queue"
 import { ExternalClient } from "./external-client"
 import { ShoppingListEvent, ShoppingListItem } from "./schemas"
 import { ShoppingList } from "./shopping-list"
@@ -8,7 +7,6 @@ import { pause } from "./test-utils/pause"
 
 test("Only calls bot once per incoming event [regression test]", async () => {
 	const externalClient = new ExternalClient({
-		eventQueue: new EventQueue<ShoppingListEvent[]>([], () => {}),
 		initialStore: [],
 		onStoreChanged: () => {},
 		bot: new MockBot([]),
@@ -35,7 +33,6 @@ test("Only calls bot once per incoming event [regression test]", async () => {
 
 test("Only generates events from items once", async () => {
 	const externalClient = new ExternalClient({
-		eventQueue: new EventQueue<ShoppingListEvent[]>([], () => {}),
 		initialStore: [],
 		onStoreChanged: () => {},
 		bot: new MockBot([{ name: "Ost", checked: false }]),
@@ -66,10 +63,8 @@ type Item = Omit<ShoppingListItem, "id" | "position">
 
 function createExternalClient() {
 	const shoppingList: Item[] = []
-	const eventQueue = new EventQueue<ShoppingListEvent[]>([], () => {})
 	const bot = new MockBot(shoppingList)
 	const externalClient = new ExternalClient({
-		eventQueue,
 		initialStore: [],
 		onStoreChanged: () => {},
 		bot,

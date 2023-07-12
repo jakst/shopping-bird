@@ -19,7 +19,6 @@ export function setupTest() {
 	const externalList: ExternalListItem[] = []
 
 	const externalClient = new ExternalClient({
-		eventQueue: new EventQueue<ShoppingListEvent[]>([], () => {}),
 		initialStore: [],
 		onStoreChanged: () => {},
 		bot: new MockBot(externalList),
