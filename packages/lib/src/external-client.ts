@@ -60,7 +60,7 @@ export class ExternalClient {
 			eventsToReturn.forEach((event) => applyEvent(workingStoreCopy, event))
 		}
 
-		this.$d.onStoreChanged(workingStoreCopy)
+		await this.$d.onStoreChanged(workingStoreCopy)
 		this.#previousStore = workingStoreCopy
 
 		while (!equalsList(workingStoreCopy, latestListFromBot)) {

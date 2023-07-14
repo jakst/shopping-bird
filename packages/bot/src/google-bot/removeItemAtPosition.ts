@@ -1,8 +1,8 @@
+import { ElementHandle, Page } from "@cloudflare/puppeteer"
 import * as Duration from "@effect/data/Duration"
 import { pipe } from "@effect/data/Function"
 import * as Effect from "@effect/io/Effect"
 import * as Schedule from "@effect/io/Schedule"
-import { ElementHandle, Page } from "puppeteer"
 import { PageDep } from "./PageDep"
 import { refreshPage } from "./refreshPage"
 

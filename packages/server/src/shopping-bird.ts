@@ -1,23 +1,9 @@
-import { ExternalClient, Server, ShoppingList, shoppingListItemSchema } from "lib"
+import { Server, ShoppingList, shoppingListItemSchema } from "lib"
 import { z } from "zod"
-import { createGoogleBot } from "./bot/google-bot/google-bot"
 import { createCached } from "./create-cached"
-import { notifyAuthFail } from "./notifyAuthFail"
 
 export async function createShoppingBird() {
-	const [bot, initialExternalClientStore, initialServerShoppingList] = await Promise.all([
-		createGoogleBot({ onAuthFail: notifyAuthFail }),
-		externalClientStoreCache.get(),
-		serverShoppingListCache.get(),
-	])
-
-	const externalClient = new ExternalClient({
-		bot,
-		initialStore: initialExternalClientStore,
-		async onStoreChanged(store) {
-			await externalClientStoreCache.set(store)
-		},
-	})
+	const initialServerShoppingList = await serverShoppingListCache.get()
 
 	const shoppingList = new ShoppingList(initialServerShoppingList, (v) => {
 		serverShoppingListCache.set(v)
@@ -32,15 +18,11 @@ export async function createShoppingBird() {
 	const server = new Server({
 		shoppingList,
 		async onSyncRequest(items) {
-			await externalClient.sync(items)
+			// NOOP! TODO: add back when we support running the bot more frequently
 		},
 	})
 
-	externalClient.onEventsReturned = (events) => server.pushEvents(events)
-
 	return server
 }
-
-const externalClientStoreCache = createCached("external-client-store", z.array(shoppingListItemSchema), [])
 
 const serverShoppingListCache = createCached("server-shopping-list", z.array(shoppingListItemSchema), [])

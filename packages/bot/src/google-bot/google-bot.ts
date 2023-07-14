@@ -1,10 +1,11 @@
+import puppeteer, { ElementHandle, Page } from "@cloudflare/puppeteer"
 import { pipe } from "@effect/data/Function"
 import * as Effect from "@effect/io/Effect"
 import * as Logger from "@effect/io/Logger"
 import * as LoggerLevel from "@effect/io/Logger/Level"
 import { trimAndUppercase, type Bot } from "lib"
-import { ElementHandle, Page } from "puppeteer"
-import { clearCookies, getPage } from "../browser"
+import { Env } from "../Env"
+import { cookiesCache } from "../kv"
 import { PageDep } from "./PageDep"
 import { removeItemAtPosition } from "./removeItemAtPosition"
 
@@ -12,12 +13,17 @@ const pause = (time: number) => new Promise((resolve) => setTimeout(resolve, tim
 
 interface CreateGoogleBotDeps {
 	onAuthFail: () => Promise<void>
+	env: Env
 }
 
-export async function createGoogleBot({ onAuthFail }: CreateGoogleBotDeps): Promise<Bot> {
-	const page = await getPage()
+export async function createGoogleBot({ env, onAuthFail }: CreateGoogleBotDeps) {
+	const browser = await puppeteer.launch(env.BOT_BROWSER)
+	const page = await browser.newPage()
+	const cookies = await cookiesCache(env.SHOPPING_BIRD_KV).get()
 
-	return {
+	await page.setCookie(...cookies)
+
+	const bot = {
 		async refreshList() {
 			await pause(1000)
 
@@ -25,7 +31,6 @@ export async function createGoogleBot({ onAuthFail }: CreateGoogleBotDeps): Prom
 
 			if (!isLoggedIn) {
 				await onAuthFail()
-				await clearCookies()
 				throw new Error("You need to authenticate")
 			}
 
@@ -75,7 +80,9 @@ export async function createGoogleBot({ onAuthFail }: CreateGoogleBotDeps): Prom
 		async SET_ITEM_CHECKED(index, value) {
 			await setItemCheckedAtPosition(page, index, value)
 		},
-	}
+	} satisfies Bot
+
+	return { bot, browser }
 }
 
 export async function goToShoppingListPage(page: Page) {
@@ -134,7 +141,7 @@ async function setItemCheckedAtPosition(page: Page, index: number, value: boolea
 	const checkbox = (await page.$$(`ul[aria-label="Min inköpslista"] > li input`))[index]
 
 	if (checkbox) {
-		const isChecked = await checkbox.evaluate((el) => el.checked)
+		const isChecked = await (checkbox as ElementHandle<HTMLInputElement>).evaluate((el) => el.checked)
 
 		if ((isChecked && !value) || (!isChecked && value)) {
 			await checkbox.click()

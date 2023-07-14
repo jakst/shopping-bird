@@ -1,0 +1,15 @@
+name = "shopping-bot"
+main = "src/worker.ts"
+compatibility_date = "2023-05-15"
+
+browser = { binding = "BOT_BROWSER", type = "browser" }
+kv_namespaces = [
+  { binding = "SHOPPING_BIRD_KV", id = "7c1ea3dafca14875b407b16da04325f6", preview_id = "36ed7c80ccbf4e46a8bbda74ac0d7bb1" },
+]
+
+# Cron Triggers
+# Docs: https://developers.cloudflare.com/workers/platform/triggers/cron-triggers/
+# Configuration: https://developers.cloudflare.com/workers/wrangler/configuration/#triggers
+[triggers]
+# * * * * * = run every minute
+crons = ["* * * * *"]

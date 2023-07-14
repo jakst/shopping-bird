@@ -1,0 +1,9 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"lib": ["ESNext", "DOM"],
+		"moduleResolution": "node",
+		"types": ["@cloudflare/workers-types"],
+		"isolatedModules": true
+	}
+}

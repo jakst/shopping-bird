@@ -2,7 +2,7 @@ import { executablePath, Protocol } from "puppeteer"
 import puppeteer from "puppeteer-extra"
 import StealthPlugin from "puppeteer-extra-plugin-stealth"
 import { env } from "../env"
-import { deleteCookies, loadCookies, saveCookies } from "./cookies"
+import { loadCookies, saveCookies } from "./cookies"
 
 puppeteer.use(StealthPlugin() as any)
 
@@ -47,9 +47,4 @@ export async function setCookies(cookies: any[]) {
 	const page = await getPage()
 	await page.setCookie(...cookies)
 	await saveCookies(cookies)
-}
-
-export async function clearCookies() {
-	_cookies = null
-	await deleteCookies()
 }
