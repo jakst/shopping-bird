@@ -235,7 +235,9 @@ function NewItem(props: { onCreate: (name: string) => void }) {
 	const [value, setValue] = createSignal("")
 
 	function submit() {
-		props.onCreate(trimAndUppercase(value()))
+		const parsedValue = trimAndUppercase(value())
+		if (parsedValue.length) props.onCreate(parsedValue)
+
 		setValue("")
 		inputField?.focus()
 	}
