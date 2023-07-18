@@ -1,31 +1,22 @@
 {
 	"name": "server",
-	"version": "1.0.0",
-	"license": "MIT",
-	"main": "src/index.ts",
+	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"dev": "NODE_ENV=development vite-node --watch src/app.ts",
-		"auth": "NODE_ENV=production vite-node scripts/auth.ts",
-		"build": "node node_modules/puppeteer/install.js",
-		"start": "NODE_ENV=production vite-node src/app.ts"
-	},
-	"dependencies": {
-		"@opentelemetry/exporter-trace-otlp-http": "^0.41.0",
-		"fastify-sse-v2": "^3.1.1",
-		"fastify": "^4.19.2",
-		"dotenv": "^16.3.1",
-		"lib": "workspace:^",
-		"puppeteer": "^20.8.1",
-		"puppeteer-extra": "^3.3.6",
-		"puppeteer-extra-plugin-stealth": "^2.11.2",
-		"redis": "^4.6.7",
-		"zod": "^3.21.4"
+		"deploy": "wrangler deploy",
+		"dev": "wrangler dev"
 	},
 	"devDependencies": {
-		"@types/node": "^20.4.2",
+		"@cloudflare/workers-types": "^4.20230710.0",
 		"typescript": "^5.1.6",
-		"vite": "^4.4.3",
-		"vite-node": "^0.33.0"
+		"wrangler": "^3.2.0"
+	},
+	"dependencies": {
+		"@cloudflare/puppeteer": "0.0.2-alpha",
+		"@effect/data": "0.12.10",
+		"@effect/io": "0.27.2",
+		"hono": "^3.3.0",
+		"lib": "workspace:^",
+		"zod": "^3.21.4"
 	}
 }

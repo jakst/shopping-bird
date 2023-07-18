@@ -40,4 +40,4 @@ jobs:
       - name: Deploy to Cloudflare Workers
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-        run: pnpm --filter=bot run deploy
+        run: pnpm --filter=server run deploy

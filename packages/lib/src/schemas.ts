@@ -79,3 +79,10 @@ export const updateMessageSchema = z.object({
 })
 
 export type UpdateMessage = z.infer<typeof updateMessageSchema>
+
+export const eventsMessageSchema = z.object({
+	clientId: z.string().optional(),
+	events: eventListSchema,
+})
+
+export type EventsMessage = z.infer<typeof eventsMessageSchema>

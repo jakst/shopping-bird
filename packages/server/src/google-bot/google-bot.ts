@@ -1,11 +1,12 @@
+// 	Needed for HTML element types
+/// <reference lib="dom" />
+
 import puppeteer, { ElementHandle, Page } from "@cloudflare/puppeteer"
 import { pipe } from "@effect/data/Function"
 import * as Effect from "@effect/io/Effect"
 import * as Logger from "@effect/io/Logger"
 import * as LoggerLevel from "@effect/io/Logger/Level"
 import { trimAndUppercase, type Bot } from "lib"
-import { Env } from "../Env"
-import { cookiesCache } from "../kv"
 import { PageDep } from "./PageDep"
 import { removeItemAtPosition } from "./removeItemAtPosition"
 
@@ -13,13 +14,12 @@ const pause = (time: number) => new Promise((resolve) => setTimeout(resolve, tim
 
 interface CreateGoogleBotDeps {
 	onAuthFail: () => Promise<void>
-	env: Env
+	browser: puppeteer.Browser
+	cookies: any[]
 }
 
-export async function createGoogleBot({ env, onAuthFail }: CreateGoogleBotDeps) {
-	const browser = await puppeteer.launch(env.BOT_BROWSER)
+export async function createGoogleBot({ onAuthFail, browser, cookies }: CreateGoogleBotDeps) {
 	const page = await browser.newPage()
-	const cookies = await cookiesCache(env.SHOPPING_BIRD_KV).get()
 
 	await page.setCookie(...cookies)
 
@@ -82,7 +82,7 @@ export async function createGoogleBot({ env, onAuthFail }: CreateGoogleBotDeps) 
 		},
 	} satisfies Bot
 
-	return { bot, browser }
+	return { bot, page }
 }
 
 export async function goToShoppingListPage(page: Page) {

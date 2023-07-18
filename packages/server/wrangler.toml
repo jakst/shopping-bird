@@ -1,0 +1,12 @@
+name = "shopping-bird"
+main = "src/worker.ts"
+compatibility_date = "2023-05-15"
+
+browser = { binding = "BROWSER", type = "browser" }
+
+[durable_objects]
+bindings = [{ name = "DO", class_name = "TheShoppingBird" }]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["TheShoppingBird"]

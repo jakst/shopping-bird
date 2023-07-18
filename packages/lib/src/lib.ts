@@ -9,10 +9,12 @@ export { ExternalClient, type Bot } from "./external-client"
 export {
 	eventListSchema,
 	eventSchema,
+	eventsMessageSchema,
 	responseMessageSchema,
 	shoppingListItemSchema,
 	shoppingListSchema,
 	updateMessageSchema,
+	type EventsMessage,
 	type ShoppingListEvent,
 	type ShoppingListItem,
 	type UpdateMessage,

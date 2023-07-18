@@ -6,6 +6,7 @@
 		"node": "18.x"
 	},
 	"scripts": {
+		"auth": "pnpm --filter=auth-script auth",
 		"app": "pnpm --filter app",
 		"server": "pnpm --filter server",
 		"lib": "pnpm --filter lib",
@@ -27,7 +28,6 @@
 	},
 	"pnpm": {
 		"patchedDependencies": {
-			"@opentelemetry/resources@1.15.0": "patches/@opentelemetry__resources@1.15.0.patch",
 			"@motionone/solid@10.16.2": "patches/@motionone__solid@10.16.2.patch"
 		}
 	}

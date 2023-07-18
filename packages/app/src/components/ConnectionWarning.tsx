@@ -1,6 +1,7 @@
 import { useConnectivitySignal } from "@solid-primitives/connectivity"
 import { usePageVisibility } from "@solid-primitives/page-visibility"
 import { ErrorBoundary, Show, createEffect, createResource, onCleanup, startTransition } from "solid-js"
+import { z } from "zod"
 import { env } from "~/lib/env"
 
 export function ConnectionWarning() {
@@ -20,7 +21,7 @@ function ConnectionStatus() {
 	const [showAuthWarning, { refetch }] = createResource(
 		async () => {
 			const req = await fetch(env.BACKEND_URL)
-			const res = (await req.json()) as { commit: string; authenticated: boolean }
+			const res = z.object({ authenticated: z.boolean() }).parse(await req.json())
 
 			return !res.authenticated
 		},

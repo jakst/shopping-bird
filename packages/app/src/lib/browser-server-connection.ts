@@ -2,6 +2,7 @@ import {
 	responseMessageSchema,
 	updateMessageSchema,
 	type ClientServerConnection,
+	type EventsMessage,
 	type OnListUpdateCallback,
 	type ShoppingListEvent,
 } from "lib"
@@ -9,7 +10,7 @@ import { env } from "./env"
 
 export class BrowserServerConnection implements ClientServerConnection {
 	clientId: string | null = null
-	eventSource: EventSource | null = null
+	ws: WebSocket | null = null
 
 	get isConnected() {
 		return this.clientId !== null
@@ -25,8 +26,7 @@ export class BrowserServerConnection implements ClientServerConnection {
 	async connect(onListUpdate: OnListUpdateCallback) {
 		if (this.isConnected) return
 
-		const eventSource = new EventSource(`${env.BACKEND_URL}/register`)
-		this.eventSource = eventSource
+		const ws = (this.ws = new WebSocket(env.WS_URL))
 
 		return new Promise<void>((resolve) => {
 			const listUpdateListener = (event: MessageEvent<string>) => {
@@ -38,23 +38,26 @@ export class BrowserServerConnection implements ClientServerConnection {
 				resolve()
 			}
 
-			eventSource.addEventListener("update", listUpdateListener)
-			eventSource.addEventListener("error", () => this.#onConnectionClosed())
+			ws.onmessage = listUpdateListener
+			ws.onerror = () => this.#onConnectionClosed()
+			ws.onclose = () => this.#onConnectionClosed()
 		})
 	}
 
 	disconnect() {
-		this.eventSource?.close()
+		this.ws?.close()
 		this.#onConnectionClosed()
 	}
 
 	async pushEvents(events: ShoppingListEvent[]) {
+		if (!this.clientId) throw new Error("Not connected to server")
+
 		const response = await fetch(`${env.BACKEND_URL}/events`, {
 			method: "POST",
 			body: JSON.stringify({
 				clientId: this.clientId,
 				events,
-			}),
+			} satisfies EventsMessage),
 		})
 
 		if (response.ok) {
