@@ -43,7 +43,8 @@ export class TheShoppingBird {
 			this.server = new Server({
 				shoppingList,
 				onSyncRequest: async (items) => {
-					this.runBot()
+					await this.state.storage.put("dirty", true)
+					await this.runBot()
 				},
 			})
 		})
@@ -91,6 +92,7 @@ export class TheShoppingBird {
 		})
 
 		this.app.get("/bot", async (c) => {
+			await this.state.storage.put("dirty", true)
 			await this.runBot()
 			return c.body(null)
 		})
@@ -149,7 +151,10 @@ export class TheShoppingBird {
 			return
 		}
 
+		console.log("BOT starting")
+
 		this.botRunning = true
+		await this.state.storage.put("dirty", false)
 
 		const initialStore: ShoppingListItem[] = (await this.state.storage.get("google-list")) ?? []
 
@@ -183,6 +188,12 @@ export class TheShoppingBird {
 
 		await page.close()
 
+		const isDirty = await this.state.storage.get("dirty")
 		this.botRunning = false
+
+		if (isDirty) {
+			console.log("BOT is dirty, running again")
+			await this.runBot()
+		}
 	}
 }
