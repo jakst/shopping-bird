@@ -17,17 +17,17 @@ export class Client {
 	#pendingUpdates = false
 
 	constructor(private $d: ClientDeps) {
-		this.#pendingUpdates = !this.$d.eventQueue.isEmpty()
+		this.#pendingUpdates = !$d.eventQueue.isEmpty()
+		$d.serverConnection.onListUpdate = ({ shoppingList }) => {
+			// Don't accept any external updates as long as we still have unsent updates ourselves
+			if (!this.#pendingUpdates) this.onRemoteListChanged(shoppingList)
+		}
 	}
 
 	async connect() {
 		if (this.$d.serverConnection.isConnected) return
 
-		await this.$d.serverConnection.connect(({ shoppingList }) => {
-			// Don't accept any external updates as long as we still have unsent updates ourselves
-			if (!this.#pendingUpdates) this.onRemoteListChanged(shoppingList)
-		})
-
+		await this.$d.serverConnection.connect()
 		await this.flushEvents()
 	}
 

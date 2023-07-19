@@ -9,7 +9,7 @@ import { pause } from "./pause"
 
 export class FakeClientServerConnection implements ClientServerConnection, ServerClientConnection {
 	clientId: string | null = null
-	onRemoteListChanged: OnListUpdateCallback | null = null
+	onListUpdate: OnListUpdateCallback | null = null
 
 	constructor(private $d: ClientServerConnectionDeps) {}
 
@@ -19,14 +19,13 @@ export class FakeClientServerConnection implements ClientServerConnection, Serve
 
 	// Called from server
 	onListChanged(payload: UpdateMessage) {
-		if (this.onRemoteListChanged) this.onRemoteListChanged(structuredClone(payload))
+		if (this.onListUpdate) this.onListUpdate(structuredClone(payload))
 		else throw new Error("No onRemoteListChanged callback")
 	}
 
 	// Called from client
-	async connect(onRemoteListChanged: OnListUpdateCallback) {
+	async connect() {
 		await pause(1)
-		this.onRemoteListChanged = onRemoteListChanged
 		this.clientId = this.$d.server.connectClient(this)
 	}
 

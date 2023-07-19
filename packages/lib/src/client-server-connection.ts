@@ -10,7 +10,8 @@ export type OnListUpdateCallback = (payload: UpdateMessage) => void
 export interface ClientServerConnection {
 	clientId: string | null
 	isConnected: boolean
-	connect(onListUpdate: OnListUpdateCallback): Promise<void>
+	onListUpdate: OnListUpdateCallback | null
+	connect(): Promise<void>
 	disconnect(): void
 	pushEvents(events: ShoppingListEvent[]): Promise<ShoppingListItem[]>
 }

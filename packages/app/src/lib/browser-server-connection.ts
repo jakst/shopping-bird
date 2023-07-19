@@ -11,6 +11,8 @@ import { env } from "./env"
 export class BrowserServerConnection implements ClientServerConnection {
 	clientId: string | null = null
 	ws: WebSocket | null = null
+	onListUpdate: OnListUpdateCallback | null = null
+	#reconnectionInterval: ReturnType<typeof setInterval> | null = null
 
 	get isConnected() {
 		return this.clientId !== null
@@ -21,18 +23,25 @@ export class BrowserServerConnection implements ClientServerConnection {
 	#onConnectionClosed() {
 		this.clientId = null
 		this.onConnectionStatusChanged(false)
+
+		if (this.#reconnectionInterval) clearInterval(this.#reconnectionInterval)
+		this.#reconnectionInterval = setInterval(() => void this.connect(), 1000)
 	}
 
-	async connect(onListUpdate: OnListUpdateCallback) {
+	async connect() {
 		if (this.isConnected) return
 
 		const ws = (this.ws = new WebSocket(env.WS_URL))
+
+		ws.onopen = () => {
+			clearInterval(this.#reconnectionInterval!)
+		}
 
 		return new Promise<void>((resolve) => {
 			const listUpdateListener = (event: MessageEvent<string>) => {
 				const data = updateMessageSchema.parse(JSON.parse(event.data))
 				this.clientId = data.clientId
-				onListUpdate(data)
+				this.onListUpdate?.(data)
 
 				this.onConnectionStatusChanged(true)
 				resolve()
