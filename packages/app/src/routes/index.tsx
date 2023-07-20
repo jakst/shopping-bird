@@ -10,7 +10,7 @@ import {
 } from "@thisbeyond/solid-dnd"
 import { Client, EventQueue, ShoppingList, ShoppingListEvent, ShoppingListItem, trimAndUppercase } from "lib"
 import { timeline } from "motion"
-import { For, JSX, Show, createEffect, createSignal } from "solid-js"
+import { For, JSX, Show, createEffect, createSignal, onCleanup, onMount } from "solid-js"
 import { createStore, reconcile } from "solid-js/store"
 import { TransitionGroup } from "solid-transition-group"
 import { ClientOnly } from "~/components/ClientOnly"
@@ -21,14 +21,34 @@ import { isInputField } from "~/lib/type-guards"
 import IconCaretRight from "~icons/radix-icons/caret-right"
 
 export default function Shell() {
+	const [mainElement, setMainElement] = createSignal<HTMLElement | null>(null)
+	const [softwareKeyboardShown, setSoftwareKeyboardShown] = createSignal(false)
+
+	onMount(() => {
+		let prevHeight = window.visualViewport?.height ?? 0
+
+		function handleResize() {
+			const el = mainElement()
+			if (el && window.visualViewport) {
+				const newHeight = window.visualViewport.height
+				el.style.height = `${newHeight.toString()}px`
+				setSoftwareKeyboardShown(prevHeight > newHeight)
+				prevHeight = newHeight
+			}
+		}
+
+		window.visualViewport?.addEventListener("resize", handleResize)
+		onCleanup(() => window.visualViewport?.removeEventListener("resize", handleResize))
+	})
+
 	return (
-		<main class="mx-auto text-color12 max-w-lg">
+		<main ref={setMainElement} class="mx-auto text-color12 max-w-lg h-full flex flex-col">
 			<div class="flex px-4 py-4 justify-between items-center content-center">
 				<img src="/header-logo.svg" alt="Shopping bird logo containing a bird riding in a shopping cart" />
 			</div>
 
 			<ClientOnly>
-				<Home />
+				<Home softwareKeyboardShown={softwareKeyboardShown()} />
 			</ClientOnly>
 		</main>
 	)
@@ -85,7 +105,7 @@ function createClient() {
 const ITEM_HEIGHT = 40
 const ITEM_HEIGHT_PX = `${ITEM_HEIGHT}px`
 
-function Home() {
+function Home(props: { softwareKeyboardShown: boolean }) {
 	const { client, items } = createClient()
 
 	const sortedList = () => {
@@ -131,73 +151,96 @@ function Home() {
 
 	const ids = () => activeList().map(({ id }) => id)
 
+	const [scrollRef, setScrollRef] = createSignal<HTMLElement | null>(null)
+
+	onMount(() => {
+		let prevHeight = scrollRef()!.clientHeight
+
+		const resizeObserver = new ResizeObserver((entries) => {
+			const ref = scrollRef()
+			if (!ref) return
+
+			const newHeight = entries[0].contentRect.height
+			ref.scrollTo({ top: ref.scrollTop + prevHeight - newHeight, behavior: "instant" })
+			prevHeight = newHeight
+		})
+
+		resizeObserver.observe(scrollRef()!)
+
+		onCleanup(() => resizeObserver.disconnect())
+	})
+
 	return (
-		<div class="text-lg mb-24">
-			<ConnectionWarning />
+		<>
+			<div style={props.softwareKeyboardShown ? { display: "none" } : {}}>
+				<ConnectionWarning />
+			</div>
 
-			<DragDropProvider onDragStart={onDragStart} onDragEnd={onDragEnd} collisionDetector={closestCenter}>
-				<DragDropSensors />
+			<div ref={setScrollRef} class="text-lg flex-1 overflow-auto">
+				<DragDropProvider onDragStart={onDragStart} onDragEnd={onDragEnd} collisionDetector={closestCenter}>
+					<DragDropSensors />
 
-				<ul class="flex flex-col">
-					<SortableProvider ids={ids()}>
-						<RowAnimator>
-							<For each={activeList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
-						</RowAnimator>
-					</SortableProvider>
-				</ul>
+					<ul class="flex flex-col">
+						<SortableProvider ids={ids()}>
+							<RowAnimator>
+								<For each={activeList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
+							</RowAnimator>
+						</SortableProvider>
+					</ul>
 
-				<Presence>
-					<DragOverlay>
-						<Motion.div
-							exit={{ opacity: 0 }}
-							style={{ height: ITEM_HEIGHT_PX, "padding-left": ITEM_HEIGHT_PX }}
-							class="flex items-center shadow-md bg-color1 border-color6 text-color12 text-lg border-[0.5px] rounded-lg"
-						>
-							{activeItem()?.name}
+					<Presence>
+						<DragOverlay>
+							<Motion.div
+								exit={{ opacity: 0 }}
+								style={{ height: ITEM_HEIGHT_PX, "padding-left": ITEM_HEIGHT_PX }}
+								class="flex items-center shadow-md bg-color1 border-color6 text-color12 text-lg border-[0.5px] rounded-lg"
+							>
+								{activeItem()?.name}
+							</Motion.div>
+						</DragOverlay>
+					</Presence>
+				</DragDropProvider>
+
+				<Presence initial={false}>
+					<Show when={checkedList().length > 0}>
+						<Motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.5 }} exit={{ opacity: 0 }}>
+							<div class="mt-4 mb-2 mx-2 flex justify-between">
+								<button class="flex items-center overflow-hidden" onClick={() => setShowChecked((v) => !v)}>
+									<IconCaretRight
+										class={`transition-transform duration-300 ${showChecked() ? "rotate-90" : "rotate-0"}`}
+									/>
+
+									<h2 class="ml-1">
+										{checkedList().length === 1 ? "1 ticked item" : `${checkedList().length} ticked items`}
+									</h2>
+								</button>
+
+								<button class="px-3 py-1" onClick={() => void client.clearCheckedItems()}>
+									Clear all
+								</button>
+							</div>
+
+							<Presence exitBeforeEnter>
+								<Show when={showChecked()}>
+									<Motion.ul
+										class="flex flex-col overflow-hidden"
+										initial={{ opacity: 0 }}
+										animate={{ opacity: 1, transition: { duration: 0.5 } }}
+										exit={{ opacity: 0, transition: { duration: 0.2 } }}
+									>
+										<RowAnimator>
+											<For each={checkedList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
+										</RowAnimator>
+									</Motion.ul>
+								</Show>
+							</Presence>
 						</Motion.div>
-					</DragOverlay>
+					</Show>
 				</Presence>
-			</DragDropProvider>
-
-			<Presence initial={false}>
-				<Show when={checkedList().length > 0}>
-					<Motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.5 }} exit={{ opacity: 0 }}>
-						<div class="mt-4 mb-2 mx-2 flex justify-between">
-							<button class="flex items-center overflow-hidden" onClick={() => setShowChecked((v) => !v)}>
-								<IconCaretRight
-									class={`transition-transform duration-300 ${showChecked() ? "rotate-90" : "rotate-0"}`}
-								/>
-
-								<h2 class="ml-1">
-									{checkedList().length === 1 ? "1 ticked item" : `${checkedList().length} ticked items`}
-								</h2>
-							</button>
-
-							<button class="px-3 py-1" onClick={() => void client.clearCheckedItems()}>
-								Clear all
-							</button>
-						</div>
-
-						<Presence exitBeforeEnter>
-							<Show when={showChecked()}>
-								<Motion.ul
-									class="flex flex-col overflow-hidden"
-									initial={{ opacity: 0 }}
-									animate={{ opacity: 1, transition: { duration: 0.5 } }}
-									exit={{ opacity: 0, transition: { duration: 0.2 } }}
-								>
-									<RowAnimator>
-										<For each={checkedList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
-									</RowAnimator>
-								</Motion.ul>
-							</Show>
-						</Presence>
-					</Motion.div>
-				</Show>
-			</Presence>
+			</div>
 
 			<NewItem onCreate={(name) => void client.addItem(name)} />
-		</div>
+		</>
 	)
 }
 
@@ -244,7 +287,7 @@ function NewItem(props: { onCreate: (name: string) => void }) {
 
 	return (
 		<form
-			class="fixed -bottom-1 backdrop-blur bg-color1/40 px-2 pb-5 pt-1 border-t-4 border-opacity-10 border-color7 max-w-lg w-full flex flex-row"
+			class="backdrop-blur bg-color1/40 px-2 pb-5 pt-1 border-t-4 border-opacity-10 border-color7 max-w-lg w-full flex flex-row"
 			onSubmit={(event) => {
 				event.preventDefault()
 				submit()
