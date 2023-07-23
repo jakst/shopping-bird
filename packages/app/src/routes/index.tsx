@@ -55,9 +55,9 @@ export default function Shell() {
 }
 
 function createClient() {
-	const [isConnected, setIsConnected] = createSignal(false)
+	const [connectionStatus, setConnectionStatus] = createSignal({ authenticated: true, connected: true })
 
-	const serverConnection = new BrowserServerConnection((value) => setIsConnected(value))
+	const serverConnection = new BrowserServerConnection((value) => setConnectionStatus(value))
 
 	const initialShoppingListString = localStorage.getItem("main-shopping-list")
 	const initialShoppingList = initialShoppingListString
@@ -99,14 +99,14 @@ function createClient() {
 		else serverConnection.disconnect()
 	})
 
-	return { client, items: list.items }
+	return { connectionStatus, client, items: list.items }
 }
 
 const ITEM_HEIGHT = 40
 const ITEM_HEIGHT_PX = `${ITEM_HEIGHT}px`
 
 function Home(props: { softwareKeyboardShown: boolean }) {
-	const { client, items } = createClient()
+	const { connectionStatus, client, items } = createClient()
 
 	const sortedList = () => {
 		return [...items].sort((a, b) => a.position - b.position)
@@ -173,7 +173,10 @@ function Home(props: { softwareKeyboardShown: boolean }) {
 	return (
 		<>
 			<div style={props.softwareKeyboardShown ? { display: "none" } : {}}>
-				<ConnectionWarning />
+				<ConnectionWarning
+					isAuthenticated={connectionStatus().authenticated}
+					isConnected={connectionStatus().connected}
+				/>
 			</div>
 
 			<div ref={setScrollRef} class="text-lg flex-1 overflow-auto">

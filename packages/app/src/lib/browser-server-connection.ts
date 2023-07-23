@@ -18,11 +18,11 @@ export class BrowserServerConnection implements ClientServerConnection {
 		return this.clientId !== null
 	}
 
-	constructor(private onConnectionStatusChanged: (connected: boolean) => void) {}
+	constructor(private onConnectionStatusChanged: (status: { authenticated: boolean; connected: boolean }) => void) {}
 
 	#onConnectionClosed() {
 		this.clientId = null
-		this.onConnectionStatusChanged(false)
+		this.onConnectionStatusChanged({ authenticated: true, connected: false })
 
 		if (this.#reconnectionInterval) clearInterval(this.#reconnectionInterval)
 		this.#reconnectionInterval = setInterval(() => void this.connect(), 1000)
@@ -43,7 +43,11 @@ export class BrowserServerConnection implements ClientServerConnection {
 				this.clientId = data.clientId
 				this.onListUpdate?.(data)
 
-				this.onConnectionStatusChanged(true)
+				this.onConnectionStatusChanged({
+					authenticated: data.authenticated,
+					connected: true,
+				})
+
 				resolve()
 			}
 
@@ -71,7 +75,14 @@ export class BrowserServerConnection implements ClientServerConnection {
 
 		if (response.ok) {
 			const body = await response.json()
-			return responseMessageSchema.parse(body).shoppingList
+			const { authenticated, shoppingList } = responseMessageSchema.parse(body)
+
+			this.onConnectionStatusChanged({
+				authenticated,
+				connected: this.isConnected,
+			})
+
+			return shoppingList
 		} else {
 			throw new Error(`Pushing events failed: ${response}`)
 		}

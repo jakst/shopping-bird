@@ -70,11 +70,13 @@ export type ShoppingListEvent = z.infer<typeof eventSchema>
 export const eventListSchema = z.array(eventSchema)
 
 export const responseMessageSchema = z.object({
+	authenticated: z.boolean(),
 	shoppingList: shoppingListSchema,
 })
 
 export const updateMessageSchema = z.object({
 	clientId: z.string(),
+	authenticated: z.boolean(),
 	shoppingList: shoppingListSchema,
 })
 

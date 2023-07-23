@@ -21,7 +21,7 @@ export class Server {
 	syncMode: SyncMode = "inactive"
 	syncInterval!: ReturnType<typeof setInterval>
 
-	constructor(private $d: ServerDeps) {
+	constructor(private $d: ServerDeps, public isAuthenticated: boolean) {
 		this.setSyncMode("inactive")
 	}
 
@@ -43,6 +43,7 @@ export class Server {
 
 		client.onListChanged({
 			clientId,
+			authenticated: this.isAuthenticated,
 			shoppingList: this.$d.shoppingList.items,
 		})
 
@@ -74,13 +75,26 @@ export class Server {
 			for (const [currentClientId, client] of this.clients.entries()) {
 				if (clientId !== currentClientId)
 					client.onListChanged({
-						shoppingList: this.$d.shoppingList.items,
 						clientId: currentClientId,
+						authenticated: this.isAuthenticated,
+						shoppingList: this.$d.shoppingList.items,
 					})
 			}
 		}
 
 		return this.$d.shoppingList.items
+	}
+
+	changeAuthState(isAuthenticated: boolean) {
+		this.isAuthenticated = isAuthenticated
+
+		for (const [clientId, client] of this.clients.entries()) {
+			client.onListChanged({
+				clientId,
+				authenticated: isAuthenticated,
+				shoppingList: this.$d.shoppingList.items,
+			})
+		}
 	}
 
 	async refreshDataFromExternalClient() {

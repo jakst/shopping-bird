@@ -40,19 +40,18 @@ export class TheShoppingBird {
 				state.storage.put("server-shopping-list", v)
 			})
 
-			this.server = new Server({
-				shoppingList,
-				onSyncRequest: async (items) => {
-					await this.state.storage.put("dirty", true)
-					await this.runBot()
-				},
-			})
-		})
+			const isAuthenticated = await this.getAuthState()
 
-		this.app.get("/", async (c) => {
-			return c.json({
-				authenticated: (await this.state.storage.get<boolean>("authenticated")) ?? false,
-			})
+			this.server = new Server(
+				{
+					shoppingList,
+					onSyncRequest: async (items) => {
+						await this.state.storage.put("dirty", true)
+						await this.runBot()
+					},
+				},
+				isAuthenticated,
+			)
 		})
 
 		this.app.get("/export", async (c) => c.json((await this.state.storage.get("server-shopping-list")) ?? []))
@@ -71,7 +70,13 @@ export class TheShoppingBird {
 
 			const shoppingList = this.server!.pushEvents(parsedBody.data.events, parsedBody.data.clientId)
 
-			return c.json({ shoppingList }, { headers: { "Access-Control-Allow-Origin": "*" } })
+			return c.json(
+				{
+					authenticated: await this.getAuthState(),
+					shoppingList,
+				},
+				{ headers: { "Access-Control-Allow-Origin": "*" } },
+			)
 		})
 
 		this.app.post("/cookies", async (c) => {
@@ -79,7 +84,7 @@ export class TheShoppingBird {
 			if (!parsedBody.success) return c.json(parsedBody.error, { status: 400 })
 
 			await this.state.storage.put<Cookie[]>("cookies", parsedBody.data)
-			await this.state.storage.put("authenticated", true)
+			await this.setAuthState(true)
 
 			return c.body(null)
 		})
@@ -115,6 +120,15 @@ export class TheShoppingBird {
 		const res = await this.app.fetch(request)
 		res.headers.set("Access-Control-Allow-Origin", "*")
 		return res
+	}
+
+	async getAuthState() {
+		return (await this.state.storage.get<boolean>("authenticated")) ?? false
+	}
+
+	async setAuthState(authenticated: boolean) {
+		await this.state.storage.put("authenticated", authenticated)
+		this.server?.changeAuthState(authenticated)
 	}
 
 	async handleSession(webSocket: WebSocket) {
@@ -166,7 +180,7 @@ export class TheShoppingBird {
 			cookies,
 			browser,
 			onAuthFail: async () => {
-				await this.state.storage.put("authenticated", false)
+				await this.setAuthState(false)
 			},
 		})
 
