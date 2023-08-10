@@ -32,15 +32,15 @@ export class BrowserServerConnection implements ClientServerConnection {
 	async connect() {
 		if (this.isConnected) return
 
+		const ws = (this.ws = new WebSocket(env.WS_URL))
+
 		if (!this.#resetConnectionInterval)
 			// Reset connection every 60s to avoid suspect connection drops
 			this.#resetConnectionInterval = setInterval(() => {
 				console.log("Resetting connection")
-				this.clientId = null
+				ws.close()
 				this.connect()
 			}, 1000 * 60)
-
-		const ws = (this.ws = new WebSocket(env.WS_URL))
 
 		ws.onopen = () => {
 			clearInterval(this.#reconnectionInterval!)
