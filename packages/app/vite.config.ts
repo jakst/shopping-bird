@@ -23,7 +23,7 @@ const env = z
 
 export default defineConfig({
 	server: {
-		host: process.env.HOST,
+		host: process.env.HOST ?? "0.0.0.0",
 	},
 	plugins: [
 		solidDevTools({
