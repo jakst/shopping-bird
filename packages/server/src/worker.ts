@@ -71,9 +71,11 @@ export class TheShoppingBird {
 				console.log(`Bot run triggered (${diff / 1000}s since last run)`)
 
 				await this.state.storage.put("botLastRanAt", now)
-				await this.runBot()
+				this.runBot()
+				return c.status(202)
 			} else {
 				console.log(`Bot run ignored (${diff / 1000}s since last run)`)
+				return c.status(429)
 			}
 		})
 
