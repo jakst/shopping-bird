@@ -24,12 +24,15 @@ export function setupTest() {
 		bot: new MockBot(externalList),
 	})
 
-	const server = new Server({
-		shoppingList: serverShoppingList,
-		async onSyncRequest(items) {
-			await externalClient.sync(items)
+	const server = new Server(
+		{
+			shoppingList: serverShoppingList,
+			async onSyncRequest(items) {
+				await externalClient.sync(items)
+			},
 		},
-	})
+		false,
+	)
 
 	externalClient.onEventsReturned = async (events) => {
 		server.pushEvents(events)
