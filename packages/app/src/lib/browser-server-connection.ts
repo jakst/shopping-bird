@@ -13,6 +13,7 @@ export class BrowserServerConnection implements ClientServerConnection {
 	ws: WebSocket | null = null
 	onListUpdate: OnListUpdateCallback | null = null
 	#reconnectionInterval: ReturnType<typeof setInterval> | null = null
+	#resetConnectionInterval: ReturnType<typeof setInterval> | null = null
 
 	get isConnected() {
 		return this.clientId !== null
@@ -30,6 +31,14 @@ export class BrowserServerConnection implements ClientServerConnection {
 
 	async connect() {
 		if (this.isConnected) return
+
+		if (!this.#resetConnectionInterval)
+			// Reset connection every 60s to avoid suspect connection drops
+			this.#resetConnectionInterval = setInterval(() => {
+				console.log("Resetting connection")
+				this.clientId = null
+				this.connect()
+			}, 1000 * 60)
 
 		const ws = (this.ws = new WebSocket(env.WS_URL))
 
@@ -60,6 +69,8 @@ export class BrowserServerConnection implements ClientServerConnection {
 	disconnect() {
 		this.ws?.close()
 		this.#onConnectionClosed()
+
+		if (this.#resetConnectionInterval) clearInterval(this.#resetConnectionInterval)
 	}
 
 	async pushEvents(events: ShoppingListEvent[]) {
