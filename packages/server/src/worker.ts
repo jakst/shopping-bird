@@ -72,11 +72,13 @@ export class TheShoppingBird {
 
 				await this.state.storage.put("botLastRanAt", now)
 				this.runBot()
-				return c.status(202)
+				c.status(202)
 			} else {
 				console.log(`Bot run ignored (${diff / 1000}s since last run)`)
-				return c.status(429)
+				c.status(429)
 			}
+
+			return c.body(null)
 		})
 
 		this.app.get("/export", async (c) => c.json((await this.state.storage.get("server-shopping-list")) ?? []))
