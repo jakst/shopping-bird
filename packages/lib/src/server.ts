@@ -11,29 +11,10 @@ interface ServerDeps {
 	onSyncRequest(items: ShoppingListItem[]): Promise<void>
 }
 
-const ACTIVE_SYNC_INTERVAL = 60 * 1000 // Every minute
-const INACTIVE_SYNC_INTERVAL = 10 * 60 * 1000 // Every ten minutes
-
-type SyncMode = "active" | "inactive"
-
 export class Server {
 	clients = new Map<string, ServerClientConnection>()
-	syncMode: SyncMode = "inactive"
-	syncInterval!: ReturnType<typeof setInterval>
 
-	constructor(private $d: ServerDeps, public isAuthenticated: boolean) {
-		this.setSyncMode("inactive")
-	}
-
-	setSyncMode(mode: SyncMode) {
-		if (this.syncMode === mode && this.syncInterval) return
-
-		if (this.syncInterval) clearInterval(this.syncInterval)
-		this.syncInterval = setInterval(
-			() => void this.refreshDataFromExternalClient(),
-			mode === "active" ? ACTIVE_SYNC_INTERVAL : INACTIVE_SYNC_INTERVAL,
-		)
-	}
+	constructor(private $d: ServerDeps, public isAuthenticated: boolean) {}
 
 	connectClient(client: ServerClientConnection) {
 		const clientId = createId()
@@ -47,7 +28,6 @@ export class Server {
 			shoppingList: this.$d.shoppingList.items,
 		})
 
-		this.setSyncMode("active")
 		this.refreshDataFromExternalClient()
 
 		return clientId
@@ -55,8 +35,6 @@ export class Server {
 
 	onClientDisconnected(clientId: string) {
 		this.clients.delete(clientId)
-
-		if (this.clients.size === 0) this.setSyncMode("inactive")
 
 		console.log(`[SERVER] ${this.clients.size} client(s) (${clientId} disconnected)`)
 	}
