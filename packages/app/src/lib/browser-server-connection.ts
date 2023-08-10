@@ -38,7 +38,8 @@ export class BrowserServerConnection implements ClientServerConnection {
 			// Reset connection every 60s to avoid suspect connection drops
 			this.#resetConnectionInterval = setInterval(() => {
 				console.log("Resetting connection")
-				ws.dispatchEvent(new Event("close"))
+				ws.close()
+				this.clientId = null
 				this.connect()
 			}, 1000 * 60)
 
