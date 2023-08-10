@@ -7,6 +7,9 @@ browser = { binding = "BROWSER", type = "browser" }
 [durable_objects]
 bindings = [{ name = "DO", class_name = "TheShoppingBird" }]
 
+[triggers]
+crons = ["*/10 * * * *"] # Every 10 minutes
+
 [[migrations]]
 tag = "v1"
 new_classes = ["TheShoppingBird"]

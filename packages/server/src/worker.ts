@@ -14,6 +14,11 @@ import { Env } from "./Env"
 import { createGoogleBot } from "./google-bot/google-bot"
 
 export default {
+	async scheduled(controller, env, ctx) {
+		const durableObjectId = env.DO.idFromName(env.ENV_DISCRIMINATOR ?? "dev")
+		const durableObjectStub = env.DO.get(durableObjectId)
+		await durableObjectStub.fetch(new Request("https://www.does-not.matter/runBot"))
+	},
 	async fetch(req, env, ctx) {
 		const durableObjectId = env.DO.idFromName(env.ENV_DISCRIMINATOR ?? "dev")
 		const durableObjectStub = env.DO.get(durableObjectId)
@@ -22,6 +27,9 @@ export default {
 } satisfies ExportedHandler<Env>
 
 type Cookie = Awaited<ReturnType<Page["cookies"]>>[number]
+
+// Run the bot max every 30s
+const BOT_RUN_INTERVAL = 1000 * 30
 
 export class TheShoppingBird {
 	sessions = new Map<WebSocket, string>()
@@ -52,6 +60,21 @@ export class TheShoppingBird {
 				},
 				isAuthenticated,
 			)
+		})
+
+		this.app.get("/runBot", async (c) => {
+			const now = Date.now()
+			const botLastRanAt = (await this.state.storage.get<number>("botLastRanAt")) ?? 0
+			const diff = now - botLastRanAt
+
+			if (diff > BOT_RUN_INTERVAL) {
+				console.log(`Bot run triggered (${diff / 1000}s since last run)`)
+
+				await this.state.storage.put("botLastRanAt", now)
+				await this.runBot()
+			} else {
+				console.log(`Bot run ignored (${diff / 1000}s since last run)`)
+			}
 		})
 
 		this.app.get("/export", async (c) => c.json((await this.state.storage.get("server-shopping-list")) ?? []))
@@ -142,6 +165,8 @@ export class TheShoppingBird {
 
 		const clientId = this.server.connectClient({ onListChanged })
 		this.sessions.set(webSocket, clientId)
+
+		this.runBot()
 	}
 
 	onCloseOrError(webSocket: WebSocket) {
