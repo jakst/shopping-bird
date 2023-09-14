@@ -210,6 +210,18 @@ export class TheShoppingBird {
 			browser,
 			onAuthFail: async () => {
 				await this.setAuthState(false)
+				await fetch("https://api.pushbullet.com/v2/pushes", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						"Access-Token": this.env.PUSHBULLET_AUTH_TOKEN,
+					},
+					body: JSON.stringify({
+						type: "note",
+						title: "Hello Admin!",
+						body: "You need to re-authenticate the Shopping Bird bot",
+					}),
+				})
 			},
 		})
 
