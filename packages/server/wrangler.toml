@@ -5,6 +5,8 @@ compatibility_date = "2023-05-15"
 logpush = true
 browser = { binding = "BROWSER", type = "browser" }
 
+vars = { ENV_DISCRIMINATOR = "prod" }
+
 [durable_objects]
 bindings = [{ name = "DO", class_name = "TheShoppingBird" }]
 
