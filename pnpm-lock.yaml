@@ -191,8 +191,8 @@ importers:
   packages/server:
     dependencies:
       '@cloudflare/puppeteer':
-        specifier: 0.0.2-alpha
-        version: 0.0.2-alpha
+        specifier: ^0.0.5
+        version: 0.0.5
       '@effect/data':
         specifier: 0.12.10
         version: 0.12.10
@@ -2378,8 +2378,8 @@ packages:
       mime: 3.0.0
     dev: true
 
-  /@cloudflare/puppeteer@0.0.2-alpha:
-    resolution: {integrity: sha512-TIMKvtPdyctv/GK405a6LgkJ/bSkT4MAJAHhR3cpmhfxh7Ohti9GDgusdyycAcYASQIWDmucQunMYQwEh81iwg==}
+  /@cloudflare/puppeteer@0.0.5:
+    resolution: {integrity: sha512-K+DLUmDVSM5UNzFokSqie0LPIFAPvdkLKHWnx8Gmck/M41387aCyLlUjWIeUGV3QifSRwaxTRfeMpELQW0lDZg==}
     engines: {node: '>=14.1.0'}
     dependencies:
       debug: 4.3.4
