@@ -2,6 +2,7 @@ name = "shopping-bird"
 main = "src/worker.ts"
 compatibility_date = "2023-05-15"
 
+logpush = true
 browser = { binding = "BROWSER", type = "browser" }
 
 [durable_objects]
