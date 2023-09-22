@@ -34,7 +34,6 @@ const BOT_RUN_INTERVAL = 1000 * 30
 export class TheShoppingBird {
 	sessions = new Map<WebSocket, string>()
 	server: Server | undefined
-	browser: puppeteer.Browser | undefined
 	botRunning = false
 	app = new Hono<{ Bindings: Env }>()
 
@@ -188,7 +187,7 @@ export class TheShoppingBird {
 		this.onCloseOrError(webSocket)
 	}
 
-	async runBot() {
+	async runBot(reusedBrowser?: puppeteer.Browser) {
 		if (this.botRunning) {
 			console.log("BOT already running")
 			return
@@ -197,58 +196,62 @@ export class TheShoppingBird {
 		console.log("BOT starting")
 
 		this.botRunning = true
-		await this.state.storage.put("dirty", false)
+		let browser = reusedBrowser
 
-		const initialStore: ShoppingListItem[] = (await this.state.storage.get("google-list")) ?? []
+		try {
+			await this.state.storage.put("dirty", false)
 
-		const cookies = (await this.state.storage.get<Cookie[]>("cookies")) ?? []
+			const initialStore: ShoppingListItem[] = (await this.state.storage.get("google-list")) ?? []
 
-		const browser = (this.browser ??= await puppeteer.launch(this.env.BROWSER))
+			const cookies = (await this.state.storage.get<Cookie[]>("cookies")) ?? []
 
-		const { bot, page } = await createGoogleBot({
-			cookies,
-			browser,
-			onAuthFail: async () => {
-				await this.setAuthState(false)
-				await fetch("https://api.pushbullet.com/v2/pushes", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-						"Access-Token": this.env.PUSHBULLET_AUTH_TOKEN,
-					},
-					body: JSON.stringify({
-						type: "note",
-						title: "Hello Admin!",
-						body: "You need to re-authenticate the Shopping Bird bot",
-					}),
-				})
-			},
-		})
+			browser ??= await puppeteer.launch(this.env.BROWSER)
 
-		const client = new ExternalClient({
-			bot,
-			initialStore,
-			onStoreChanged: async (list) => {
-				await this.state.storage.put("google-list", list)
-			},
-		})
+			const { bot, page } = await createGoogleBot({
+				cookies,
+				browser,
+				onAuthFail: async () => {
+					await this.setAuthState(false)
+					await fetch("https://api.pushbullet.com/v2/pushes", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							"Access-Token": this.env.PUSHBULLET_AUTH_TOKEN,
+						},
+						body: JSON.stringify({
+							type: "note",
+							title: "Hello Admin!",
+							body: "You need to re-authenticate the Shopping Bird bot",
+						}),
+					})
+				},
+			})
 
-		client.onEventsReturned = async (events) => {
-			this.server!.pushEvents(events)
-		}
+			const client = new ExternalClient({
+				bot,
+				initialStore,
+				onStoreChanged: async (list) => {
+					await this.state.storage.put("google-list", list)
+				},
+			})
 
-		const data: ShoppingListItem[] = (await this.state.storage.get("server-shopping-list")) ?? []
+			client.onEventsReturned = async (events) => {
+				this.server!.pushEvents(events)
+			}
 
-		await client.sync(data)
+			const data: ShoppingListItem[] = (await this.state.storage.get("server-shopping-list")) ?? []
 
-		await page.close()
+			await client.sync(data)
 
-		const isDirty = await this.state.storage.get("dirty")
-		this.botRunning = false
+			await page.close()
+		} finally {
+			const isDirty = await this.state.storage.get("dirty")
+			this.botRunning = false
 
-		if (isDirty) {
-			console.log("BOT is dirty, running again")
-			await this.runBot()
+			if (isDirty) {
+				console.log("BOT is dirty, running again")
+				await this.runBot(browser)
+			}
 		}
 	}
 }
