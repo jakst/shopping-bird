@@ -71,7 +71,7 @@ export class TheShoppingBird {
 				console.log(`Bot run triggered (${diff / 1000}s since last run)`)
 
 				await this.state.storage.put("botLastRanAt", now)
-				this.runBot()
+				this.runBot().catch((e) => console.error(e))
 				c.status(202)
 			} else {
 				console.log(`Bot run ignored (${diff / 1000}s since last run)`)
@@ -170,7 +170,7 @@ export class TheShoppingBird {
 		const clientId = this.server.connectClient({ onListChanged })
 		this.sessions.set(webSocket, clientId)
 
-		this.runBot()
+		this.runBot().catch((e) => console.error(e))
 	}
 
 	onCloseOrError(webSocket: WebSocket) {
