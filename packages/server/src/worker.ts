@@ -93,6 +93,8 @@ class AShoppingBird {
 
 				const tracer = trace.getTracer("runBot")
 				tracer.startActiveSpan("runBot", (span) => {
+					span.setAttribute("trigger", c.req.url.includes("www.does-not.matter") ? "scheduled" : "manual")
+					span.setAttribute("botLastRanAt", botLastRanAt)
 					this.runBot()
 						.then(() => {
 							span.end()
@@ -203,6 +205,8 @@ class AShoppingBird {
 
 		const tracer = trace.getTracer("runBot")
 		tracer.startActiveSpan("runBot", (span) => {
+			span.setAttribute("trigger", "new-connection")
+
 			this.runBot()
 				.then(() => {
 					span.end()
