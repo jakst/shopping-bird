@@ -15,6 +15,8 @@
 		"@cloudflare/puppeteer": "^0.0.5",
 		"@effect/data": "0.12.10",
 		"@effect/io": "0.27.2",
+		"@microlabs/otel-cf-workers": "1.0.0-rc.14",
+		"@opentelemetry/api": "^1.6.0",
 		"hono": "^3.6.0",
 		"lib": "workspace:^",
 		"zod": "^3.21.4"

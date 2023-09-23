@@ -1,4 +1,6 @@
 import puppeteer, { Page } from "@cloudflare/puppeteer"
+import { instrument, instrumentDO } from "@microlabs/otel-cf-workers"
+import { trace } from "@opentelemetry/api"
 import { Hono } from "hono"
 import {
 	ExternalClient,
@@ -13,25 +15,43 @@ import { z } from "zod"
 import { Env } from "./Env"
 import { createGoogleBot } from "./google-bot/google-bot"
 
-export default {
-	async scheduled(controller, env, ctx) {
-		const durableObjectId = env.DO.idFromName(env.ENV_DISCRIMINATOR ?? "dev")
-		const durableObjectStub = env.DO.get(durableObjectId)
-		await durableObjectStub.fetch(new Request("https://www.does-not.matter/runBot"))
+const handler = instrument<Env, unknown, unknown>(
+	{
+		async scheduled(controller, env, ctx) {
+			const durableObjectId = env.DO.idFromName(env.ENV_DISCRIMINATOR ?? "dev")
+			const durableObjectStub = env.DO.get(durableObjectId)
+			await durableObjectStub.fetch(new Request("https://www.does-not.matter/runBot"))
+		},
+		async fetch(req: Request, env, ctx) {
+			const durableObjectId = env.DO.idFromName(env.ENV_DISCRIMINATOR ?? "dev")
+			const durableObjectStub = env.DO.get(durableObjectId)
+			return await durableObjectStub.fetch(req)
+		},
 	},
-	async fetch(req, env, ctx) {
-		const durableObjectId = env.DO.idFromName(env.ENV_DISCRIMINATOR ?? "dev")
-		const durableObjectStub = env.DO.get(durableObjectId)
-		return durableObjectStub.fetch(req)
+	(env: Env, _triggger) => {
+		return {
+			exporter: {
+				url: `${env.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/traces`,
+
+				headers: {
+					authorization: env.HYPERDX_API_KEY,
+				},
+			},
+			service: {
+				name: `${env.ENV_DISCRIMINATOR}-${env.OTEL_SERVICE_NAME}`,
+			},
+		}
 	},
-} satisfies ExportedHandler<Env>
+)
+
+export default handler
 
 type Cookie = Awaited<ReturnType<Page["cookies"]>>[number]
 
 // Run the bot max every 30s
 const BOT_RUN_INTERVAL = 1000 * 30
 
-export class TheShoppingBird {
+class AShoppingBird {
 	sessions = new Map<WebSocket, string>()
 	server: Server | undefined
 	botRunning = false
@@ -70,7 +90,19 @@ export class TheShoppingBird {
 				console.log(`Bot run triggered (${diff / 1000}s since last run)`)
 
 				await this.state.storage.put("botLastRanAt", now)
-				this.runBot().catch((e) => console.error(e))
+
+				const tracer = trace.getTracer("runBot")
+				tracer.startActiveSpan("runBot", (span) => {
+					this.runBot()
+						.then(() => {
+							span.end()
+						})
+						.catch((e) => {
+							span.recordException(e)
+							span.end()
+							console.error(e)
+						})
+				})
 				c.status(202)
 			} else {
 				console.log(`Bot run ignored (${diff / 1000}s since last run)`)
@@ -169,7 +201,18 @@ export class TheShoppingBird {
 		const clientId = this.server.connectClient({ onListChanged })
 		this.sessions.set(webSocket, clientId)
 
-		this.runBot().catch((e) => console.error(e))
+		const tracer = trace.getTracer("runBot")
+		tracer.startActiveSpan("runBot", (span) => {
+			this.runBot()
+				.then(() => {
+					span.end()
+				})
+				.catch((e) => {
+					span.recordException(e)
+					span.end()
+					console.error(e)
+				})
+		})
 	}
 
 	onCloseOrError(webSocket: WebSocket) {
@@ -255,3 +298,19 @@ export class TheShoppingBird {
 		}
 	}
 }
+
+// @ts-expect-error instrumentDO expects AShoppingBird to be implement
+// the webSocketMessage handler. We don't need it, so let's just ignore it.
+export const TheShoppingBird = instrumentDO(AShoppingBird, (env: Env, _triggger) => {
+	return {
+		exporter: {
+			url: `${env.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/traces`,
+			headers: {
+				authorization: env.HYPERDX_API_KEY,
+			},
+		},
+		service: {
+			name: `${env.ENV_DISCRIMINATOR}-${env.OTEL_SERVICE_NAME}-DO`,
+		},
+	}
+})

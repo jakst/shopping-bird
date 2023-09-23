@@ -29,7 +29,8 @@
 	"pnpm": {
 		"patchedDependencies": {
 			"@motionone/solid@10.16.2": "patches/@motionone__solid@10.16.2.patch",
-			"solid-start@0.2.26": "patches/solid-start@0.2.26.patch"
+			"solid-start@0.2.26": "patches/solid-start@0.2.26.patch",
+			"@microlabs/otel-cf-workers@1.0.0-rc.14": "patches/@microlabs__otel-cf-workers@1.0.0-rc.14.patch"
 		}
 	}
 }

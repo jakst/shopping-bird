@@ -7,7 +7,7 @@ compatibility_flags = ["nodejs_compat"]
 logpush = true
 browser = { binding = "BROWSER", type = "browser" }
 
-vars = { ENV_DISCRIMINATOR = "prod" }
+vars = { ENV_DISCRIMINATOR = "prod", OTEL_SERVICE_NAME = "shopping-bird", OTEL_EXPORTER_OTLP_ENDPOINT = "https://in-otel.hyperdx.io" }
 
 [durable_objects]
 bindings = [{ name = "DO", class_name = "TheShoppingBird" }]
