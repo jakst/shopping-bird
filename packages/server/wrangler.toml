@@ -13,8 +13,8 @@ vars = { ENV_DISCRIMINATOR = "prod" }
 bindings = [{ name = "DO", class_name = "TheShoppingBird" }]
 
 [triggers]
-# Every 3 minutes between 04:00 and 21:00 UTC (i.e. 06:00 and 23:00 GMT+2 )
-crons = ["*/3 4-21 * * *"]
+# Every 15 minutes between 04:00 and 21:00 UTC (i.e. 06:00 and 23:00 GMT+2 )
+crons = ["*/15 4-21 * * *"]
 
 [[migrations]]
 tag = "v1"
