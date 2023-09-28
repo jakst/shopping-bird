@@ -1,8 +1,5 @@
 import { ElementHandle, Page } from "@cloudflare/puppeteer"
-import * as Duration from "@effect/data/Duration"
-import { pipe } from "@effect/data/Function"
-import * as Effect from "@effect/io/Effect"
-import * as Schedule from "@effect/io/Schedule"
+import { Duration, Effect, Schedule, pipe } from "effect"
 import { PageDep } from "./PageDep"
 import { refreshPage } from "./refreshPage"
 
@@ -15,7 +12,10 @@ class DeleteItemError {
 }
 
 function sleepWithSpan(duration: Duration.Duration) {
-	return pipe(Effect.sleep(duration), Effect.withSpan("sleep", { attributes: { duration: `${duration.millis} ms` } }))
+	return pipe(
+		Effect.sleep(duration),
+		Effect.withSpan("sleep", { attributes: { duration: `${Duration.toMillis(duration)} ms` } }),
+	)
 }
 
 function retryPolicyWithSideEffect<R>(logName: string, retries: number, fn: Effect.Effect<R, never, void>) {
@@ -24,7 +24,7 @@ function retryPolicyWithSideEffect<R>(logName: string, retries: number, fn: Effe
 		Schedule.addDelay(() => Duration.seconds(1)),
 		Schedule.tapOutput((iteration) =>
 			iteration < retries
-				? Effect.all(Effect.logWarning(`[BOT] ${logName} failed. Retry #${iteration + 1}`), fn)
+				? Effect.all([Effect.logWarning(`[BOT] ${logName} failed. Retry #${iteration + 1}`), fn])
 				: Effect.logWarning(`[BOT] ${logName} failed. No more retries.`),
 		),
 	)
@@ -63,10 +63,10 @@ export function removeItemAtPosition(position: number) {
 			pipe(
 				Effect.logDebug(`[BOT] Looking for item at position ${position}`),
 				Effect.flatMap(() =>
-					Effect.tryCatchPromise(
-						() => locateItem(page, position),
-						() => new LocateItemError(),
-					),
+					Effect.tryPromise({
+						try: () => locateItem(page, position),
+						catch: () => new LocateItemError(),
+					}),
 				),
 				Effect.withSpan("locateItemAttempt"),
 				Effect.retry(retryPolicyWithSideEffect("locateItem", 2, refreshPage)),
@@ -76,10 +76,10 @@ export function removeItemAtPosition(position: number) {
 					pipe(
 						Effect.logInfo(`[BOT] Deleting item '${nameDisplay.name}' at position ${position}`),
 						Effect.flatMap(() =>
-							Effect.tryCatchPromise(
-								() => deleteItem(page, nameDisplay.element),
-								() => new DeleteItemError(),
-							),
+							Effect.tryPromise({
+								try: () => deleteItem(page, nameDisplay.element),
+								catch: () => new DeleteItemError(),
+							}),
 						),
 						Effect.withSpan("deleteItem", { attributes: { itemName: nameDisplay.name } }),
 					),

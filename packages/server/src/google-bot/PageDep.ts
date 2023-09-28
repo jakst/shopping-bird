@@ -1,4 +1,4 @@
 import { Page } from "@cloudflare/puppeteer"
-import * as Context from "@effect/data/Context"
+import { Context } from "effect"
 
 export const PageDep = Context.Tag<Page>()

@@ -2,10 +2,7 @@
 /// <reference lib="dom" />
 
 import puppeteer, { ElementHandle, Page } from "@cloudflare/puppeteer"
-import { pipe } from "@effect/data/Function"
-import * as Effect from "@effect/io/Effect"
-import * as Logger from "@effect/io/Logger"
-import * as LoggerLevel from "@effect/io/Logger/Level"
+import { Effect, LogLevel, Logger, pipe } from "effect"
 import { trimAndUppercase, type Bot } from "lib"
 import { PageDep } from "./PageDep"
 import { removeItemAtPosition } from "./removeItemAtPosition"
@@ -73,7 +70,7 @@ export async function createGoogleBot({ onAuthFail, browser, cookies }: CreateGo
 			const program = pipe(
 				removeItemAtPosition(index),
 				Effect.provideService(PageDep, PageDep.of(page)),
-				Logger.withMinimumLogLevel(LoggerLevel.Debug),
+				Logger.withMinimumLogLevel(LogLevel.Debug),
 			)
 			await Effect.runPromise(program)
 		},
