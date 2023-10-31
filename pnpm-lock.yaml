@@ -155,6 +155,12 @@ importers:
       '@effect/io':
         specifier: 0.27.2
         version: 0.27.2
+      '@effect/opentelemetry':
+        specifier: 0.1.1
+        version: 0.1.1
+      '@opentelemetry/exporter-trace-otlp-http':
+        specifier: ^0.41.0
+        version: 0.41.0(@opentelemetry/api@1.4.1)
       hono:
         specifier: ^3.3.0
         version: 3.3.0
@@ -1538,6 +1544,16 @@ packages:
     resolution: {integrity: sha512-J9s+v2JyGUKzxG5I6v1/X5v+I/e9dST4Afk3y6ZYBEXzU3Slo+3ZDf7XlazicS7koAoTEnvJ6zt79aM4LLkoWA==}
     dependencies:
       '@effect/data': 0.12.10
+    dev: false
+
+  /@effect/opentelemetry@0.1.1:
+    resolution: {integrity: sha512-hW2vz2qfPK01Ii9rM8T7XzjRTBsYDPJWzVq+dsfyyHElYq5dE2nIylbjWvliCU4iNf8Dgu2q5+Fgn5ILKpBGVg==}
+    dependencies:
+      '@effect/data': 0.12.10
+      '@effect/io': 0.27.2
+      '@opentelemetry/api': 1.4.1
+      '@opentelemetry/resources': 1.15.0(patch_hash=pw7uhhbehk4scv3t2eb5j2ypsm)(@opentelemetry/api@1.4.1)
+      '@opentelemetry/semantic-conventions': 1.15.0
     dev: false
 
   /@esbuild-plugins/node-globals-polyfill@0.1.1(esbuild@0.16.3):

@@ -70,12 +70,15 @@ export async function createGoogleBot({ env, onAuthFail }: CreateGoogleBotDeps) 
 			if (checked) await setItemCheckedAtPosition(page, 0, true)
 		},
 		async DELETE_ITEM(index) {
+			// const { close, runPromise } = await makeCustomRuntime(TracingLive)
 			const program = pipe(
 				removeItemAtPosition(index),
 				Effect.provideService(PageDep, PageDep.of(page)),
 				Logger.withMinimumLogLevel(LoggerLevel.Debug),
 			)
 			await Effect.runPromise(program)
+			// await runPromise(program)
+			// await close()
 		},
 		async SET_ITEM_CHECKED(index, value) {
 			await setItemCheckedAtPosition(page, index, value)
