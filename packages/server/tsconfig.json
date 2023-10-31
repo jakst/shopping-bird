@@ -8,7 +8,7 @@
 
 		"lib": ["ESNext"],
 		"moduleResolution": "node",
-		"types": ["@cloudflare/workers-types"],
+		"types": ["@cloudflare/workers-types", "bun-types"],
 		"isolatedModules": true
 	}
 }
