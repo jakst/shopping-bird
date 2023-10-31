@@ -15,8 +15,12 @@
 		"@cloudflare/puppeteer": "0.0.2-alpha",
 		"@effect/data": "0.12.10",
 		"@effect/io": "0.27.2",
+		"@effect/opentelemetry": "^0.1.1",
+		"@opentelemetry/exporter-trace-otlp-http": "^0.41.2",
+		"@opentelemetry/sdk-node": "^0.41.2",
 		"hono": "^3.3.0",
 		"lib": "workspace:^",
+		"opentelemetry-sdk-workers": "^0.6.2",
 		"zod": "^3.21.4"
 	}
 }

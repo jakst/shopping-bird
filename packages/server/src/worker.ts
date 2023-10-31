@@ -9,6 +9,7 @@ import {
 	eventsMessageSchema,
 	shoppingListItemSchema,
 } from "lib"
+import "opentelemetry-sdk-workers/performance"
 import { z } from "zod"
 import { Env } from "./Env"
 import { createGoogleBot } from "./google-bot/google-bot"
@@ -29,6 +30,7 @@ export class TheShoppingBird {
 	browser: puppeteer.Browser | undefined
 	botRunning = false
 	app = new Hono<{ Bindings: Env }>()
+	logs: any[] = []
 
 	constructor(private state: DurableObjectState, private env: Env) {
 		state.blockConcurrencyWhile(async () => {
@@ -53,6 +55,32 @@ export class TheShoppingBird {
 				isAuthenticated,
 			)
 		})
+
+		this.app.get("/logs", async (c) => c.text(JSON.stringify(this.logs, null, 2)))
+
+		this.app.post("/logs", async (c) => {
+			const body = await c.req.json()
+			const headers: Record<string, any> = {}
+
+			c.req.headers.forEach((v, k) => (headers[k] = v))
+
+			this.logs.push({ body, headers })
+			return c.body(null)
+		})
+
+		// this.app.get("/lol", async (c) => {
+		// 	// const { close, runPromise } = await makeCustomRuntime(TracingLive)
+		// 	// const program = pipe(
+		// 	// 	Effect.sync(() => console.log("lol")),
+		// 	// 	Effect.withSpan("lol"),
+		// 	// 	Logger.withMinimumLogLevel(LoggerLevel.Debug),
+		// 	// )
+		// 	// await runPromise(program)
+		// 	// await close()
+		// 	const sdk = new WorkersSDK(c.req, c, { service: "worker", traceExporter })
+
+		// 	return sdk.sendResponse(new Response("Hello World!"))
+		// })
 
 		this.app.get("/export", async (c) => c.json((await this.state.storage.get("server-shopping-list")) ?? []))
 		this.app.post("/import", async (c) => {
