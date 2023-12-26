@@ -1,9 +1,6 @@
-import { config } from "dotenv"
 import puppeteer from "puppeteer-extra"
 import StealthPlugin from "puppeteer-extra-plugin-stealth"
 import { z } from "zod"
-
-config()
 
 function pause(n: number) {
 	return new Promise((resolve) => setTimeout(resolve, n))
