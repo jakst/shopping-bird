@@ -3,7 +3,7 @@ import {
 	type ClientServerConnectionDeps,
 	type OnListUpdateCallback,
 } from "../client-server-connection"
-import { UpdateMessage, type ShoppingListEvent } from "../schemas"
+import { type ShoppingListEvent, type UpdateMessage } from "../schemas"
 import { type ServerClientConnection } from "../server"
 import { pause } from "./pause"
 

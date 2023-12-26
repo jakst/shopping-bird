@@ -40,7 +40,7 @@ module.exports = {
 		"plugin:@typescript-eslint/recommended-requiring-type-checking",
 	],
 	parser: "@typescript-eslint/parser",
-	plugins: ["@typescript-eslint"],
+	plugins: ["@typescript-eslint", "biome"],
 	root: true,
 	parserOptions: {
 		tsconfigRootDir: ".",

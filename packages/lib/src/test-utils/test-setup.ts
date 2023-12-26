@@ -1,7 +1,7 @@
 import { expect } from "vitest"
 import { Client } from "../client"
 import { EventQueue } from "../event-queue"
-import { ExternalClient, ExternalListItem } from "../external-client"
+import { ExternalClient, type ExternalListItem } from "../external-client"
 import { type ShoppingListEvent } from "../lib"
 import { type ShoppingListItem } from "../schemas"
 import { Server } from "../server"

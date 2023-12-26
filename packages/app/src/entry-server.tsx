@@ -1,4 +1,4 @@
-import { createHandler, renderAsync, StartServer } from "solid-start/entry-server"
+import { StartServer, createHandler, renderAsync } from "solid-start/entry-server"
 import { createAuthMiddleware } from "./lib/auth/middleware"
 
 export default createHandler(

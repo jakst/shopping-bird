@@ -1,4 +1,4 @@
-import { ExternalListItem, type Bot } from "../external-client"
+import { type Bot, type ExternalListItem } from "../external-client"
 import { pause } from "./pause"
 
 export class MockBot implements Bot {

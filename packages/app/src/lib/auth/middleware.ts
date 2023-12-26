@@ -1,5 +1,5 @@
 import { getSession } from "@auth/solid-start"
-import { redirect, type FetchEvent } from "solid-start"
+import { type FetchEvent, redirect } from "solid-start"
 import { type MiddlewareInput } from "solid-start/entry-server"
 import { authOptions } from "./options"
 

@@ -3,14 +3,14 @@ import { useConnectivitySignal } from "@solid-primitives/connectivity"
 import {
 	DragDropProvider,
 	DragDropSensors,
+	type DragEvent,
 	DragOverlay,
 	SortableProvider,
 	closestCenter,
-	type DragEvent,
 } from "@thisbeyond/solid-dnd"
-import { Client, EventQueue, ShoppingList, ShoppingListEvent, ShoppingListItem, trimAndUppercase } from "lib"
+import { Client, EventQueue, ShoppingList, type ShoppingListEvent, type ShoppingListItem, trimAndUppercase } from "lib"
 import { timeline } from "motion"
-import { For, JSX, Show, createEffect, createSignal, onCleanup, onMount } from "solid-js"
+import { For, type JSX, Show, createEffect, createSignal, onCleanup, onMount } from "solid-js"
 import { createStore, reconcile } from "solid-js/store"
 import { TransitionGroup } from "solid-transition-group"
 import { ClientOnly } from "~/components/ClientOnly"
@@ -208,7 +208,11 @@ function Home(props: { softwareKeyboardShown: boolean }) {
 					<Show when={checkedList().length > 0}>
 						<Motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.5 }} exit={{ opacity: 0 }}>
 							<div class="mt-4 mb-2 mx-2 flex justify-between">
-								<button class="flex items-center overflow-hidden" onClick={() => setShowChecked((v) => !v)}>
+								<button
+									type="button"
+									class="flex items-center overflow-hidden"
+									onClick={() => setShowChecked((v) => !v)}
+								>
 									<IconCaretRight
 										class={`transition-transform duration-300 ${showChecked() ? "rotate-90" : "rotate-0"}`}
 									/>
@@ -218,7 +222,7 @@ function Home(props: { softwareKeyboardShown: boolean }) {
 									</h2>
 								</button>
 
-								<button class="px-3 py-1" onClick={() => void client.clearCheckedItems()}>
+								<button type="button" class="px-3 py-1" onClick={() => void client.clearCheckedItems()}>
 									Clear all
 								</button>
 							</div>
@@ -252,7 +256,9 @@ function RowAnimator(props: { children: JSX.Element }) {
 		<TransitionGroup
 			onBeforeEnter={(el) => {
 				// @ts-expect-error This works...
-				;(el.style.height = 0), (el.style.opacity = 0)
+				el.style.height = 0
+				// @ts-expect-error This works...
+				el.style.opacity = 0
 			}}
 			onEnter={(el, done) => {
 				timeline([
@@ -262,7 +268,9 @@ function RowAnimator(props: { children: JSX.Element }) {
 			}}
 			onBeforeExit={(el) => {
 				// @ts-expect-error This works...
-				;(el.style.height = ITEM_HEIGHT_PX), (el.style.opacity = 1)
+				el.style.height = ITEM_HEIGHT_PX
+				// @ts-expect-error This works...
+				el.style.opacity = 1
 			}}
 			onExit={(el, done) => {
 				timeline([

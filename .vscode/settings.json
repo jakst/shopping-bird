@@ -1,15 +1,17 @@
 {
 	"editor.codeActionsOnSave": {
-		"source.organizeImports": true
+		"source.fixAll": "explicit",
+		"source.organizeImports": false,
+		"source.organizeImports.biome": true
 	},
 	"vitest.commandLine": "pnpm --filter lib test",
 	"vitest.showFailMessages": true,
 	"typescript.tsdk": "node_modules/typescript/lib",
 
-	"[javascript][typescript][typescriptreact][json]": {
-		"editor.defaultFormatter": "rome.rome"
+	"[javascript][typescript][typescriptreact]": {
+		"editor.defaultFormatter": "biomejs.biome"
 	},
-	"[jsonc][html][markdown][yaml]": {
+	"[jsonc][html][markdown][yaml][json]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	}
 }

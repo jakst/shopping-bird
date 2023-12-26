@@ -1,10 +1,10 @@
 import {
-	responseMessageSchema,
-	updateMessageSchema,
 	type ClientServerConnection,
 	type EventsMessage,
 	type OnListUpdateCallback,
 	type ShoppingListEvent,
+	responseMessageSchema,
+	updateMessageSchema,
 } from "lib"
 import { env } from "./env"
 
@@ -85,18 +85,16 @@ export class BrowserServerConnection implements ClientServerConnection {
 			} satisfies EventsMessage),
 		})
 
-		if (response.ok) {
-			const body = await response.json()
-			const { authenticated, shoppingList } = responseMessageSchema.parse(body)
+		if (!response.ok) throw new Error(`Pushing events failed: ${response}`)
 
-			this.onConnectionStatusChanged({
-				authenticated,
-				connected: this.isConnected,
-			})
+		const body = await response.json()
+		const { authenticated, shoppingList } = responseMessageSchema.parse(body)
 
-			return shoppingList
-		} else {
-			throw new Error(`Pushing events failed: ${response}`)
-		}
+		this.onConnectionStatusChanged({
+			authenticated,
+			connected: this.isConnected,
+		})
+
+		return shoppingList
 	}
 }

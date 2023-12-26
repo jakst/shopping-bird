@@ -6,13 +6,13 @@ import {
 	ExternalClient,
 	Server,
 	ShoppingList,
-	ShoppingListItem,
-	UpdateMessage,
+	type ShoppingListItem,
+	type UpdateMessage,
 	eventsMessageSchema,
 	shoppingListItemSchema,
 } from "lib"
 import { z } from "zod"
-import { Env } from "./Env"
+import { type Env } from "./Env"
 import { createGoogleBot } from "./google-bot/google-bot"
 
 const handler = instrument<Env, unknown, unknown>(

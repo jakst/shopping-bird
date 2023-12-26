@@ -6,7 +6,7 @@ import { pipe } from "@effect/data/Function"
 import * as Effect from "@effect/io/Effect"
 import * as Logger from "@effect/io/Logger"
 import * as LoggerLevel from "@effect/io/Logger/Level"
-import { trimAndUppercase, type Bot } from "lib"
+import { type Bot, trimAndUppercase } from "lib"
 import { PageDep } from "./PageDep"
 import { removeItemAtPosition } from "./removeItemAtPosition"
 

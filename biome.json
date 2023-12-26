@@ -1,0 +1,33 @@
+{
+	"$schema": "https://biomejs.dev/schemas/1.4.1/schema.json",
+	"organizeImports": {
+		"enabled": true
+	},
+	"javascript": {
+		"formatter": {
+			"semicolons": "asNeeded",
+			"lineWidth": 120
+		}
+	},
+	"formatter": {
+		"ignore": ["**/tsconfig.*.json"]
+	},
+	"linter": {
+		"enabled": true,
+		"ignore": ["**/tsconfig.*.json"],
+		"rules": {
+			"recommended": true,
+			"complexity": {
+				"noForEach": "off",
+				"useLiteralKeys": "off"
+			},
+			"style": {
+				"noNonNullAssertion": "off"
+			},
+			"suspicious": {
+				"noAssignInExpressions": "off",
+				"noExplicitAny": "off"
+			}
+		}
+	}
+}

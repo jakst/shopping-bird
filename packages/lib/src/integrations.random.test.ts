@@ -13,7 +13,7 @@ test("Random", async () => {
 
 	const actionLog: string[] = []
 	async function assertRandomTest(i: number) {
-		actionLog.push(`await setup.playOutListSync();\nsetup.assertEqualLists();`)
+		actionLog.push("await setup.playOutListSync();\nsetup.assertEqualLists();")
 		await setup.playOutListSync()
 
 		try {

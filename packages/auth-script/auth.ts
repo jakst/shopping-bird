@@ -27,7 +27,7 @@ await page.keyboard.press("Enter")
 
 await Promise.race([
 	page.waitForSelector('input[type="password"]', { visible: true }),
-	(async function () {
+	(async () => {
 		await page.waitForSelector('xpath///*[text()="Testa ett annat sätt"]', { visible: true })
 		await page.keyboard.press("Tab")
 		await page.keyboard.press("Tab")
