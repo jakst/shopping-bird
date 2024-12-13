@@ -1,11 +1,10 @@
 {
 	"editor.codeActionsOnSave": {
 		"source.fixAll": "explicit",
-		"source.organizeImports": false,
-		"source.organizeImports.biome": true
+		"quickfix.biome": "explicit",
+		"source.organizeImports": "never",
+		"source.organizeImports.biome": "explicit"
 	},
-	"vitest.commandLine": "pnpm --filter lib test",
-	"vitest.showFailMessages": true,
 	"typescript.tsdk": "node_modules/typescript/lib",
 
 	"[javascript][typescript][typescriptreact]": {
