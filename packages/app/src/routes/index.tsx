@@ -1,4 +1,3 @@
-import { Motion, Presence } from "@motionone/solid"
 import { useConnectivitySignal } from "@solid-primitives/connectivity"
 import {
 	DragDropProvider,
@@ -12,6 +11,7 @@ import { Client, EventQueue, ShoppingList, type ShoppingListEvent, type Shopping
 import { timeline } from "motion"
 import { For, type JSX, Show, createEffect, createSignal, onCleanup, onMount } from "solid-js"
 import { createStore, reconcile } from "solid-js/store"
+import { Motion, Presence } from "solid-motionone"
 import { TransitionGroup } from "solid-transition-group"
 import { ClientOnly } from "~/components/ClientOnly"
 import { ConnectionWarning } from "~/components/ConnectionWarning"
