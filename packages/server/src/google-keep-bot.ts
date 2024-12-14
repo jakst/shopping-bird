@@ -13,6 +13,13 @@ function createRandomString(length: number) {
 	return Array.from({ length }, () => alphabet.charAt(Math.floor(Math.random() * alphabet.length))).join()
 }
 
+// To obtain a master key
+// * Go to https://accounts.google.com/EmbeddedSetup and log in
+// * Grab `oauth_token` from cookies
+// * Run `docker run --rm -it --entrypoint /bin/sh python:3 -c 'pip install gpsoauth; python3 -c '\''print(__import__("gpsoauth").exchange_token(input("Email: "), input("OAuth Token: "), input("Android ID: ")))'\'``
+// * Pass in the gmail address, the oauth token and any android id (e.g. com.jakst.shopping-bird)
+// * Grab the `Token` value from the JSON output. That's your master key.
+
 async function getToken(options: { email: string; masterKey: string }) {
 	const headers = new Headers({
 		Host: "android.clients.google.com",
@@ -85,6 +92,7 @@ interface ListItem {
 
 type Node = List | ListItem
 
+// The API has been reverse engineered from https://github.com/kiwiz/gkeepapi
 export class GoogleKeepBot implements Bot {
 	token = ""
 
