@@ -36,7 +36,7 @@
 		"dotenv": "^16.3.1",
 		"lib": "workspace:^",
 		"motion": "^10.16.2",
-		"solid-js": "^1.7.8",
+		"solid-js": "^1.9.3",
 		"solid-start": "^0.2.26",
 		"solid-start-node": "^0.2.26",
 		"solid-start-vercel": "^0.2.26",
