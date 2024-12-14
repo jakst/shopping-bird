@@ -5,9 +5,8 @@ compatibility_flags = ["nodejs_compat"]
 
 
 logpush = true
-browser = { binding = "BROWSER", type = "browser" }
 
-vars = { ENV_DISCRIMINATOR = "prod", OTEL_SERVICE_NAME = "shopping-bird", OTEL_EXPORTER_OTLP_ENDPOINT = "https://in-otel.hyperdx.io" }
+vars = { ENV_DISCRIMINATOR = "prod", OTEL_SERVICE_NAME = "shopping-bird", OTEL_EXPORTER_OTLP_ENDPOINT = "https://in-otel.hyperdx.io", KEEP_EMAIL = "jakob.stahl91@gmail.com", KEEP_SHOPPING_LIST_ID = "1cT_A1zlW4UkVQPdiQxOy1GyqobwBktgbt3dThQ7p7sHCsKJmb3izdzA_6mq7GQ" }
 
 [durable_objects]
 bindings = [{ name = "DO", class_name = "TheShoppingBird" }]

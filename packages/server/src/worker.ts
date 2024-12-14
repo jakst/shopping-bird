@@ -1,4 +1,3 @@
-import puppeteer, { Page } from "@cloudflare/puppeteer"
 import { instrument, instrumentDO } from "@microlabs/otel-cf-workers"
 import { trace } from "@opentelemetry/api"
 import { Hono } from "hono"
@@ -13,7 +12,7 @@ import {
 } from "lib"
 import { z } from "zod"
 import { type Env } from "./Env"
-import { createGoogleBot } from "./google-bot/google-bot"
+import { GoogleKeepBot } from "./google-keep-bot"
 
 const handler = instrument<Env, unknown, unknown>(
 	{
@@ -28,7 +27,7 @@ const handler = instrument<Env, unknown, unknown>(
 			return await durableObjectStub.fetch(req)
 		},
 	},
-	(env: Env, _triggger) => {
+	(env: Env, _trigger) => {
 		return {
 			exporter: {
 				url: `${env.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/traces`,
@@ -45,8 +44,6 @@ const handler = instrument<Env, unknown, unknown>(
 )
 
 export default handler
-
-type Cookie = Awaited<ReturnType<Page["cookies"]>>[number]
 
 // Run the bot max every 30s
 const BOT_RUN_INTERVAL = 1000 * 30
@@ -67,7 +64,7 @@ class AShoppingBird {
 				state.storage.put("server-shopping-list", v)
 			})
 
-			const isAuthenticated = await this.getAuthState()
+			const isAuthenticated = true
 
 			this.server = new Server(
 				{
@@ -137,16 +134,6 @@ class AShoppingBird {
 				},
 				{ headers: { "Access-Control-Allow-Origin": "*" } },
 			)
-		})
-
-		this.app.post("/cookies", async (c) => {
-			const parsedBody = z.array(z.any()).safeParse(await c.req.json())
-			if (!parsedBody.success) return c.json(parsedBody.error, { status: 400 })
-
-			await this.state.storage.put<Cookie[]>("cookies", parsedBody.data)
-			await this.setAuthState(true)
-
-			return c.body(null)
 		})
 
 		this.app.get("/storage", async (c) => {
@@ -234,7 +221,7 @@ class AShoppingBird {
 		this.onCloseOrError(webSocket)
 	}
 
-	async runBot(reusedBrowser?: puppeteer.Browser) {
+	async runBot() {
 		if (this.botRunning) {
 			console.log("BOT already running")
 			return
@@ -243,36 +230,19 @@ class AShoppingBird {
 		console.log("BOT starting")
 
 		this.botRunning = true
-		let browser = reusedBrowser
 
 		try {
 			await this.state.storage.put("dirty", false)
 
 			const initialStore: ShoppingListItem[] = (await this.state.storage.get("google-list")) ?? []
 
-			const cookies = (await this.state.storage.get<Cookie[]>("cookies")) ?? []
-
-			browser ??= await puppeteer.launch(this.env.BROWSER)
-
-			const { bot, page } = await createGoogleBot({
-				cookies,
-				browser,
-				onAuthFail: async () => {
-					await this.setAuthState(false)
-					await fetch("https://api.pushbullet.com/v2/pushes", {
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-							"Access-Token": this.env.PUSHBULLET_AUTH_TOKEN,
-						},
-						body: JSON.stringify({
-							type: "note",
-							title: "Hello Admin!",
-							body: "You need to re-authenticate the Shopping Bird bot",
-						}),
-					})
-				},
+			const bot = new GoogleKeepBot(this.env.KEEP_SHOPPING_LIST_ID)
+			const authenticated = await bot.authenticate({
+				email: this.env.KEEP_EMAIL,
+				masterKey: this.env.KEEP_MASTER_KEY,
 			})
+
+			await this.setAuthState(authenticated)
 
 			const client = new ExternalClient({
 				bot,
@@ -289,15 +259,13 @@ class AShoppingBird {
 			const data: ShoppingListItem[] = (await this.state.storage.get("server-shopping-list")) ?? []
 
 			await client.sync(data)
-
-			await page.close()
 		} finally {
 			const isDirty = await this.state.storage.get("dirty")
 			this.botRunning = false
 
 			if (isDirty) {
 				console.log("BOT is dirty, running again")
-				await this.runBot(browser)
+				await this.runBot()
 			}
 		}
 	}
@@ -305,7 +273,7 @@ class AShoppingBird {
 
 // @ts-expect-error instrumentDO expects AShoppingBird to be implement
 // the webSocketMessage handler. We don't need it, so let's just ignore it.
-export const TheShoppingBird = instrumentDO(AShoppingBird, (env: Env, _triggger) => {
+export const TheShoppingBird = instrumentDO(AShoppingBird, (env: Env, _trigger) => {
 	return {
 		exporter: {
 			url: `${env.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/traces`,

@@ -6,7 +6,6 @@
 		"node": "18.x"
 	},
 	"scripts": {
-		"auth": "pnpm --filter=auth-script auth",
 		"app": "pnpm --filter app",
 		"server": "pnpm --filter server",
 		"lib": "pnpm --filter lib",
