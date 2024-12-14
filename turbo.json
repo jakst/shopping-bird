@@ -1,12 +1,12 @@
 {
 	"$schema": "https://turbo.build/schema.json",
-	"pipeline": {
+	"tasks": {
 		"build": {
 			"outputs": ["dist/**", ".cache/**"]
 		},
 		"app#build": {
 			"outputs": ["dist/**", ".solid/**", ".output/**", ".vercel/output/**"],
-			"env": ["LOCAL_DEV"]
+			"env": ["VITE_*", "LOCAL_DEV"]
 		},
 		"start": {
 			"cache": false

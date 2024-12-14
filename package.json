@@ -23,7 +23,7 @@
 		"eslint": "^8.44.0",
 		"eslint-plugin-biome": "^0.8.32",
 		"prettier": "^2.8.7",
-		"turbo": "^1.10.7",
+		"turbo": "^2.3.3",
 		"typescript": "^5.1.6"
 	},
 	"pnpm": {
