@@ -11,7 +11,7 @@ import {
 	shoppingListItemSchema,
 } from "lib"
 import { z } from "zod"
-import { type Env } from "./Env"
+import type { Env } from "./Env"
 import { GoogleKeepBot } from "./google-keep-bot"
 
 const handler = instrument<Env, unknown, unknown>(
@@ -54,7 +54,10 @@ class AShoppingBird {
 	botRunning = false
 	app = new Hono<{ Bindings: Env }>()
 
-	constructor(private state: DurableObjectState, private env: Env) {
+	constructor(
+		private state: DurableObjectState,
+		private env: Env,
+	) {
 		state.blockConcurrencyWhile(async () => {
 			const initialServerShoppingList = z
 				.array(shoppingListItemSchema)
@@ -271,7 +274,6 @@ class AShoppingBird {
 	}
 }
 
-// @ts-expect-error instrumentDO expects AShoppingBird to be implement
 // the webSocketMessage handler. We don't need it, so let's just ignore it.
 export const TheShoppingBird = instrumentDO(AShoppingBird, (env: Env, _trigger) => {
 	return {

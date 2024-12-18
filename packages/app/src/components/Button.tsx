@@ -1,4 +1,4 @@
-import { type JSX } from "solid-js"
+import type { JSX } from "solid-js"
 
 export function Button(props: { onClick?: () => void; disabled?: boolean; children: JSX.Element }) {
 	return (

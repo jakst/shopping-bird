@@ -3,7 +3,7 @@
 	"private": true,
 	"packageManager": "pnpm@9.15.0",
 	"engines": {
-		"node": "18.x"
+		"node": "22.x"
 	},
 	"scripts": {
 		"app": "pnpm --filter app",
@@ -27,8 +27,10 @@
 		"typescript": "^5.7.2"
 	},
 	"pnpm": {
+		"overrides": {
+			"vite": "6.0.4"
+		},
 		"patchedDependencies": {
-			"solid-start@0.2.26": "patches/solid-start@0.2.26.patch",
 			"@microlabs/otel-cf-workers@1.0.0-rc.14": "patches/@microlabs__otel-cf-workers@1.0.0-rc.14.patch"
 		}
 	}

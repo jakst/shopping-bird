@@ -1,5 +1,5 @@
 import { amber, red, slate } from "@radix-ui/colors"
-import { type Config } from "tailwindcss"
+import type { Config } from "tailwindcss"
 import defaultTheme from "tailwindcss/defaultTheme"
 
 const colorsSlate = {

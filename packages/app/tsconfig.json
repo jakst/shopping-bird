@@ -3,13 +3,13 @@
 	"include": ["./src"],
 	"files": ["./reset.d.ts", "./tailwind.config.ts"],
 	"compilerOptions": {
-		"outDir": "./node_modules/.cache/tsc",
+		// The build breaks without this... why?
+		"verbatimModuleSyntax": false,
 
-		"target": "ESNext",
-		"module": "ESNext",
-		"jsxImportSource": "solid-js",
 		"jsx": "preserve",
-		"types": ["node", "vite/client", "vite-plugin-pwa/client", "unplugin-icons/types/solid"],
+		"jsxImportSource": "solid-js",
+		"noEmit": true,
+		"types": ["vinxi/types/client", "node", "vite-plugin-pwa/client", "unplugin-icons/types/solid"],
 		"baseUrl": "./",
 		"paths": {
 			"~/components/*": ["./src/components/*"],

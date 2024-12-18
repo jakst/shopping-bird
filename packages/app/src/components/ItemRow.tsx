@@ -1,5 +1,5 @@
 import { createSortable, transformStyle, useDragDropContext } from "@thisbeyond/solid-dnd"
-import { type ShoppingListItem } from "lib"
+import type { ShoppingListItem } from "lib"
 import { Show, batch, createSignal } from "solid-js"
 import IconPadding from "~icons/ci/drag-vertical"
 import IconTrash from "~icons/ci/trash-full"
