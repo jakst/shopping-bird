@@ -1,5 +1,5 @@
 import { action, query, redirect } from "@solidjs/router"
-import { getCookie, getRequestHost, getRequestProtocol, setCookie } from "vinxi/http"
+import { getCookie, getRequestProtocol, setCookie } from "vinxi/http"
 import { secretEnv } from "./secretEnv"
 
 export const checkAuth = query(async () => {
