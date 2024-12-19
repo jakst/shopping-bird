@@ -14,7 +14,10 @@ interface ServerDeps {
 export class Server {
 	clients = new Map<string, ServerClientConnection>()
 
-	constructor(private $d: ServerDeps, public isAuthenticated: boolean) {}
+	constructor(
+		private $d: ServerDeps,
+		public isAuthenticated: boolean,
+	) {}
 
 	connectClient(client: ServerClientConnection) {
 		const clientId = createId()

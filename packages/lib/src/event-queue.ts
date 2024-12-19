@@ -2,7 +2,10 @@ export class EventQueue<T> {
 	#queue: T[]
 	#processPromise: Promise<void> | null = null
 
-	constructor(initialQueue: T[], private onQueueChanged: (events: T[]) => void) {
+	constructor(
+		initialQueue: T[],
+		private onQueueChanged: (events: T[]) => void,
+	) {
 		this.#queue = initialQueue
 	}
 

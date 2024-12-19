@@ -5,7 +5,10 @@ type OnChange = (list: ShoppingListItem[]) => void
 export class ShoppingList {
 	items: ShoppingListItem[]
 
-	constructor(initialItems: ShoppingListItem[], private onChange: OnChange) {
+	constructor(
+		initialItems: ShoppingListItem[],
+		private onChange: OnChange,
+	) {
 		this.items = initialItems
 	}
 
