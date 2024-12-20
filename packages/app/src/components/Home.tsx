@@ -16,6 +16,7 @@ import { TransitionGroup } from "solid-transition-group"
 import { ConnectionWarning } from "~/components/ConnectionWarning"
 import { ItemRow } from "~/components/ItemRow"
 import { BrowserServerConnection } from "~/lib/browser-server-connection"
+import { addItem, clearCheckedItems, moveItem, myShoppingList } from "~/lib/store"
 import { isInputField } from "~/lib/type-guards"
 import IconCaretRight from "~icons/radix-icons/caret-right"
 
@@ -71,22 +72,20 @@ const ITEM_HEIGHT = 40
 const ITEM_HEIGHT_PX = `${ITEM_HEIGHT}px`
 
 export function Home(props: { softwareKeyboardShown: boolean }) {
-	const { connectionStatus, client, items } = createClient()
+	const { connectionStatus, client } = createClient()
 
 	const sortedList = () => {
-		return [...items].sort((a, b) => a.position - b.position)
+		return myShoppingList.toSorted(([, a], [, b]) => a.position - b.position)
 	}
 
-	const activeList = () => sortedList().filter((item) => !item.checked)
-	const checkedList = () => sortedList().filter((item) => item.checked)
+	createEffect(() => {
+		console.log({ ...sortedList().map(([, item]) => item) })
+	})
+
+	const activeList = () => sortedList().filter(([, item]) => !item.checked)
+	const checkedList = () => sortedList().filter(([, item]) => item.checked)
 
 	const [showChecked, setShowChecked] = createSignal(false)
-
-	const actions = {
-		deleteItem: client.deleteItem.bind(client),
-		setChecked: client.setItemChecked.bind(client),
-		renameItem: client.renameItem.bind(client),
-	}
 
 	const [activeItem, setActiveItem] = createSignal<ShoppingListItem | null>(null)
 
@@ -105,16 +104,16 @@ export function Home(props: { softwareKeyboardShown: boolean }) {
 			const fromIndex = currentIds.indexOf(draggable.id as string)
 			const toIndex = currentIds.indexOf(droppable.id as string)
 
-			const fromPosition = activeList()[fromIndex].position ?? fromIndex
-			const toPosition = activeList()[toIndex].position ?? toIndex
+			const fromPosition = activeList()[fromIndex][1].position ?? fromIndex
+			const toPosition = activeList()[toIndex][1].position ?? toIndex
 
 			if (fromIndex !== toIndex) {
-				client.moveItem(draggable.id as string, { fromPosition, toPosition })
+				moveItem(draggable.id as string, { fromPosition, toPosition })
 			}
 		}
 	}
 
-	const ids = () => activeList().map(({ id }) => id)
+	const ids = () => activeList().map(([id]) => id)
 
 	const [scrollRef, setScrollRef] = createSignal<HTMLElement | null>(null)
 
@@ -151,7 +150,7 @@ export function Home(props: { softwareKeyboardShown: boolean }) {
 					<ul class="flex flex-col">
 						<SortableProvider ids={ids()}>
 							<RowAnimator>
-								<For each={activeList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
+								<For each={activeList()}>{([id, item]) => <ItemRow id={id} item={item} />}</For>
 							</RowAnimator>
 						</SortableProvider>
 					</ul>
@@ -187,7 +186,7 @@ export function Home(props: { softwareKeyboardShown: boolean }) {
 									</h2>
 								</button>
 
-								<button type="button" class="px-3 py-1" onClick={() => void client.clearCheckedItems()}>
+								<button type="button" class="px-3 py-1" onClick={() => clearCheckedItems()}>
 									Clear all
 								</button>
 							</div>
@@ -201,7 +200,7 @@ export function Home(props: { softwareKeyboardShown: boolean }) {
 										exit={{ opacity: 0, transition: { duration: 0.2 } }}
 									>
 										<RowAnimator>
-											<For each={checkedList()}>{(item) => <ItemRow item={item} actions={actions} />}</For>
+											<For each={checkedList()}>{([id, item]) => <ItemRow id={id} item={item} />}</For>
 										</RowAnimator>
 									</Motion.ul>
 								</Show>
@@ -211,7 +210,12 @@ export function Home(props: { softwareKeyboardShown: boolean }) {
 				</Presence>
 			</div>
 
-			<NewItem onCreate={(name) => void client.addItem(name)} />
+			<NewItem
+				onCreate={(name) => {
+					addItem(name)
+					client.addItem(name)
+				}}
+			/>
 		</>
 	)
 }

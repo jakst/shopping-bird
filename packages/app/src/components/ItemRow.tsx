@@ -1,19 +1,14 @@
 import { createSortable, transformStyle, useDragDropContext } from "@thisbeyond/solid-dnd"
 import type { ShoppingListItem } from "lib"
 import { Show, batch, createSignal } from "solid-js"
+import { deleteItem, renameItem, setItemChecked } from "~/lib/store"
 import IconPadding from "~icons/ci/drag-vertical"
 import IconTrash from "~icons/ci/trash-full"
 import { Button } from "./Button"
 
-interface Actions {
-	deleteItem: (id: string) => void
-	setChecked: (id: string, checked: boolean) => void
-	renameItem: (id: string, name: string) => void
-}
-
 const [focusingSomeRow, setFocusingSomeRow] = createSignal(false)
 
-export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
+export function ItemRow(props: { id: string; item: ShoppingListItem }) {
 	const [hoveringThisRow, setHoveringThisRow] = createSignal(false)
 	const [focusingThisRow, setFocusingThisRow] = createSignal(false)
 
@@ -22,13 +17,13 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 	const nameHasChanged = () => newName() !== props.item.name
 
 	function submitNameChange() {
-		if (nameHasChanged()) props.actions.renameItem(props.item.id, newName())
+		if (nameHasChanged()) renameItem(props.id, newName())
 	}
 
 	let nameInputField: HTMLInputElement | undefined
 
 	const dragDropContext = useDragDropContext()
-	const sortable = dragDropContext ? createSortable(props.item.id, props.item) : undefined
+	const sortable = dragDropContext ? createSortable(props.id, props.item) : undefined
 
 	const showingActions = () => {
 		if (props.item.checked) return false
@@ -81,7 +76,7 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 							type="checkbox"
 							checked={props.item.checked}
 							onChange={(event) => {
-								props.actions.setChecked(props.item.id, event.currentTarget.checked)
+								setItemChecked(props.id, event.currentTarget.checked)
 							}}
 						/>
 					</label>
@@ -110,7 +105,7 @@ export function ItemRow(props: { item: ShoppingListItem; actions: Actions }) {
 
 				<Show when={showingActions()}>
 					<div class="flex items-center">
-						<Button onClick={() => props.actions.deleteItem(props.item.id)}>
+						<Button onClick={() => deleteItem(props.id)}>
 							<IconTrash height="100%" />
 						</Button>
 					</div>
