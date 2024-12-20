@@ -17,31 +17,31 @@ importers:
   .:
     devDependencies:
       '@biomejs/biome':
-        specifier: ^1.4.1
+        specifier: 1.9.4
         version: 1.9.4
       '@total-typescript/ts-reset':
-        specifier: ^0.6.1
+        specifier: 0.6.1
         version: 0.6.1
       '@typescript-eslint/eslint-plugin':
-        specifier: ^5.57.1
+        specifier: 5.62.0
         version: 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.7.2))(eslint@8.57.1)(typescript@5.7.2)
       '@typescript-eslint/parser':
-        specifier: ^5.57.1
+        specifier: 5.62.0
         version: 5.62.0(eslint@8.57.1)(typescript@5.7.2)
       eslint:
-        specifier: ^8.44.0
+        specifier: 8.57.1
         version: 8.57.1
       eslint-plugin-biome:
-        specifier: ^0.8.32
+        specifier: 0.8.32
         version: 0.8.32
       prettier:
-        specifier: ^2.8.7
+        specifier: 2.8.8
         version: 2.8.8
       turbo:
-        specifier: ^2.3.3
+        specifier: 2.3.3
         version: 2.3.3
       typescript:
-        specifier: ^5.7.2
+        specifier: 5.7.2
         version: 5.7.2
 
   packages/app:
@@ -96,7 +96,7 @@ importers:
         version: 3.24.1
     devDependencies:
       '@dotenvx/dotenvx':
-        specifier: ^1.31.0
+        specifier: 1.31.0
         version: 1.31.0
       '@iconify-json/bi':
         specifier: 1.2.2
@@ -132,23 +132,23 @@ importers:
   packages/lib:
     dependencies:
       zod:
-        specifier: ^3.21.4
+        specifier: 3.24.1
         version: 3.24.1
     devDependencies:
       '@vitest/ui':
-        specifier: ^2.1.8
+        specifier: 2.1.8
         version: 2.1.8(vitest@2.1.8)
       typescript:
-        specifier: ^5.7.2
+        specifier: 5.7.2
         version: 5.7.2
       vitest:
-        specifier: ^2.1.8
+        specifier: 2.1.8
         version: 2.1.8(@types/node@22.10.2)(@vitest/ui@2.1.8)(jiti@2.4.1)(terser@5.19.4)(yaml@2.6.1)
 
   packages/server:
     dependencies:
       '@cloudflare/puppeteer':
-        specifier: ^0.0.5
+        specifier: 0.0.5
         version: 0.0.5
       '@effect/data':
         specifier: 0.12.10
@@ -160,26 +160,26 @@ importers:
         specifier: 1.0.0-rc.14
         version: 1.0.0-rc.14(patch_hash=uwec5emyprdmhzbfssdzkfnlye)
       '@opentelemetry/api':
-        specifier: ^1.6.0
+        specifier: 1.9.0
         version: 1.9.0
       hono:
-        specifier: ^3.6.0
+        specifier: 3.6.0
         version: 3.6.0
       lib:
         specifier: workspace:^
         version: link:../lib
       zod:
-        specifier: ^3.21.4
+        specifier: 3.24.1
         version: 3.24.1
     devDependencies:
       '@cloudflare/workers-types':
-        specifier: ^4.20230710.0
+        specifier: 4.20241205.0
         version: 4.20241205.0
       typescript:
-        specifier: ^5.7.2
+        specifier: 5.7.2
         version: 5.7.2
       wrangler:
-        specifier: ^3.95.0
+        specifier: 3.95.0
         version: 3.95.0(@cloudflare/workers-types@4.20241205.0)
 
 packages:
@@ -3509,10 +3509,6 @@ packages:
   magicast@0.3.5:
     resolution: {integrity: sha512-L0WhttDl+2BOsybvEOLK7fW3UA0OQ0IQ2d6Zl2x/a6vVRs3bAY0ECOSHHeL5jD+SbOpOCUEi0y1DgHEn9Qn1AQ==}
 
-  math-intrinsics@1.0.0:
-    resolution: {integrity: sha512-4MqMiKP90ybymYvsut0CH2g4XWbfLtmlCkXmtmdcDCxNB+mQcu1w/1+L/VD7vi/PSv7X2JYV7SCcR+jiPXnQtA==}
-    engines: {node: '>= 0.4'}
-
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
@@ -4907,10 +4903,6 @@ packages:
     resolution: {integrity: sha512-K4jVyjnBdgvc86Y6BkaLZEN933SwYOuBFkdmBu9ZfkcAbdVbpITnDmjvZ/aQjRXQrv5EPkTnD1s39GiiqbngCw==}
     engines: {node: '>= 0.4'}
 
-  which-typed-array@1.1.16:
-    resolution: {integrity: sha512-g+N+GAWiRj66DngFwHvISJd+ITsyphZvD1vChfVg6cEdnzy53GzB3oy0fUNlvhz7H7+MiqhYr26qxQShCpKTTQ==}
-    engines: {node: '>= 0.4'}
-
   which-typed-array@1.1.18:
     resolution: {integrity: sha512-qEcY+KJYlWyLH9vNbsr6/5j59AXk5ni5aakf8ldzBvGde6Iz4sxZGkJyWSAueTG7QhOvNRYb1lDdFmL5Td0QKA==}
     engines: {node: '>= 0.4'}
@@ -6125,7 +6117,7 @@ snapshots:
       debug: 4.4.0(supports-color@9.4.0)
       espree: 9.6.1
       globals: 13.24.0
-      ignore: 5.2.4
+      ignore: 5.3.2
       import-fresh: 3.3.0
       js-yaml: 4.1.0
       minimatch: 3.1.2
@@ -6830,7 +6822,7 @@ snapshots:
       debug: 4.4.0(supports-color@9.4.0)
       eslint: 8.57.1
       graphemer: 1.4.0
-      ignore: 5.2.4
+      ignore: 5.3.2
       natural-compare-lite: 1.4.0
       semver: 7.6.3
       tsutils: 3.21.0(typescript@5.7.2)
@@ -7786,7 +7778,7 @@ snapshots:
       glob-parent: 6.0.2
       globals: 13.24.0
       graphemer: 1.4.0
-      ignore: 5.2.4
+      ignore: 5.3.2
       imurmurhash: 0.1.4
       is-glob: 4.0.3
       is-path-inside: 3.0.3
@@ -7995,7 +7987,7 @@ snapshots:
       gopd: 1.2.0
       has-symbols: 1.1.0
       hasown: 2.0.2
-      math-intrinsics: 1.0.0
+      math-intrinsics: 1.1.0
 
   get-own-enumerable-property-symbols@3.0.2: {}
 
@@ -8082,7 +8074,7 @@ snapshots:
       array-union: 2.1.0
       dir-glob: 3.0.1
       fast-glob: 3.3.2
-      ignore: 5.2.4
+      ignore: 5.3.2
       merge2: 1.4.1
       slash: 3.0.0
 
@@ -8349,7 +8341,7 @@ snapshots:
 
   is-typed-array@1.1.15:
     dependencies:
-      which-typed-array: 1.1.16
+      which-typed-array: 1.1.18
 
   is-weakmap@2.0.2: {}
 
@@ -8539,8 +8531,6 @@ snapshots:
       '@babel/parser': 7.26.3
       '@babel/types': 7.26.3
       source-map-js: 1.2.1
-
-  math-intrinsics@1.0.0: {}
 
   math-intrinsics@1.1.0: {}
 
@@ -9129,7 +9119,7 @@ snapshots:
 
   rimraf@3.0.2:
     dependencies:
-      glob: 7.1.6
+      glob: 7.2.3
 
   rimraf@5.0.10:
     dependencies:
@@ -9902,7 +9892,7 @@ snapshots:
       is-arguments: 1.1.1
       is-generator-function: 1.0.10
       is-typed-array: 1.1.15
-      which-typed-array: 1.1.16
+      which-typed-array: 1.1.18
 
   validate-html-nesting@1.2.1: {}
 
@@ -10125,14 +10115,6 @@ snapshots:
       is-set: 2.0.3
       is-weakmap: 2.0.2
       is-weakset: 2.0.4
-
-  which-typed-array@1.1.16:
-    dependencies:
-      available-typed-arrays: 1.0.7
-      call-bind: 1.0.8
-      for-each: 0.3.3
-      gopd: 1.2.0
-      has-tostringtag: 1.0.2
 
   which-typed-array@1.1.18:
     dependencies:
