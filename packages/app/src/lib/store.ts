@@ -15,14 +15,13 @@ let persister: LocalPersister
 
 if (!isServer) {
 	persister = createLocalPersister(tinybase, "shopping-list")
-	persister.load()
+	persister.startAutoLoad()
+	persister.startAutoSave()
 }
 
 tinybase.addTableListener("items", (store, tableId) => {
 	const table = store.getTable(tableId) as Record<string, ShoppingListItem>
 	setShoppingList(reconcile(Object.entries(table), { key: "0" }))
-
-	persister?.save().catch(console.error)
 })
 
 export function addItem(name: string) {
