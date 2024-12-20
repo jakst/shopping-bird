@@ -1,5 +1,5 @@
 {
-	"extends": "../../tsconfig.base.json",
+	"extends": "../../tsconfig.base.jsonc",
 	"include": ["./src"],
 	"files": ["./reset.d.ts", "./tailwind.config.ts"],
 	"compilerOptions": {
@@ -9,7 +9,12 @@
 		"jsx": "preserve",
 		"jsxImportSource": "solid-js",
 		"noEmit": true,
-		"types": ["vinxi/types/client", "node", "vite-plugin-pwa/client", "unplugin-icons/types/solid"],
+		"types": [
+			"vinxi/types/client",
+			"node",
+			"vite-plugin-pwa/client",
+			"unplugin-icons/types/solid"
+		],
 		"baseUrl": "./",
 		"paths": {
 			"~/components/*": ["./src/components/*"],

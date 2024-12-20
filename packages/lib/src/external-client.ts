@@ -1,5 +1,5 @@
 import { createId } from "./create-id"
-import { type ShoppingListEvent, type ShoppingListItem } from "./schemas"
+import type { ShoppingListEvent, ShoppingListItem } from "./schemas"
 import { applyEvent } from "./shopping-list"
 import { equalsList } from "./utils/equals-list"
 

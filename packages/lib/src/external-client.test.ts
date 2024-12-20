@@ -1,6 +1,6 @@
 import { expect, test, vi } from "vitest"
 import { ExternalClient } from "./external-client"
-import { type ShoppingListEvent, type ShoppingListItem } from "./schemas"
+import type { ShoppingListEvent, ShoppingListItem } from "./schemas"
 import { ShoppingList } from "./shopping-list"
 import { MockBot } from "./test-utils/bot.mock"
 import { pause } from "./test-utils/pause"

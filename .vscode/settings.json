@@ -1,16 +1,18 @@
 {
+	"typescript.tsdk": "node_modules/typescript/lib",
+
 	"editor.codeActionsOnSave": {
 		"source.fixAll": "explicit",
 		"quickfix.biome": "explicit",
 		"source.organizeImports": "never",
 		"source.organizeImports.biome": "explicit"
 	},
-	"typescript.tsdk": "node_modules/typescript/lib",
 
-	"[javascript][typescript][typescriptreact]": {
+	"[javascript][typescript][typescriptreact][json][jsonc]": {
 		"editor.defaultFormatter": "biomejs.biome"
 	},
-	"[jsonc][html][markdown][yaml][json]": {
+
+	"[html][markdown][yaml]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	}
 }

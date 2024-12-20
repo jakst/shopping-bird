@@ -1,8 +1,8 @@
 export { Client } from "./client"
-export {
-	type ClientServerConnection,
-	type ClientServerConnectionDeps,
-	type OnListUpdateCallback,
+export type {
+	ClientServerConnection,
+	ClientServerConnectionDeps,
+	OnListUpdateCallback,
 } from "./client-server-connection"
 export { EventQueue } from "./event-queue"
 export { ExternalClient, type Bot } from "./external-client"

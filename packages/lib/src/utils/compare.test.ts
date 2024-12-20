@@ -1,5 +1,5 @@
 import { expect, test } from "vitest"
-import { type ShoppingListItem } from "../lib"
+import type { ShoppingListItem } from "../lib"
 import { compare } from "./compare"
 
 test("Adds unchecked items", () => {

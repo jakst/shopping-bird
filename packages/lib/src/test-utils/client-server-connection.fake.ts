@@ -1,10 +1,10 @@
-import {
-	type ClientServerConnection,
-	type ClientServerConnectionDeps,
-	type OnListUpdateCallback,
+import type {
+	ClientServerConnection,
+	ClientServerConnectionDeps,
+	OnListUpdateCallback,
 } from "../client-server-connection"
-import { type ShoppingListEvent, type UpdateMessage } from "../schemas"
-import { type ServerClientConnection } from "../server"
+import type { ShoppingListEvent, UpdateMessage } from "../schemas"
+import type { ServerClientConnection } from "../server"
 import { pause } from "./pause"
 
 export class FakeClientServerConnection implements ClientServerConnection, ServerClientConnection {

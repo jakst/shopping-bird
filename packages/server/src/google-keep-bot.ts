@@ -200,7 +200,7 @@ export class GoogleKeepBot implements Bot {
 			return node.type === "LIST_ITEM" && node.parentServerId === this.shoppingListId
 		}) as ListItem[]
 
-		const sortedItems = childItems.sort((a, b) => parseInt(b.sortValue) - parseInt(a.sortValue))
+		const sortedItems = childItems.sort((a, b) => Number.parseInt(b.sortValue) - Number.parseInt(a.sortValue))
 
 		return { list, listItems: sortedItems }
 	}
@@ -238,7 +238,7 @@ export class GoogleKeepBot implements Bot {
 		const { list, listItems } = await this.#getItems()
 
 		const highestStortValue = listItems.reduce((min, item) => {
-			const val = parseInt(item.sortValue)
+			const val = Number.parseInt(item.sortValue)
 			if (Number.isNaN(val)) return min
 			return Math.min(min, val)
 		}, 0)

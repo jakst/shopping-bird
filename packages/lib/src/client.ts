@@ -1,8 +1,8 @@
-import { type ClientServerConnection } from "./client-server-connection"
+import type { ClientServerConnection } from "./client-server-connection"
 import { createId } from "./create-id"
-import { EventQueue } from "./event-queue"
-import { type ShoppingListEvent, type ShoppingListItem } from "./schemas"
-import { ShoppingList, validateEvent } from "./shopping-list"
+import type { EventQueue } from "./event-queue"
+import type { ShoppingListEvent, ShoppingListItem } from "./schemas"
+import { type ShoppingList, validateEvent } from "./shopping-list"
 import { compare } from "./utils/compare"
 
 interface ClientDeps {

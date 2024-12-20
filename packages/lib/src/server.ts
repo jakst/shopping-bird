@@ -1,6 +1,6 @@
 import { createId } from "./create-id"
-import { type ShoppingListEvent, type ShoppingListItem, type UpdateMessage } from "./schemas"
-import { ShoppingList } from "./shopping-list"
+import type { ShoppingListEvent, ShoppingListItem, UpdateMessage } from "./schemas"
+import type { ShoppingList } from "./shopping-list"
 
 export interface ServerClientConnection {
 	onListChanged(payload: UpdateMessage): void

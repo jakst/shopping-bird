@@ -1,4 +1,4 @@
-import { type ShoppingListEvent, type ShoppingListItem } from "../lib"
+import type { ShoppingListEvent, ShoppingListItem } from "../lib"
 
 export function compare(oldList: ShoppingListItem[], newList: ShoppingListItem[]) {
 	const events: ShoppingListEvent[] = []

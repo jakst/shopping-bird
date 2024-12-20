@@ -1,5 +1,5 @@
-import { type ShoppingListEvent, type ShoppingListItem, type UpdateMessage } from "./schemas"
-import { type Server } from "./server"
+import type { ShoppingListEvent, ShoppingListItem, UpdateMessage } from "./schemas"
+import type { Server } from "./server"
 
 export interface ClientServerConnectionDeps {
 	server: Server
