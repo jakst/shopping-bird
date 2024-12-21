@@ -36,5 +36,4 @@ async function init() {
 
 if (!isServer) init()
 
-export const { addItem, deleteItem, setItemChecked, renameItem, clearCheckedItems, moveItem } =
-	createTinybaseClient(tinybase)
+export const shopping = createTinybaseClient(tinybase)

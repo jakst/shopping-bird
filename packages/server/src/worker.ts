@@ -10,23 +10,10 @@ import { GoogleKeepBot } from "./google-keep-bot"
 
 const SYNC_INTERVAL = 5_000
 
-export class TinyObject extends WsServerDurableObject<Env> {
+export class TinyDO extends WsServerDurableObject<Env> {
 	tinybaseStore = createMergeableStore()
-
 	shoppingList = createTinybaseClient(this.tinybaseStore)
-
 	interval: ReturnType<typeof setInterval> | undefined
-
-	// constructor(ctx: DurableObjectState, env: Env) {
-	// 	super(ctx, env)
-
-	// 	// this.tinybaseStore.addTableListener("items", (store, tableId) => {
-	// 	// 	console.log(
-	// 	// 		"OLA!",
-	// 	// 		Object.fromEntries(Object.values(store.getTable(tableId)).map((item) => [item.id, item.name])),
-	// 	// 	)
-	// 	// })
-	// }
 
 	onPathId(pathId: Id, addedOrRemoved: IdAddedOrRemoved) {
 		if (this.interval) {
@@ -44,24 +31,7 @@ export class TinyObject extends WsServerDurableObject<Env> {
 		return createDurableObjectStoragePersister(this.tinybaseStore, this.ctx.storage)
 	}
 
-	// async sync() {
-	// 	console.log("I AM SYNCING")
-	// 	// this.tinybaseStore.
-	// 	// const store = createMergeableStore()
-	// 	// const synchronizer = await createWsSynchronizer(store, new WebSocket("http://localhost:8787/tinybase"), 1)
-
-	// 	// await synchronizer.startSync()
-	// 	// const shoppingList = createTinybaseClient(store)
-	// 	this.shoppingList.addItem("HERPADERP")
-	// 	this.shoppingList.addItem("HERPADERP2")
-	// 	console.log("ADDED ITEMS")
-	// }
-
 	async sync() {
-		console.log(this.tinybaseStore.getValue("lastChangedAt"))
-
-		// if (Math.random() > 0) return
-
 		const keepBot = new GoogleKeepBot(this.env.KEEP_SHOPPING_LIST_ID)
 		await keepBot.authenticate({ email: this.env.KEEP_EMAIL, masterKey: this.env.KEEP_MASTER_KEY })
 
@@ -77,7 +47,7 @@ export class TinyObject extends WsServerDurableObject<Env> {
 		}
 
 		const prevKeepStore = (await this.ctx.storage.get<DiffStore>("keep-list")) ?? { lastChangedAt: "", items: [] }
-		const newKeepList = await keepBot.getList2()
+		const newKeepList = await keepBot.getList()
 
 		// If changes have been made in Keep since last time we checked, sync them back to the server.
 		if (newKeepList.lastChangedAt !== prevKeepStore.lastChangedAt) {
@@ -88,21 +58,25 @@ export class TinyObject extends WsServerDurableObject<Env> {
 			const removedIds = oldIds.difference(newIds)
 
 			removedIds.forEach((id) => {
-				this.shoppingList.deleteItem(id)
+				console.log(`Removing ${prevKeepStore.items.find((item) => item.id === id)?.name}`)
+				this.shoppingList.removeItem(id)
 			})
-
-			const newItems: DiffItem[] = []
 
 			newKeepList.items.forEach((newKeepItem) => {
 				if (this.tinybaseStore.hasRow("items", newKeepItem.id)) {
 					const previousKeepItem = prevKeepStore.items.find((prevKeepItem) => prevKeepItem.id === newKeepItem.id)
+					console.log("[KEEP]", previousKeepItem, newKeepItem, prevKeepStore)
 
 					if (previousKeepItem) {
 						if (newKeepItem.name !== previousKeepItem.name) {
+							console.log(`[KEEP] Changing name from ${previousKeepItem.name} to ${newKeepItem.name}`)
 							this.shoppingList.renameItem(newKeepItem.id, newKeepItem.name)
 						}
 
 						if (newKeepItem.checked !== previousKeepItem.checked) {
+							console.log(
+								`[KEEP] Setting checked on ${newKeepItem.name} from ${previousKeepItem.checked} to ${newKeepItem.checked}`,
+							)
 							this.shoppingList.setItemChecked(newKeepItem.id, newKeepItem.checked)
 						}
 					}
@@ -112,10 +86,7 @@ export class TinyObject extends WsServerDurableObject<Env> {
 				}
 			})
 
-			await this.ctx.storage.put<DiffStore>("keep-list", {
-				lastChangedAt: newKeepList.lastChangedAt,
-				items: newItems,
-			})
+			await this.ctx.storage.put<DiffStore>("keep-list", newKeepList)
 		} else {
 			type ServerStore = {
 				lastChangedAt: string
@@ -161,14 +132,16 @@ export class TinyObject extends WsServerDurableObject<Env> {
 							}
 
 							if (changed) {
-								console.log("Updating item", serverItem.id, changed, updatedItem)
+								console.log(`Updating item ${`${serverItem.name} (${serverItem.id})`} to keep`)
 								keepBot.updateItem(serverItem.id, updatedItem).catch((error) => {
 									console.error(error)
 								})
 							}
 						} else {
-							// This is an edge case. The object exists in keep, but doesn't exist
-							// in the server. It means we lost some data. Use the server values.
+							// This is an edge case. The object exists in keep, but doesn't exist in the
+							// server cache. It means we lost some cached data. Use the server values.
+
+							console.log(`Updating item ${`${serverItem.name} (${serverItem.id})`} to keep`)
 							keepBot.updateItem(serverItem.id, serverItem).catch((error) => {
 								console.error(error)
 							})
@@ -191,7 +164,7 @@ export class TinyObject extends WsServerDurableObject<Env> {
 					items: serverList,
 				})
 
-				const diffStore = await keepBot.getList2()
+				const diffStore = await keepBot.getList()
 				await this.ctx.storage.put<DiffStore>("keep-list", diffStore)
 			}
 		}
@@ -200,7 +173,7 @@ export class TinyObject extends WsServerDurableObject<Env> {
 
 export default {
 	async fetch(request, env) {
-		const req = getWsServerDurableObjectFetch("TinyObject")(request, env)
+		const req = getWsServerDurableObjectFetch("TinyDO")(request, env)
 		return req
 	},
 } satisfies ExportedHandler<Env>

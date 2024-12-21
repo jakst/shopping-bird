@@ -1,4 +1,3 @@
-import { useConnectivitySignal } from "@solid-primitives/connectivity"
 import {
 	DragDropProvider,
 	DragDropSensors,
@@ -7,66 +6,15 @@ import {
 	SortableProvider,
 	closestCenter,
 } from "@thisbeyond/solid-dnd"
-import { Client, EventQueue, ShoppingList, type ShoppingListEvent, type ShoppingListItem, trimAndUppercase } from "lib"
+import { type ShoppingListItem, trimAndUppercase } from "lib"
 import { animate } from "motion/mini"
-import { For, type JSX, Show, createEffect, createSignal, onCleanup, onMount } from "solid-js"
-// import { createStore, reconcile } from "solid-js/store"
+import { For, type JSX, Show, createSignal, onCleanup, onMount } from "solid-js"
 import { Motion, Presence } from "solid-motionone"
 import { TransitionGroup } from "solid-transition-group"
-import { ConnectionWarning } from "~/components/ConnectionWarning"
 import { ItemRow } from "~/components/ItemRow"
-// import { BrowserServerConnection } from "~/lib/browser-server-connection"
-import { addItem, clearCheckedItems, moveItem, myShoppingList } from "~/lib/store"
+import { myShoppingList, shopping } from "~/lib/store"
 import { isInputField } from "~/lib/type-guards"
 import IconCaretRight from "~icons/radix-icons/caret-right"
-
-// function createClient() {
-// 	const [connectionStatus, setConnectionStatus] = createSignal({ authenticated: true, connected: true })
-
-// 	const serverConnection = new BrowserServerConnection((value) => setConnectionStatus(value))
-
-// 	const initialShoppingListString = localStorage.getItem("main-shopping-list")
-// 	const initialShoppingList = initialShoppingListString
-// 		? (JSON.parse(initialShoppingListString) as ShoppingListItem[])
-// 		: []
-
-// 	const [list, setStore] = createStore({ items: initialShoppingList })
-
-// 	const shoppingList = new ShoppingList(structuredClone(initialShoppingList), (newList) => {
-// 		setStore("items", reconcile(structuredClone(newList)))
-// 		localStorage.setItem("main-shopping-list", JSON.stringify(newList))
-// 	})
-
-// 	const storedRemoteShoppingListCopyString = localStorage.getItem("remote-shopping-list")
-// 	const storedRemoteShoppingListCopy = storedRemoteShoppingListCopyString
-// 		? (JSON.parse(storedRemoteShoppingListCopyString) as ShoppingListItem[])
-// 		: []
-// 	const remoteShoppingListCopy = new ShoppingList(storedRemoteShoppingListCopy, (newList) => {
-// 		localStorage.setItem("remote-shopping-list", JSON.stringify(newList))
-// 	})
-
-// 	const storedEventQueueString = localStorage.getItem("event-queue")
-// 	const storedEventQueue = storedEventQueueString ? (JSON.parse(storedEventQueueString) as ShoppingListEvent[]) : []
-// 	const eventQueue = new EventQueue<ShoppingListEvent>(storedEventQueue, (events) => {
-// 		localStorage.setItem("event-queue", JSON.stringify(events))
-// 	})
-
-// 	const client = new Client({
-// 		shoppingList,
-// 		remoteShoppingListCopy,
-// 		serverConnection,
-// 		eventQueue,
-// 	})
-
-// 	const isOnline = useConnectivitySignal()
-
-// 	createEffect(() => {
-// 		if (isOnline()) client.connect()
-// 		else serverConnection.disconnect()
-// 	})
-
-// 	return { connectionStatus, client, items: list.items }
-// }
 
 const ITEM_HEIGHT = 40
 const ITEM_HEIGHT_PX = `${ITEM_HEIGHT}px`
@@ -100,7 +48,7 @@ export function Home(props: { softwareKeyboardShown: boolean }) {
 			const toPosition = activeList()[toIndex].position
 
 			if (fromIndex !== toIndex) {
-				moveItem(draggable.id as string, { fromPosition, toPosition })
+				shopping.moveItem(draggable.id as string, { fromPosition, toPosition })
 			}
 		}
 	}
@@ -178,7 +126,7 @@ export function Home(props: { softwareKeyboardShown: boolean }) {
 									</h2>
 								</button>
 
-								<button type="button" class="px-3 py-1" onClick={() => clearCheckedItems()}>
+								<button type="button" class="px-3 py-1" onClick={() => shopping.clearCheckedItems()}>
 									Clear all
 								</button>
 							</div>
@@ -202,7 +150,7 @@ export function Home(props: { softwareKeyboardShown: boolean }) {
 				</Presence>
 			</div>
 
-			<NewItem onCreate={(name) => addItem(name)} />
+			<NewItem onCreate={(name) => shopping.addItem(name)} />
 		</>
 	)
 }

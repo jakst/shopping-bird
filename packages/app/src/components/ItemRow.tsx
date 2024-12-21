@@ -1,7 +1,7 @@
 import { createSortable, transformStyle, useDragDropContext } from "@thisbeyond/solid-dnd"
 import type { ShoppingListItem } from "lib"
 import { Show, batch, createSignal } from "solid-js"
-import { deleteItem, renameItem, setItemChecked } from "~/lib/store"
+import { shopping } from "~/lib/store"
 import IconPadding from "~icons/ci/drag-vertical"
 import IconTrash from "~icons/ci/trash-full"
 import { Button } from "./Button"
@@ -17,7 +17,7 @@ export function ItemRow(props: { item: ShoppingListItem }) {
 	const nameHasChanged = () => newName() !== props.item.name
 
 	function submitNameChange() {
-		if (nameHasChanged()) renameItem(props.item.id, newName())
+		if (nameHasChanged()) shopping.renameItem(props.item.id, newName())
 	}
 
 	let nameInputField: HTMLInputElement | undefined
@@ -76,7 +76,7 @@ export function ItemRow(props: { item: ShoppingListItem }) {
 							type="checkbox"
 							checked={props.item.checked}
 							onChange={(event) => {
-								setItemChecked(props.item.id, event.currentTarget.checked)
+								shopping.setItemChecked(props.item.id, event.currentTarget.checked)
 							}}
 						/>
 					</label>
@@ -105,7 +105,7 @@ export function ItemRow(props: { item: ShoppingListItem }) {
 
 				<Show when={showingActions()}>
 					<div class="flex items-center">
-						<Button onClick={() => deleteItem(props.item.id)}>
+						<Button onClick={() => shopping.removeItem(props.item.id)}>
 							<IconTrash height="100%" />
 						</Button>
 					</div>

@@ -21,7 +21,7 @@ export function createTinybaseClient(tinybase: MergeableStore) {
 		return id
 	}
 
-	function deleteItem(id: string) {
+	function removeItem(id: string) {
 		tinybase.delRow("items", id)
 
 		updateTimestamp()
@@ -67,5 +67,5 @@ export function createTinybaseClient(tinybase: MergeableStore) {
 		updateTimestamp()
 	}
 
-	return { addItem, deleteItem, setItemChecked, renameItem, clearCheckedItems, moveItem }
+	return { addItem, removeItem, setItemChecked, renameItem, clearCheckedItems, moveItem }
 }
