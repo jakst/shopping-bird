@@ -1,290 +1,188 @@
-import { instrument, instrumentDO } from "@microlabs/otel-cf-workers"
-import { trace } from "@opentelemetry/api"
-import { Hono } from "hono"
+import { type ShoppingListItem, createTinybaseClient } from "lib"
+import { type Id, type IdAddedOrRemoved, createMergeableStore } from "tinybase"
+import { createDurableObjectStoragePersister } from "tinybase/persisters/persister-durable-object-storage"
 import {
-	ExternalClient,
-	Server,
-	ShoppingList,
-	type ShoppingListItem,
-	type UpdateMessage,
-	eventsMessageSchema,
-	shoppingListItemSchema,
-} from "lib"
-import { z } from "zod"
+	WsServerDurableObject,
+	getWsServerDurableObjectFetch,
+} from "tinybase/synchronizers/synchronizer-ws-server-durable-object"
 import type { Env } from "./Env"
 import { GoogleKeepBot } from "./google-keep-bot"
 
-const handler = instrument<Env, unknown, unknown>(
-	{
-		async scheduled(controller, env, ctx) {
-			const durableObjectId = env.DO.idFromName(env.ENV_DISCRIMINATOR ?? "dev")
-			const durableObjectStub = env.DO.get(durableObjectId)
-			await durableObjectStub.fetch(new Request("https://www.does-not.matter/runBot"))
-		},
-		async fetch(req: Request, env, ctx) {
-			const durableObjectId = env.DO.idFromName(env.ENV_DISCRIMINATOR ?? "dev")
-			const durableObjectStub = env.DO.get(durableObjectId)
-			return await durableObjectStub.fetch(req)
-		},
-	},
-	(env: Env, _trigger) => {
-		return {
-			exporter: {
-				url: `${env.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/traces`,
+const SYNC_INTERVAL = 5_000
 
-				headers: {
-					authorization: env.HYPERDX_API_KEY,
-				},
-			},
-			service: {
-				name: `${env.ENV_DISCRIMINATOR}-${env.OTEL_SERVICE_NAME}`,
-			},
-		}
-	},
-)
+export class TinyObject extends WsServerDurableObject<Env> {
+	tinybaseStore = createMergeableStore()
 
-export default handler
+	shoppingList = createTinybaseClient(this.tinybaseStore)
 
-// Run the bot max every 30s
-const BOT_RUN_INTERVAL = 1000 * 30
+	interval: ReturnType<typeof setInterval> | undefined
 
-class AShoppingBird {
-	sessions = new Map<WebSocket, string>()
-	server: Server | undefined
-	botRunning = false
-	app = new Hono<{ Bindings: Env }>()
+	constructor(ctx: DurableObjectState, env: Env) {
+		super(ctx, env)
 
-	constructor(
-		private state: DurableObjectState,
-		private env: Env,
-	) {
-		state.blockConcurrencyWhile(async () => {
-			const initialServerShoppingList = z
-				.array(shoppingListItemSchema)
-				.parse((await state.storage.get("server-shopping-list")) ?? [])
-
-			const shoppingList = new ShoppingList(initialServerShoppingList, (v) => {
-				state.storage.put("server-shopping-list", v)
-			})
-
-			const isAuthenticated = true
-
-			this.server = new Server(
-				{
-					shoppingList,
-					onSyncRequest: async (items) => {
-						await this.state.storage.put("dirty", true)
-						await this.runBot()
-					},
-				},
-				isAuthenticated,
+		this.tinybaseStore.addTableListener("items", (store, tableId) => {
+			console.log(
+				"OLA!",
+				Object.fromEntries(Object.values(store.getTable(tableId)).map((item) => [item.id, item.name])),
 			)
 		})
+	}
 
-		this.app.get("/runBot", async (c) => {
-			const now = Date.now()
-			const botLastRanAt = (await this.state.storage.get<number>("botLastRanAt")) ?? 0
-			const diff = now - botLastRanAt
+	onPathId(pathId: Id, addedOrRemoved: IdAddedOrRemoved) {
+		if (this.interval) {
+			clearInterval(this.interval)
+			this.interval = undefined
+		}
 
-			if (diff > BOT_RUN_INTERVAL) {
-				console.log(`Bot run triggered (${diff / 1000}s since last run)`)
+		if (addedOrRemoved > 0) {
+			this.interval = setInterval(() => this.sync(), SYNC_INTERVAL)
+			this.sync()
+		}
+	}
 
-				await this.state.storage.put("botLastRanAt", now)
+	createPersister() {
+		return createDurableObjectStoragePersister(this.tinybaseStore, this.ctx.storage)
+	}
 
-				const tracer = trace.getTracer("runBot")
-				tracer.startActiveSpan("runBot", (span) => {
-					span.setAttribute("trigger", c.req.url.includes("www.does-not.matter") ? "scheduled" : "manual")
-					span.setAttribute("botLastRanAt", botLastRanAt)
-					this.runBot()
-						.then(() => {
-							span.end()
-						})
-						.catch((e) => {
-							span.recordException(e)
-							span.end()
-							console.error(e)
-						})
-				})
-				c.status(202)
-			} else {
-				console.log(`Bot run ignored (${diff / 1000}s since last run)`)
-				c.status(429)
+	async sync() {
+		console.log(this.tinybaseStore.getValue("lastChangedAt"))
+
+		// if (Math.random() > 0) return
+
+		const keepBot = new GoogleKeepBot(this.env.KEEP_SHOPPING_LIST_ID)
+		await keepBot.authenticate({ email: this.env.KEEP_EMAIL, masterKey: this.env.KEEP_MASTER_KEY })
+
+		type DiffItem = {
+			id: string
+			name: string
+			checked: boolean
+		}
+
+		type DiffStore = {
+			lastChangedAt: string
+			items: DiffItem[]
+		}
+
+		const prevKeepStore = (await this.ctx.storage.get<DiffStore>("keep-list")) ?? { lastChangedAt: "", items: [] }
+		const newKeepList = await keepBot.getList2()
+
+		// If changes have been made in Keep since last time we checked, sync them back to the server.
+		if (newKeepList.lastChangedAt !== prevKeepStore.lastChangedAt) {
+			console.log("Keep list changed. Investigating...", newKeepList.lastChangedAt, prevKeepStore.lastChangedAt)
+
+			const oldIds = new Set(prevKeepStore.items.map((item) => item.id))
+			const newIds = new Set(newKeepList.items.map((item) => item.id))
+			const removedIds = oldIds.difference(newIds)
+
+			removedIds.forEach((id) => {
+				this.shoppingList.deleteItem(id)
+			})
+
+			const newItems: DiffItem[] = []
+
+			newKeepList.items.forEach((newKeepItem) => {
+				const existingServerItem = this.tinybaseStore.getRow("items", newKeepItem.id) as ShoppingListItem
+
+				if (existingServerItem) {
+					const previousKeepItem = prevKeepStore.items.find((prevKeepItem) => prevKeepItem.id === newKeepItem.id)
+
+					if (previousKeepItem) {
+						if (newKeepItem.name !== previousKeepItem.name) {
+							this.shoppingList.renameItem(existingServerItem.id, newKeepItem.name)
+						}
+
+						if (newKeepItem.checked !== previousKeepItem.checked) {
+							this.shoppingList.setItemChecked(existingServerItem.id, newKeepItem.checked)
+						}
+					}
+				} else {
+					this.shoppingList.addItem(newKeepItem.name, newKeepItem.id)
+					if (newKeepItem.checked) this.shoppingList.setItemChecked(newKeepItem.id, true)
+				}
+			})
+
+			await this.ctx.storage.put<DiffStore>("keep-list", {
+				lastChangedAt: newKeepList.lastChangedAt,
+				items: newItems,
+			})
+		} else {
+			type ServerStore = {
+				lastChangedAt: string
+				items: ShoppingListItem[]
 			}
 
-			return c.body(null)
-		})
-
-		this.app.get("/export", async (c) => c.json((await this.state.storage.get("server-shopping-list")) ?? []))
-		this.app.post("/import", async (c) => {
-			const parsedBody = z.array(shoppingListItemSchema).safeParse(await c.req.json())
-			if (!parsedBody.success) return c.json(parsedBody.error, { status: 400 })
-
-			await this.state.storage.put("server-shopping-list", parsedBody.data)
-
-			return c.body(null)
-		})
-
-		this.app.post("/events", async (c) => {
-			const parsedBody = eventsMessageSchema.safeParse(await c.req.json())
-			if (!parsedBody.success) return c.json(parsedBody.error, { status: 400 })
-
-			const shoppingList = this.server!.pushEvents(parsedBody.data.events, parsedBody.data.clientId)
-
-			return c.json(
-				{
-					authenticated: await this.getAuthState(),
-					shoppingList,
-				},
-				{ headers: { "Access-Control-Allow-Origin": "*" } },
-			)
-		})
-
-		this.app.get("/storage", async (c) => {
-			return c.json({
-				serverShoppingList: (await this.state.storage.get("server-shopping-list")) ?? [],
-				googleList: (await this.state.storage.get("google-list")) ?? [],
-			})
-		})
-
-		this.app.get("/bot", async (c) => {
-			await this.state.storage.put("dirty", true)
-			await this.runBot()
-			return c.body(null)
-		})
-	}
-
-	async fetch(request: Request) {
-		if (request.headers.get("upgrade") === "websocket") {
-			const pair = new WebSocketPair()
-			const [clientWs, serverWs] = Object.values(pair)
-
-			await this.handleSession(serverWs)
-
-			return new Response(null, {
-				status: 101,
-				webSocket: clientWs,
-				headers: { "Access-Control-Allow-Origin": "*" },
-			})
-		}
-
-		const res = await this.app.fetch(request)
-		res.headers.set("Access-Control-Allow-Origin", "*")
-		return res
-	}
-
-	async getAuthState() {
-		return (await this.state.storage.get<boolean>("authenticated")) ?? false
-	}
-
-	async setAuthState(authenticated: boolean) {
-		await this.state.storage.put("authenticated", authenticated)
-		this.server?.changeAuthState(authenticated)
-	}
-
-	async handleSession(webSocket: WebSocket) {
-		if (!this.server) throw new Error("Server not set up correctly")
-
-		this.state.acceptWebSocket(webSocket)
-
-		function onListChanged(payload: UpdateMessage) {
-			webSocket.send(JSON.stringify(payload))
-		}
-
-		const clientId = this.server.connectClient({ onListChanged })
-		this.sessions.set(webSocket, clientId)
-
-		const tracer = trace.getTracer("runBot")
-		tracer.startActiveSpan("runBot", (span) => {
-			span.setAttribute("trigger", "new-connection")
-
-			this.runBot()
-				.then(() => {
-					span.end()
-				})
-				.catch((e) => {
-					span.recordException(e)
-					span.end()
-					console.error(e)
-				})
-		})
-	}
-
-	onCloseOrError(webSocket: WebSocket) {
-		const clientId = this.sessions.get(webSocket)
-		this.sessions.delete(webSocket)
-
-		if (clientId && this.server) this.server.onClientDisconnected(clientId)
-	}
-
-	async webSocketClose(webSocket: WebSocket) {
-		this.onCloseOrError(webSocket)
-	}
-
-	async webSocketError(webSocket: WebSocket) {
-		this.onCloseOrError(webSocket)
-	}
-
-	async runBot() {
-		if (this.botRunning) {
-			console.log("BOT already running")
-			return
-		}
-
-		console.log("BOT starting")
-
-		this.botRunning = true
-
-		try {
-			await this.state.storage.put("dirty", false)
-
-			const initialStore: ShoppingListItem[] = (await this.state.storage.get("google-list")) ?? []
-
-			const bot = new GoogleKeepBot(this.env.KEEP_SHOPPING_LIST_ID)
-			const authenticated = await bot.authenticate({
-				email: this.env.KEEP_EMAIL,
-				masterKey: this.env.KEEP_MASTER_KEY,
-			})
-
-			await this.setAuthState(authenticated)
-
-			const client = new ExternalClient({
-				bot,
-				initialStore,
-				onStoreChanged: async (list) => {
-					await this.state.storage.put("google-list", list)
-				},
-			})
-
-			client.onEventsReturned = async (events) => {
-				this.server!.pushEvents(events)
+			const prevServerStore = (await this.ctx.storage.get<ServerStore>("server-list")) ?? {
+				lastChangedAt: "",
+				items: [],
 			}
+			const serverLastChangedAt = this.tinybaseStore.getValue("lastChangedAt") as string
+			const serverRecord = this.tinybaseStore.getTable("items") as Record<string, ShoppingListItem>
+			const serverList = Object.values(serverRecord)
 
-			const data: ShoppingListItem[] = (await this.state.storage.get("server-shopping-list")) ?? []
+			// If changes have been made on the server since last time we checked, sync them back to Keep.
+			if (prevServerStore.lastChangedAt !== serverLastChangedAt) {
+				const oldIds = new Set(prevServerStore.items.map((item) => item.id))
+				const newIds = new Set(serverList.map((item) => item.id))
+				const removedIds = oldIds.difference(newIds)
 
-			await client.sync(data)
-		} finally {
-			const isDirty = await this.state.storage.get("dirty")
-			this.botRunning = false
+				removedIds.forEach((id) => {
+					keepBot.deleteItem(id).catch((error) => {
+						console.error(error)
+					})
+				})
 
-			if (isDirty) {
-				console.log("BOT is dirty, running again")
-				await this.runBot()
+				serverList.forEach((serverItem) => {
+					const keepItem = newKeepList.items.find((keepItem) => keepItem.id === serverItem.id)
+					console.log("\n\n", newKeepList)
+					console.log(serverItem, keepItem, "\n\n")
+
+					if (keepItem) {
+						const previousServerItem = prevServerStore.items.find((item) => item.id === serverItem.id)
+
+						if (previousServerItem) {
+							let changed = false
+							const updatedItem: { name?: string; checked?: boolean } = {}
+							if (previousServerItem.name !== serverItem.name) {
+								changed = true
+								updatedItem.name = serverItem.name
+							}
+							if (previousServerItem.checked !== serverItem.checked) {
+								changed = true
+								updatedItem.checked = serverItem.checked
+							}
+
+							keepBot.updateItem(serverItem.id, updatedItem).catch((error) => {
+								console.error(error)
+							})
+						} else {
+							// This is an edge case. The object exists in keep, but doesn't exist
+							// in the server. It means we lost some data. Use the server values.
+							keepBot.updateItem(serverItem.id, serverItem).catch((error) => {
+								console.error(error)
+							})
+						}
+					} else {
+						keepBot.addItem(serverItem.id, serverItem.name, serverItem.checked).catch((error) => {
+							console.error(error)
+						})
+					}
+				})
+
+				await this.ctx.storage.put<ServerStore>("server-list", {
+					lastChangedAt: serverLastChangedAt ?? new Date().toISOString(),
+					items: serverList,
+				})
+
+				const diffStore = await keepBot.getList2()
+				await this.ctx.storage.put<DiffStore>("keep-list", diffStore)
 			}
 		}
 	}
 }
 
-// the webSocketMessage handler. We don't need it, so let's just ignore it.
-export const TheShoppingBird = instrumentDO(AShoppingBird, (env: Env, _trigger) => {
-	return {
-		exporter: {
-			url: `${env.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/traces`,
-			headers: {
-				authorization: env.HYPERDX_API_KEY,
-			},
-		},
-		service: {
-			name: `${env.ENV_DISCRIMINATOR}-${env.OTEL_SERVICE_NAME}-DO`,
-		},
-	}
-})
+export default {
+	async fetch(request, env) {
+		const req = getWsServerDurableObjectFetch("TinyObject")(request, env)
+		return req
+	},
+} satisfies ExportedHandler<Env>

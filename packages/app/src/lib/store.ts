@@ -1,71 +1,40 @@
-import type { ShoppingListItem } from "lib"
-import { createId } from "lib/src/create-id"
+import { type ShoppingListItem, createTinybaseClient } from "lib"
+import ReconnectingWebSocket from "reconnecting-websocket"
 import { createStore, reconcile } from "solid-js/store"
 import { isServer } from "solid-js/web"
-import { createStore as createTinybaseStore } from "tinybase"
-import { type LocalPersister, createLocalPersister } from "tinybase/persisters/persister-browser"
+import { createMergeableStore } from "tinybase"
+import { createLocalPersister } from "tinybase/persisters/persister-browser"
+import { createWsSynchronizer } from "tinybase/synchronizers/synchronizer-ws-client"
 
-type TinyBaseItem = [id: string, item: ShoppingListItem]
+const [myShoppingList, setShoppingList] = createStore<ShoppingListItem[]>([])
+export { myShoppingList }
 
-export const [myShoppingList, setShoppingList] = createStore<TinyBaseItem[]>([])
+const tinybase = createMergeableStore()
 
-const tinybase = createTinybaseStore()
+async function init() {
+	tinybase.addTableListener("items", (store, tableId) => {
+		const table = store.getTable(tableId) as Record<string, ShoppingListItem>
+		setShoppingList(reconcile(Object.values(table), { key: "id" }))
+	})
 
-let persister: LocalPersister
+	const persister = createLocalPersister(tinybase, "shopping-list")
+	await persister.startAutoLoad()
+	await persister.startAutoSave()
 
-if (!isServer) {
-	persister = createLocalPersister(tinybase, "shopping-list")
-	persister.startAutoLoad()
-	persister.startAutoSave()
-}
+	const synchronizer = await createWsSynchronizer(
+		tinybase,
+		new ReconnectingWebSocket("http://localhost:8787/tinybase"),
+		1,
+	)
+	await synchronizer.startSync()
 
-tinybase.addTableListener("items", (store, tableId) => {
-	const table = store.getTable(tableId) as Record<string, ShoppingListItem>
-	setShoppingList(reconcile(Object.entries(table), { key: "0" }))
-})
-
-export function addItem(name: string) {
-	const position =
-		Object.entries(tinybase.getTable("items") as Record<string, ShoppingListItem>).reduce(
-			(prev, [, curr]) => Math.max(prev, curr.position),
-			0,
-		) + 1
-
-	tinybase.addRow("items", { id: createId(), name, checked: false, position })
-}
-
-export function deleteItem(id: string) {
-	tinybase.delRow("items", id)
-}
-
-export function setItemChecked(id: string, checked: boolean) {
-	tinybase.setPartialRow("items", id, { checked })
-}
-
-export function renameItem(id: string, name: string) {
-	tinybase.setPartialRow("items", id, { name })
-}
-
-export function clearCheckedItems() {
-	tinybase.transaction(() => {
-		const itemEntries = Object.entries(tinybase.getTable("items") as Record<string, ShoppingListItem>)
-		itemEntries.filter(([, item]) => item.checked).forEach(([id]) => tinybase.delRow("items", id))
+	// If the websocket reconnects in the future, do another explicit sync.
+	synchronizer.getWebSocket().addEventListener("open", () => {
+		synchronizer.load().then(() => synchronizer.save())
 	})
 }
 
-export function moveItem(id: string, { fromPosition, toPosition }: { fromPosition: number; toPosition: number }) {
-	tinybase.transaction(() => {
-		tinybase.setPartialRow("items", id, { position: toPosition })
+if (!isServer) init()
 
-		const itemEntries = Object.entries(tinybase.getTable("items") as Record<string, ShoppingListItem>)
-		itemEntries.forEach(([itemId, item]) => {
-			if (itemId !== id) {
-				if (item.position > fromPosition && item.position <= toPosition) {
-					tinybase.setPartialRow("items", itemId, { position: item.position - 1 })
-				} else if (item.position < fromPosition && item.position >= toPosition) {
-					tinybase.setPartialRow("items", itemId, { position: item.position + 1 })
-				}
-			}
-		})
-	})
-}
+export const { addItem, deleteItem, setItemChecked, renameItem, clearCheckedItems, moveItem } =
+	createTinybaseClient(tinybase)

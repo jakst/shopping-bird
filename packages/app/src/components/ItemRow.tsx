@@ -8,7 +8,7 @@ import { Button } from "./Button"
 
 const [focusingSomeRow, setFocusingSomeRow] = createSignal(false)
 
-export function ItemRow(props: { id: string; item: ShoppingListItem }) {
+export function ItemRow(props: { item: ShoppingListItem }) {
 	const [hoveringThisRow, setHoveringThisRow] = createSignal(false)
 	const [focusingThisRow, setFocusingThisRow] = createSignal(false)
 
@@ -17,13 +17,13 @@ export function ItemRow(props: { id: string; item: ShoppingListItem }) {
 	const nameHasChanged = () => newName() !== props.item.name
 
 	function submitNameChange() {
-		if (nameHasChanged()) renameItem(props.id, newName())
+		if (nameHasChanged()) renameItem(props.item.id, newName())
 	}
 
 	let nameInputField: HTMLInputElement | undefined
 
 	const dragDropContext = useDragDropContext()
-	const sortable = dragDropContext ? createSortable(props.id, props.item) : undefined
+	const sortable = dragDropContext ? createSortable(props.item.id, props.item) : undefined
 
 	const showingActions = () => {
 		if (props.item.checked) return false
@@ -76,7 +76,7 @@ export function ItemRow(props: { id: string; item: ShoppingListItem }) {
 							type="checkbox"
 							checked={props.item.checked}
 							onChange={(event) => {
-								setItemChecked(props.id, event.currentTarget.checked)
+								setItemChecked(props.item.id, event.currentTarget.checked)
 							}}
 						/>
 					</label>
@@ -105,7 +105,7 @@ export function ItemRow(props: { id: string; item: ShoppingListItem }) {
 
 				<Show when={showingActions()}>
 					<div class="flex items-center">
-						<Button onClick={() => deleteItem(props.id)}>
+						<Button onClick={() => deleteItem(props.item.id)}>
 							<IconTrash height="100%" />
 						</Button>
 					</div>

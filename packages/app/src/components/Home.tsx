@@ -10,80 +10,72 @@ import {
 import { Client, EventQueue, ShoppingList, type ShoppingListEvent, type ShoppingListItem, trimAndUppercase } from "lib"
 import { animate } from "motion/mini"
 import { For, type JSX, Show, createEffect, createSignal, onCleanup, onMount } from "solid-js"
-import { createStore, reconcile } from "solid-js/store"
+// import { createStore, reconcile } from "solid-js/store"
 import { Motion, Presence } from "solid-motionone"
 import { TransitionGroup } from "solid-transition-group"
 import { ConnectionWarning } from "~/components/ConnectionWarning"
 import { ItemRow } from "~/components/ItemRow"
-import { BrowserServerConnection } from "~/lib/browser-server-connection"
+// import { BrowserServerConnection } from "~/lib/browser-server-connection"
 import { addItem, clearCheckedItems, moveItem, myShoppingList } from "~/lib/store"
 import { isInputField } from "~/lib/type-guards"
 import IconCaretRight from "~icons/radix-icons/caret-right"
 
-function createClient() {
-	const [connectionStatus, setConnectionStatus] = createSignal({ authenticated: true, connected: true })
+// function createClient() {
+// 	const [connectionStatus, setConnectionStatus] = createSignal({ authenticated: true, connected: true })
 
-	const serverConnection = new BrowserServerConnection((value) => setConnectionStatus(value))
+// 	const serverConnection = new BrowserServerConnection((value) => setConnectionStatus(value))
 
-	const initialShoppingListString = localStorage.getItem("main-shopping-list")
-	const initialShoppingList = initialShoppingListString
-		? (JSON.parse(initialShoppingListString) as ShoppingListItem[])
-		: []
+// 	const initialShoppingListString = localStorage.getItem("main-shopping-list")
+// 	const initialShoppingList = initialShoppingListString
+// 		? (JSON.parse(initialShoppingListString) as ShoppingListItem[])
+// 		: []
 
-	const [list, setStore] = createStore({ items: initialShoppingList })
+// 	const [list, setStore] = createStore({ items: initialShoppingList })
 
-	const shoppingList = new ShoppingList(structuredClone(initialShoppingList), (newList) => {
-		setStore("items", reconcile(structuredClone(newList)))
-		localStorage.setItem("main-shopping-list", JSON.stringify(newList))
-	})
+// 	const shoppingList = new ShoppingList(structuredClone(initialShoppingList), (newList) => {
+// 		setStore("items", reconcile(structuredClone(newList)))
+// 		localStorage.setItem("main-shopping-list", JSON.stringify(newList))
+// 	})
 
-	const storedRemoteShoppingListCopyString = localStorage.getItem("remote-shopping-list")
-	const storedRemoteShoppingListCopy = storedRemoteShoppingListCopyString
-		? (JSON.parse(storedRemoteShoppingListCopyString) as ShoppingListItem[])
-		: []
-	const remoteShoppingListCopy = new ShoppingList(storedRemoteShoppingListCopy, (newList) => {
-		localStorage.setItem("remote-shopping-list", JSON.stringify(newList))
-	})
+// 	const storedRemoteShoppingListCopyString = localStorage.getItem("remote-shopping-list")
+// 	const storedRemoteShoppingListCopy = storedRemoteShoppingListCopyString
+// 		? (JSON.parse(storedRemoteShoppingListCopyString) as ShoppingListItem[])
+// 		: []
+// 	const remoteShoppingListCopy = new ShoppingList(storedRemoteShoppingListCopy, (newList) => {
+// 		localStorage.setItem("remote-shopping-list", JSON.stringify(newList))
+// 	})
 
-	const storedEventQueueString = localStorage.getItem("event-queue")
-	const storedEventQueue = storedEventQueueString ? (JSON.parse(storedEventQueueString) as ShoppingListEvent[]) : []
-	const eventQueue = new EventQueue<ShoppingListEvent>(storedEventQueue, (events) => {
-		localStorage.setItem("event-queue", JSON.stringify(events))
-	})
+// 	const storedEventQueueString = localStorage.getItem("event-queue")
+// 	const storedEventQueue = storedEventQueueString ? (JSON.parse(storedEventQueueString) as ShoppingListEvent[]) : []
+// 	const eventQueue = new EventQueue<ShoppingListEvent>(storedEventQueue, (events) => {
+// 		localStorage.setItem("event-queue", JSON.stringify(events))
+// 	})
 
-	const client = new Client({
-		shoppingList,
-		remoteShoppingListCopy,
-		serverConnection,
-		eventQueue,
-	})
+// 	const client = new Client({
+// 		shoppingList,
+// 		remoteShoppingListCopy,
+// 		serverConnection,
+// 		eventQueue,
+// 	})
 
-	const isOnline = useConnectivitySignal()
+// 	const isOnline = useConnectivitySignal()
 
-	createEffect(() => {
-		if (isOnline()) client.connect()
-		else serverConnection.disconnect()
-	})
+// 	createEffect(() => {
+// 		if (isOnline()) client.connect()
+// 		else serverConnection.disconnect()
+// 	})
 
-	return { connectionStatus, client, items: list.items }
-}
+// 	return { connectionStatus, client, items: list.items }
+// }
 
 const ITEM_HEIGHT = 40
 const ITEM_HEIGHT_PX = `${ITEM_HEIGHT}px`
 
 export function Home(props: { softwareKeyboardShown: boolean }) {
-	const { connectionStatus, client } = createClient()
+	const sortedList = () => myShoppingList.toSorted((a, b) => a.position - b.position)
 
-	const sortedList = () => {
-		return myShoppingList.toSorted(([, a], [, b]) => a.position - b.position)
-	}
-
-	createEffect(() => {
-		console.log({ ...sortedList().map(([, item]) => item) })
-	})
-
-	const activeList = () => sortedList().filter(([, item]) => !item.checked)
-	const checkedList = () => sortedList().filter(([, item]) => item.checked)
+	const activeList = () => sortedList().filter((item) => !item.checked)
+	const checkedList = () => sortedList().filter((item) => item.checked)
 
 	const [showChecked, setShowChecked] = createSignal(false)
 
@@ -104,8 +96,8 @@ export function Home(props: { softwareKeyboardShown: boolean }) {
 			const fromIndex = currentIds.indexOf(draggable.id as string)
 			const toIndex = currentIds.indexOf(droppable.id as string)
 
-			const fromPosition = activeList()[fromIndex][1].position ?? fromIndex
-			const toPosition = activeList()[toIndex][1].position ?? toIndex
+			const fromPosition = activeList()[fromIndex].position
+			const toPosition = activeList()[toIndex].position
 
 			if (fromIndex !== toIndex) {
 				moveItem(draggable.id as string, { fromPosition, toPosition })
@@ -113,7 +105,7 @@ export function Home(props: { softwareKeyboardShown: boolean }) {
 		}
 	}
 
-	const ids = () => activeList().map(([id]) => id)
+	const ids = () => activeList().map((item) => item.id)
 
 	const [scrollRef, setScrollRef] = createSignal<HTMLElement | null>(null)
 
@@ -137,10 +129,10 @@ export function Home(props: { softwareKeyboardShown: boolean }) {
 	return (
 		<>
 			<div style={props.softwareKeyboardShown ? { display: "none" } : {}}>
-				<ConnectionWarning
+				{/* <ConnectionWarning
 					isAuthenticated={connectionStatus().authenticated}
 					isConnected={connectionStatus().connected}
-				/>
+				/> */}
 			</div>
 
 			<div ref={setScrollRef} class="text-lg flex-1 overflow-auto">
@@ -150,7 +142,7 @@ export function Home(props: { softwareKeyboardShown: boolean }) {
 					<ul class="flex flex-col">
 						<SortableProvider ids={ids()}>
 							<RowAnimator>
-								<For each={activeList()}>{([id, item]) => <ItemRow id={id} item={item} />}</For>
+								<For each={activeList()}>{(item) => <ItemRow item={item} />}</For>
 							</RowAnimator>
 						</SortableProvider>
 					</ul>
@@ -200,7 +192,7 @@ export function Home(props: { softwareKeyboardShown: boolean }) {
 										exit={{ opacity: 0, transition: { duration: 0.2 } }}
 									>
 										<RowAnimator>
-											<For each={checkedList()}>{([id, item]) => <ItemRow id={id} item={item} />}</For>
+											<For each={checkedList()}>{(item) => <ItemRow item={item} />}</For>
 										</RowAnimator>
 									</Motion.ul>
 								</Show>
@@ -210,12 +202,7 @@ export function Home(props: { softwareKeyboardShown: boolean }) {
 				</Presence>
 			</div>
 
-			<NewItem
-				onCreate={(name) => {
-					addItem(name)
-					client.addItem(name)
-				}}
-			/>
+			<NewItem onCreate={(name) => addItem(name)} />
 		</>
 	)
 }

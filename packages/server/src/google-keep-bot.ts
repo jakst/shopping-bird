@@ -95,8 +95,11 @@ type Node = List | ListItem
 // The API has been reverse engineered from https://github.com/kiwiz/gkeepapi
 export class GoogleKeepBot implements Bot {
 	token = ""
+	shoppingListId
 
-	constructor(private shoppingListId: string) {}
+	constructor(shoppingListId: string) {
+		this.shoppingListId = shoppingListId
+	}
 
 	async authenticate(options: { email: string; masterKey: string }) {
 		const token = await getToken(options)
@@ -223,6 +226,60 @@ export class GoogleKeepBot implements Bot {
 		})
 
 		await this.updateNodes(modifiedItems)
+	}
+
+	async getList2() {
+		const { list, listItems } = await this.#getItems()
+		return {
+			lastChangedAt: list.timestamps.updated,
+			items: listItems.map((item) => ({
+				id: item.id,
+				name: item.text,
+				checked: item.checked,
+			})),
+		}
+	}
+
+	async addItem(id: string, name: string, checked: boolean) {
+		const { list, listItems } = await this.#getItems()
+
+		const highestStortValue = listItems.reduce((min, item) => {
+			const val = Number.parseInt(item.sortValue)
+			if (Number.isNaN(val)) return min
+			return Math.min(min, val)
+		}, 0)
+
+		await this.updateNodes([
+			{
+				id,
+				type: "LIST_ITEM" as const,
+				parentId: list.id,
+				text: name,
+				checked,
+				sortValue: (highestStortValue - 1000).toString(),
+			},
+		])
+	}
+
+	async deleteItem(id: string) {
+		const { listItems } = await this.#getItems()
+		const item = listItems.find((item) => item.serverId === id)
+
+		if (item) {
+			item.timestamps.deleted = new Date().toISOString()
+			await this.updateNodes([item])
+		}
+	}
+
+	async updateItem(id: string, { name, checked }: { name?: string; checked?: boolean }) {
+		const { listItems } = await this.#getItems()
+		const item = listItems.find((item) => item.serverId === id)
+
+		if (item) {
+			if (name) item.text = name
+			if (checked !== undefined) item.checked = checked
+			await this.updateNodes([item])
+		}
 	}
 
 	async getList() {

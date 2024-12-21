@@ -22,3 +22,4 @@ export {
 export { Server } from "./server"
 export { ShoppingList } from "./shopping-list"
 export { trimAndUppercase } from "./utils/trim-and-uppercase"
+export { createTinybaseClient } from "./tinybase-client"

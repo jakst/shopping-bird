@@ -1,5 +1,8 @@
+import type { WsServerDurableObject } from "tinybase/synchronizers/synchronizer-ws-server-durable-object"
+
 export type Env = {
 	DO: DurableObjectNamespace
+	TinyObject: DurableObjectNamespace<WsServerDurableObject>
 	ENV_DISCRIMINATOR: string
 	HYPERDX_API_KEY: string
 	OTEL_SERVICE_NAME: string
