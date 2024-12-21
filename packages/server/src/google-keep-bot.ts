@@ -240,7 +240,7 @@ export class GoogleKeepBot implements Bot {
 		}
 	}
 
-	async addItem(id: string, name: string, checked: boolean) {
+	async addItem(id: string, name: string) {
 		const { list, listItems } = await this.#getItems()
 
 		const highestStortValue = listItems.reduce((min, item) => {
@@ -255,7 +255,6 @@ export class GoogleKeepBot implements Bot {
 				type: "LIST_ITEM" as const,
 				parentId: list.id,
 				text: name,
-				checked,
 				sortValue: (highestStortValue - 1000).toString(),
 			},
 		])

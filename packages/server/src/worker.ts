@@ -160,10 +160,12 @@ export class TinyObject extends WsServerDurableObject<Env> {
 								updatedItem.checked = serverItem.checked
 							}
 
-							console.log("Updating item", serverItem.id, changed, updatedItem)
-							keepBot.updateItem(serverItem.id, updatedItem).catch((error) => {
-								console.error(error)
-							})
+							if (changed) {
+								console.log("Updating item", serverItem.id, changed, updatedItem)
+								keepBot.updateItem(serverItem.id, updatedItem).catch((error) => {
+									console.error(error)
+								})
+							}
 						} else {
 							// This is an edge case. The object exists in keep, but doesn't exist
 							// in the server. It means we lost some data. Use the server values.
@@ -172,9 +174,15 @@ export class TinyObject extends WsServerDurableObject<Env> {
 							})
 						}
 					} else {
-						keepBot.addItem(serverItem.id, serverItem.name, serverItem.checked).catch((error) => {
-							console.error(error)
-						})
+						console.log("Adding item", serverItem.name)
+						keepBot
+							.addItem(serverItem.id, serverItem.name)
+							.then(() => {
+								if (serverItem.checked) keepBot.updateItem(serverItem.id, { checked: true })
+							})
+							.catch((error) => {
+								console.error(error)
+							})
 					}
 				})
 
