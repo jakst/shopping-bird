@@ -17,16 +17,16 @@ export class TinyObject extends WsServerDurableObject<Env> {
 
 	interval: ReturnType<typeof setInterval> | undefined
 
-	constructor(ctx: DurableObjectState, env: Env) {
-		super(ctx, env)
+	// constructor(ctx: DurableObjectState, env: Env) {
+	// 	super(ctx, env)
 
-		this.tinybaseStore.addTableListener("items", (store, tableId) => {
-			console.log(
-				"OLA!",
-				Object.fromEntries(Object.values(store.getTable(tableId)).map((item) => [item.id, item.name])),
-			)
-		})
-	}
+	// 	// this.tinybaseStore.addTableListener("items", (store, tableId) => {
+	// 	// 	console.log(
+	// 	// 		"OLA!",
+	// 	// 		Object.fromEntries(Object.values(store.getTable(tableId)).map((item) => [item.id, item.name])),
+	// 	// 	)
+	// 	// })
+	// }
 
 	onPathId(pathId: Id, addedOrRemoved: IdAddedOrRemoved) {
 		if (this.interval) {
@@ -43,6 +43,19 @@ export class TinyObject extends WsServerDurableObject<Env> {
 	createPersister() {
 		return createDurableObjectStoragePersister(this.tinybaseStore, this.ctx.storage)
 	}
+
+	// async sync() {
+	// 	console.log("I AM SYNCING")
+	// 	// this.tinybaseStore.
+	// 	// const store = createMergeableStore()
+	// 	// const synchronizer = await createWsSynchronizer(store, new WebSocket("http://localhost:8787/tinybase"), 1)
+
+	// 	// await synchronizer.startSync()
+	// 	// const shoppingList = createTinybaseClient(store)
+	// 	this.shoppingList.addItem("HERPADERP")
+	// 	this.shoppingList.addItem("HERPADERP2")
+	// 	console.log("ADDED ITEMS")
+	// }
 
 	async sync() {
 		console.log(this.tinybaseStore.getValue("lastChangedAt"))
@@ -81,18 +94,16 @@ export class TinyObject extends WsServerDurableObject<Env> {
 			const newItems: DiffItem[] = []
 
 			newKeepList.items.forEach((newKeepItem) => {
-				const existingServerItem = this.tinybaseStore.getRow("items", newKeepItem.id) as ShoppingListItem
-
-				if (existingServerItem) {
+				if (this.tinybaseStore.hasRow("items", newKeepItem.id)) {
 					const previousKeepItem = prevKeepStore.items.find((prevKeepItem) => prevKeepItem.id === newKeepItem.id)
 
 					if (previousKeepItem) {
 						if (newKeepItem.name !== previousKeepItem.name) {
-							this.shoppingList.renameItem(existingServerItem.id, newKeepItem.name)
+							this.shoppingList.renameItem(newKeepItem.id, newKeepItem.name)
 						}
 
 						if (newKeepItem.checked !== previousKeepItem.checked) {
-							this.shoppingList.setItemChecked(existingServerItem.id, newKeepItem.checked)
+							this.shoppingList.setItemChecked(newKeepItem.id, newKeepItem.checked)
 						}
 					}
 				} else {
@@ -133,8 +144,6 @@ export class TinyObject extends WsServerDurableObject<Env> {
 
 				serverList.forEach((serverItem) => {
 					const keepItem = newKeepList.items.find((keepItem) => keepItem.id === serverItem.id)
-					console.log("\n\n", newKeepList)
-					console.log(serverItem, keepItem, "\n\n")
 
 					if (keepItem) {
 						const previousServerItem = prevServerStore.items.find((item) => item.id === serverItem.id)
@@ -151,6 +160,7 @@ export class TinyObject extends WsServerDurableObject<Env> {
 								updatedItem.checked = serverItem.checked
 							}
 
+							console.log("Updating item", serverItem.id, changed, updatedItem)
 							keepBot.updateItem(serverItem.id, updatedItem).catch((error) => {
 								console.error(error)
 							})

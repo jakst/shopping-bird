@@ -263,7 +263,7 @@ export class GoogleKeepBot implements Bot {
 
 	async deleteItem(id: string) {
 		const { listItems } = await this.#getItems()
-		const item = listItems.find((item) => item.serverId === id)
+		const item = listItems.find((item) => item.id === id)
 
 		if (item) {
 			item.timestamps.deleted = new Date().toISOString()
@@ -273,7 +273,7 @@ export class GoogleKeepBot implements Bot {
 
 	async updateItem(id: string, { name, checked }: { name?: string; checked?: boolean }) {
 		const { listItems } = await this.#getItems()
-		const item = listItems.find((item) => item.serverId === id)
+		const item = listItems.find((item) => item.id === id)
 
 		if (item) {
 			if (name) item.text = name

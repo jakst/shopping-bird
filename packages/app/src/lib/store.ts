@@ -23,7 +23,7 @@ async function init() {
 
 	const synchronizer = await createWsSynchronizer(
 		tinybase,
-		new ReconnectingWebSocket("http://localhost:8787/tinybase"),
+		new ReconnectingWebSocket("http://localhost:8787/tinybase3"),
 		1,
 	)
 	await synchronizer.startSync()
