@@ -1,5 +1,6 @@
 import { type ShoppingListItem, createTinybaseClient } from "lib"
 import ReconnectingWebSocket from "reconnecting-websocket"
+import { createSignal } from "solid-js"
 import { createStore, reconcile } from "solid-js/store"
 import { isServer } from "solid-js/web"
 import { createMergeableStore } from "tinybase"
@@ -7,8 +8,9 @@ import { createLocalPersister } from "tinybase/persisters/persister-browser"
 import { createWsSynchronizer } from "tinybase/synchronizers/synchronizer-ws-client"
 import { env } from "./env"
 
+const [isConnected, setIsConnected] = createSignal(true)
 const [myShoppingList, setShoppingList] = createStore<ShoppingListItem[]>([])
-export { myShoppingList }
+export { myShoppingList, isConnected }
 
 const store = createMergeableStore()
 
@@ -24,7 +26,12 @@ if (!isServer) {
 	await persister.startAutoLoad()
 	await persister.startAutoSave()
 
-	const synchronizer = await createWsSynchronizer(store, new ReconnectingWebSocket(WS_ENDPOINT), 1)
+	const ws = new ReconnectingWebSocket(WS_ENDPOINT)
+
+	ws.addEventListener("open", () => void setIsConnected(true))
+	ws.addEventListener("close", () => void setIsConnected(false))
+
+	const synchronizer = await createWsSynchronizer(store, ws, 1)
 	await synchronizer.startSync()
 
 	// If the websocket reconnects in the future, do another explicit sync.

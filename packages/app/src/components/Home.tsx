@@ -12,9 +12,10 @@ import { For, type JSX, Show, createSignal, onCleanup, onMount } from "solid-js"
 import { Motion, Presence } from "solid-motionone"
 import { TransitionGroup } from "solid-transition-group"
 import { ItemRow } from "~/components/ItemRow"
-import { myShoppingList, shopping } from "~/lib/shopping-list"
+import { isConnected, myShoppingList, shopping } from "~/lib/shopping-list"
 import { isInputField } from "~/lib/type-guards"
 import IconCaretRight from "~icons/radix-icons/caret-right"
+import { ConnectionWarning } from "./ConnectionWarning"
 
 const ITEM_HEIGHT = 40
 const ITEM_HEIGHT_PX = `${ITEM_HEIGHT}px`
@@ -77,10 +78,7 @@ export function Home(props: { softwareKeyboardShown: boolean }) {
 	return (
 		<>
 			<div style={props.softwareKeyboardShown ? { display: "none" } : {}}>
-				{/* <ConnectionWarning
-					isAuthenticated={connectionStatus().authenticated}
-					isConnected={connectionStatus().connected}
-				/> */}
+				<ConnectionWarning isConnected={isConnected()} />
 			</div>
 
 			<div ref={setScrollRef} class="text-lg flex-1 overflow-auto">
