@@ -1,12 +1,11 @@
 import { useConnectivitySignal } from "@solid-primitives/connectivity"
 import { Match, Switch } from "solid-js"
 
-export function ConnectionWarning(props: { isAuthenticated: boolean; isConnected: boolean }) {
+export function ConnectionWarning(props: { isConnected: boolean }) {
 	const isOnline = useConnectivitySignal()
 
 	const showOfflineWarning = () => !isOnline()
 	const showNotConnectedWarning = () => isOnline() && !props.isConnected
-	const showAuthWarning = () => isOnline() && props.isConnected && !props.isAuthenticated
 
 	return (
 		<Switch>
@@ -25,18 +24,6 @@ export function ConnectionWarning(props: { isAuthenticated: boolean; isConnected
 				<div class="mx-2 mb-4 bg-red2 border border-red6 text-sm text-red9 px-4 py-3 rounded relative" role="alert">
 					<strong class="font-bold">Connection error!</strong>
 					<span class="block">Your changes will be synced when the server is back up again.</span>
-				</div>
-			</Match>
-
-			<Match when={showAuthWarning()}>
-				<div
-					class="mx-2 mb-4 bg-amber2 border border-amber7 text-sm text-amber11 px-4 py-3 rounded relative"
-					role="alert"
-				>
-					<strong class="font-bold">Whoppa!</strong>
-					<span class="block">
-						Looks like the server has lost its authentication info. Contact your system admin to re-authenticate.
-					</span>
 				</div>
 			</Match>
 		</Switch>

@@ -13,7 +13,7 @@ export default createHandler(() => (
 					<meta name="description" content="Your shopping list" />
 
 					<link rel="icon" type="image/png" href="/favicon.png" />
-					<link rel="preload" href="Hubot-Sans-1.0.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+					<link rel="preload" href="/_build/Hubot-Sans-1.0.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
 
 					<Show when={import.meta.env.PROD}>
 						<link rel="manifest" type="application/manifest+json" href="/manifest.webmanifest" />

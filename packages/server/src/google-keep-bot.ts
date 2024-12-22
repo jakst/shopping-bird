@@ -1,4 +1,4 @@
-import { type Bot, trimAndUppercase } from "lib"
+import { trimAndUppercase } from "lib"
 
 function cleanFromTrash(value: string) {
 	let res = value
@@ -6,11 +6,6 @@ function cleanFromTrash(value: string) {
 	if (value.endsWith(" på")) res = res.slice(0, -3)
 
 	return res
-}
-
-const alphabet = "0123456789abcdef"
-function createRandomString(length: number) {
-	return Array.from({ length }, () => alphabet.charAt(Math.floor(Math.random() * alphabet.length))).join()
 }
 
 // To obtain a master key
@@ -93,10 +88,13 @@ interface ListItem {
 type Node = List | ListItem
 
 // The API has been reverse engineered from https://github.com/kiwiz/gkeepapi
-export class GoogleKeepBot implements Bot {
+export class GoogleKeepBot {
 	token = ""
+	shoppingListId
 
-	constructor(private shoppingListId: string) {}
+	constructor(shoppingListId: string) {
+		this.shoppingListId = shoppingListId
+	}
 
 	async authenticate(options: { email: string; masterKey: string }) {
 		const token = await getToken(options)
@@ -205,6 +203,7 @@ export class GoogleKeepBot implements Bot {
 		return { list, listItems: sortedItems }
 	}
 
+	// TODO: Use this
 	async refreshList() {
 		const { listItems } = await this.#getItems()
 
@@ -226,15 +225,18 @@ export class GoogleKeepBot implements Bot {
 	}
 
 	async getList() {
-		const { listItems } = await this.#getItems()
-		return listItems.map((item, index) => ({
-			name: item.text,
-			checked: item.checked,
-			index,
-		}))
+		const { list, listItems } = await this.#getItems()
+		return {
+			lastChangedAt: list.timestamps.updated,
+			items: listItems.map((item) => ({
+				id: item.id,
+				name: item.text,
+				checked: item.checked,
+			})),
+		}
 	}
 
-	async ADD_ITEM(name: string, checked?: boolean) {
+	async addItem(id: string, name: string) {
 		const { list, listItems } = await this.#getItems()
 
 		const highestStortValue = listItems.reduce((min, item) => {
@@ -245,29 +247,33 @@ export class GoogleKeepBot implements Bot {
 
 		await this.updateNodes([
 			{
-				id: `${createRandomString(11)}.${createRandomString(14)}`,
+				id,
 				type: "LIST_ITEM" as const,
 				parentId: list.id,
 				text: name,
-				checked,
 				sortValue: (highestStortValue - 1000).toString(),
 			},
 		])
 	}
 
-	async DELETE_ITEM(index: number) {
+	async deleteItem(id: string) {
 		const { listItems } = await this.#getItems()
-		const item = listItems[index]!
+		const item = listItems.find((item) => item.id === id)
 
-		item.timestamps.deleted = new Date().toISOString()
-		await this.updateNodes([item])
+		if (item) {
+			item.timestamps.deleted = new Date().toISOString()
+			await this.updateNodes([item])
+		}
 	}
 
-	async SET_ITEM_CHECKED(index: number, checked: boolean) {
+	async updateItem(id: string, { name, checked }: { name?: string; checked?: boolean }) {
 		const { listItems } = await this.#getItems()
-		const item = listItems[index]
-		item.checked = checked
+		const item = listItems.find((item) => item.id === id)
 
-		await this.updateNodes([item])
+		if (item) {
+			if (name) item.text = name
+			if (checked !== undefined) item.checked = checked
+			await this.updateNodes([item])
+		}
 	}
 }
