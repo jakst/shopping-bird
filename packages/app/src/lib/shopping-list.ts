@@ -14,7 +14,7 @@ export { myShoppingList, isConnected }
 
 const store = createMergeableStore()
 
-if (!isServer) {
+async function init() {
 	const WS_ENDPOINT = new URL(`/${env.ENV_DISCRIMONATOR}`, env.WS_URL).toString()
 
 	store.addTableListener("items", (store, tableId) => {
@@ -38,6 +38,10 @@ if (!isServer) {
 	synchronizer.getWebSocket().addEventListener("open", () => {
 		synchronizer.load().then(() => synchronizer.save())
 	})
+
+	await persister.save()
 }
+
+if (!isServer) init()
 
 export const shopping = createTinybaseClient(store)
