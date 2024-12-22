@@ -5,7 +5,8 @@
 		"source.fixAll": "explicit",
 		"quickfix.biome": "explicit",
 		"source.organizeImports": "never",
-		"source.organizeImports.biome": "explicit"
+		"source.organizeImports.biome": "always",
+		"source.removeUnusedImports": "always"
 	},
 
 	"[javascript][typescript][typescriptreact][json][jsonc]": {
