@@ -8,7 +8,7 @@ import {
 import type { Env } from "./Env"
 import { GoogleKeepBot } from "./google-keep-bot"
 
-const SYNC_INTERVAL = 5_000
+const SYNC_INTERVAL = 10_000
 
 export class TinyDO extends WsServerDurableObject<Env> {
 	tinybaseStore = createMergeableStore()
@@ -21,6 +21,7 @@ export class TinyDO extends WsServerDurableObject<Env> {
 			this.interval = undefined
 		}
 
+		// Enable syncing on an interval when there are clients connectect
 		if (addedOrRemoved > 0) {
 			this.interval = setInterval(() => this.sync(), SYNC_INTERVAL)
 			this.sync()
@@ -51,36 +52,34 @@ export class TinyDO extends WsServerDurableObject<Env> {
 
 		// If changes have been made in Keep since last time we checked, sync them back to the server.
 		if (newKeepList.lastChangedAt !== prevKeepStore.lastChangedAt) {
-			console.log("Keep list changed. Investigating...", newKeepList.lastChangedAt, prevKeepStore.lastChangedAt)
+			console.log("[KEEP] List changed. Syncing changes back to the shopping list...")
 
 			const oldIds = new Set(prevKeepStore.items.map((item) => item.id))
 			const newIds = new Set(newKeepList.items.map((item) => item.id))
 			const removedIds = oldIds.difference(newIds)
 
 			removedIds.forEach((id) => {
-				console.log(`Removing ${prevKeepStore.items.find((item) => item.id === id)?.name}`)
+				console.log(`[KEEP] "${prevKeepStore.items.find((item) => item.id === id)?.name}" was removed`)
 				this.shoppingList.removeItem(id)
 			})
 
 			newKeepList.items.forEach((newKeepItem) => {
 				if (this.tinybaseStore.hasRow("items", newKeepItem.id)) {
 					const previousKeepItem = prevKeepStore.items.find((prevKeepItem) => prevKeepItem.id === newKeepItem.id)
-					console.log("[KEEP]", previousKeepItem, newKeepItem, prevKeepStore)
 
 					if (previousKeepItem) {
 						if (newKeepItem.name !== previousKeepItem.name) {
-							console.log(`[KEEP] Changing name from ${previousKeepItem.name} to ${newKeepItem.name}`)
+							console.log(`[KEEP] Name changed from ${previousKeepItem.name} to ${newKeepItem.name}`)
 							this.shoppingList.renameItem(newKeepItem.id, newKeepItem.name)
 						}
 
 						if (newKeepItem.checked !== previousKeepItem.checked) {
-							console.log(
-								`[KEEP] Setting checked on ${newKeepItem.name} from ${previousKeepItem.checked} to ${newKeepItem.checked}`,
-							)
+							console.log(`[KEEP] "${newKeepItem.name}" was ${newKeepItem.checked ? "checked" : "unchecked"}`)
 							this.shoppingList.setItemChecked(newKeepItem.id, newKeepItem.checked)
 						}
 					}
 				} else {
+					console.log(`[KEEP] Found  ${newKeepItem.checked ? "checked" : "unchecked"} new item "${newKeepItem.name}"`)
 					this.shoppingList.addItem(newKeepItem.name, newKeepItem.id)
 					if (newKeepItem.checked) this.shoppingList.setItemChecked(newKeepItem.id, true)
 				}
@@ -103,11 +102,13 @@ export class TinyDO extends WsServerDurableObject<Env> {
 
 			// If changes have been made on the server since last time we checked, sync them back to Keep.
 			if (prevServerStore.lastChangedAt !== serverLastChangedAt) {
+				console.log("Shopping list changed. Syncing changes to Keep...")
 				const oldIds = new Set(prevServerStore.items.map((item) => item.id))
 				const newIds = new Set(serverList.map((item) => item.id))
 				const removedIds = oldIds.difference(newIds)
 
 				removedIds.forEach((id) => {
+					console.log(`Removing "${prevKeepStore.items.find((item) => item.id === id)?.name}" from Keep`)
 					keepBot.deleteItem(id).catch((error) => {
 						console.error(error)
 					})
@@ -123,16 +124,17 @@ export class TinyDO extends WsServerDurableObject<Env> {
 							let changed = false
 							const updatedItem: { name?: string; checked?: boolean } = {}
 							if (previousServerItem.name !== serverItem.name) {
+								console.log(`Renaming item "${previousServerItem.name}" to "${serverItem.name}" in Keep`)
 								changed = true
 								updatedItem.name = serverItem.name
 							}
 							if (previousServerItem.checked !== serverItem.checked) {
+								console.log(`${serverItem.checked ? "Checking" : "Unchecking"} item "${serverItem.name}" in Keep`)
 								changed = true
 								updatedItem.checked = serverItem.checked
 							}
 
 							if (changed) {
-								console.log(`Updating item ${`${serverItem.name} (${serverItem.id})`} to keep`)
 								keepBot.updateItem(serverItem.id, updatedItem).catch((error) => {
 									console.error(error)
 								})
@@ -141,13 +143,13 @@ export class TinyDO extends WsServerDurableObject<Env> {
 							// This is an edge case. The object exists in keep, but doesn't exist in the
 							// server cache. It means we lost some cached data. Use the server values.
 
-							console.log(`Updating item ${`${serverItem.name} (${serverItem.id})`} to keep`)
+							console.warn(`Updating item (edge case) "${serverItem.name}" in keep`, { serverItem, keepItem })
 							keepBot.updateItem(serverItem.id, serverItem).catch((error) => {
 								console.error(error)
 							})
 						}
 					} else {
-						console.log("Adding item", serverItem.name)
+						console.log(`Adding ${serverItem.checked ? "checked" : "unchecked"} item ${serverItem.name} to Keep`)
 						keepBot
 							.addItem(serverItem.id, serverItem.name)
 							.then(() => {

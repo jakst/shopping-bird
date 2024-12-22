@@ -12,7 +12,7 @@ import { For, type JSX, Show, createSignal, onCleanup, onMount } from "solid-js"
 import { Motion, Presence } from "solid-motionone"
 import { TransitionGroup } from "solid-transition-group"
 import { ItemRow } from "~/components/ItemRow"
-import { myShoppingList, shopping } from "~/lib/store"
+import { myShoppingList, shopping } from "~/lib/shopping-list"
 import { isInputField } from "~/lib/type-guards"
 import IconCaretRight from "~icons/radix-icons/caret-right"
 
