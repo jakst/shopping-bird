@@ -69,7 +69,7 @@ export class TinyDO extends WsServerDurableObject<Env> {
 
 					if (previousKeepItem) {
 						if (newKeepItem.name !== previousKeepItem.name) {
-							console.log(`[KEEP] Name changed from ${previousKeepItem.name} to ${newKeepItem.name}`)
+							console.log(`[KEEP] Name changed from "${previousKeepItem.name}" to "${newKeepItem.name}"`)
 							this.shoppingList.renameItem(newKeepItem.id, newKeepItem.name)
 						}
 
