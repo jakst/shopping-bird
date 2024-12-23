@@ -10,7 +10,7 @@
 		"version": "vinxi version"
 	},
 	"devDependencies": {
-		"@dotenvx/dotenvx": "1.31.0",
+		"@dotenvx/dotenvx": "1.31.3",
 		"@iconify-json/bi": "1.2.2",
 		"@iconify-json/ci": "1.2.2",
 		"@iconify-json/radix-icons": "1.2.2",
