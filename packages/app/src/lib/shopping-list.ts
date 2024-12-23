@@ -19,7 +19,13 @@ async function init() {
 
 	store.addTableListener("items", (store, tableId) => {
 		const table = store.getTable(tableId) as Record<string, ShoppingListItem>
-		setShoppingList(reconcile(Object.values(table), { key: "id" }))
+		setShoppingList(
+			reconcile(
+				// Someimtes we get items without IDs for some reason. Filter those out.
+				Object.values(table).filter((item) => item.id),
+				{ key: "id" },
+			),
+		)
 	})
 
 	const persister = createLocalPersister(store, "shopping-list")
