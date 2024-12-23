@@ -90,7 +90,7 @@ export function ItemRow(props: { item: ShoppingListItem }) {
 						}}
 					>
 						<input
-							data-item="true"
+							data-checked={props.item.checked}
 							ref={nameInputField}
 							value={props.item.name}
 							style={{ "-webkit-tap-highlight-color": "transparent" }}
@@ -102,7 +102,7 @@ export function ItemRow(props: { item: ShoppingListItem }) {
 							onInput={(event) => setNewName(trimAndUppercase(event.currentTarget.value))}
 							onKeyDown={(event) => {
 								if (event.currentTarget.value === "" && event.key === "Backspace") {
-									const inputs = document.querySelectorAll<HTMLInputElement>("input[data-item=true]")
+									const inputs = document.querySelectorAll<HTMLInputElement>("input[data-checked=false]")
 									const currentItemIndex = Array.from(inputs).indexOf(event.currentTarget)
 									if (currentItemIndex > 0) {
 										const previousItem = inputs[currentItemIndex - 1]
@@ -110,12 +110,46 @@ export function ItemRow(props: { item: ShoppingListItem }) {
 									}
 
 									shopping.removeItem(props.item.id)
+								} else if (event.shiftKey && event.key === "ArrowUp") {
+									event.preventDefault()
+									const inputs = Array.from(document.querySelectorAll<HTMLInputElement>("input[data-checked=false]"))
+
+									if (inputs.indexOf(event.currentTarget) > 0)
+										shopping.moveItem(props.item.id, {
+											fromPosition: props.item.position,
+											toPosition: props.item.position - 1,
+										})
+
+									event.currentTarget.focus()
+								} else if (event.shiftKey && event.key === "ArrowDown") {
+									event.preventDefault()
+									const inputs = Array.from(document.querySelectorAll<HTMLInputElement>("input[data-checked=false]"))
+
+									if (inputs.indexOf(event.currentTarget) < inputs.length - 1)
+										shopping.moveItem(props.item.id, {
+											fromPosition: props.item.position,
+											toPosition: props.item.position + 1,
+										})
+
+									event.currentTarget.focus()
+								} else if (!event.shiftKey && event.key === "ArrowUp") {
+									event.preventDefault()
+									const inputs = Array.from(document.querySelectorAll<HTMLInputElement>("input[data-checked=false]"))
+
+									const previousItem = inputs[inputs.indexOf(event.currentTarget) - 1]
+									previousItem?.focus()
+								} else if (!event.shiftKey && event.key === "ArrowDown") {
+									event.preventDefault()
+									const inputs = Array.from(document.querySelectorAll<HTMLInputElement>("input[data-checked=false]"))
+
+									const nextItem = inputs[inputs.indexOf(event.currentTarget) + 1]
+									nextItem?.focus()
 								}
 							}}
 							onKeyPress={(event) => {
 								if (event.key === "Enter") {
 									shopping.addItemAfter(props.item.position)
-									const inputs = document.querySelectorAll<HTMLInputElement>("input[data-item=true]")
+									const inputs = document.querySelectorAll<HTMLInputElement>("input[data-checked=false]")
 									const currentItemIndex = Array.from(inputs).indexOf(event.currentTarget)
 									if (currentItemIndex >= 0) {
 										const nextItem = inputs[currentItemIndex + 1]
