@@ -77,8 +77,8 @@ export function Home() {
 							onClick={() => {
 								shopping.addItem("")
 
-								const inputs = document.querySelectorAll<HTMLInputElement>("input[data-item=true]")
-								const item = Array.from(inputs.entries()).at(-1)?.[1]
+								const inputs = document.querySelectorAll<HTMLInputElement>("input[data-checked=false]")
+								const item = Array.from(inputs).at(-1)
 								item?.focus()
 							}}
 							class="text-color10 font-light flex flex-row gap-2 items-center px-3 cursor-text h-10"
