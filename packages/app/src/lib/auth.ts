@@ -18,7 +18,7 @@ export const login = action(async (formData: FormData) => {
 	if (`${username}:${password}` !== secretEnv.AUTH_INFO) return new Error("Invalid credentials")
 
 	setCookie("authenticated", "true", {
-		expires: new Date(Date.now() + 60 * 60 * 24 * 365),
+		expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
 		httpOnly: true,
 		sameSite: "lax",
 		secure: getRequestProtocol() === "https",
