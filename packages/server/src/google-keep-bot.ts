@@ -2,8 +2,8 @@ import { trimAndUppercase } from "lib"
 
 function cleanFromTrash(value: string) {
 	let res = value
-	if (value.startsWith("till ")) res = res.slice(5)
-	if (value.endsWith(" på")) res = res.slice(0, -3)
+	if (value.toLowerCase().startsWith("till ")) res = res.slice(5)
+	if (value.toLowerCase().endsWith(" på")) res = res.slice(0, -3)
 
 	return res
 }
@@ -203,7 +203,6 @@ export class GoogleKeepBot {
 		return { list, listItems: sortedItems }
 	}
 
-	// TODO: Use this
 	async refreshList() {
 		const { listItems } = await this.#getItems()
 
@@ -216,6 +215,7 @@ export class GoogleKeepBot {
 			res = trimAndUppercase(res)
 
 			if (res !== initialText) {
+				console.log(`[KEEP] "${initialText}" was cleaned up and renamed to "${res}"`)
 				item.text = res
 				modifiedItems.push(item)
 			}

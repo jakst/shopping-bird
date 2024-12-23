@@ -54,6 +54,8 @@ export class TinyDO extends WsServerDurableObject<Env> {
 		if (newKeepList.lastChangedAt !== prevKeepStore.lastChangedAt) {
 			console.log("[KEEP] List changed. Syncing changes back to the shopping list...")
 
+			await keepBot.refreshList()
+
 			const oldIds = new Set(prevKeepStore.items.map((item) => item.id))
 			const newIds = new Set(newKeepList.items.map((item) => item.id))
 			const removedIds = oldIds.difference(newIds)
