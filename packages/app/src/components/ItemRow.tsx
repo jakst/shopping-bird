@@ -119,6 +119,10 @@ export function ItemRow(props: { item: ShoppingListItem }) {
 									const currentItemIndex = Array.from(inputs).indexOf(event.currentTarget)
 									if (currentItemIndex >= 0) {
 										const nextItem = inputs[currentItemIndex + 1]
+
+										// Focus instantly to keep keyboard open in proper browsers
+										nextItem.focus()
+										// Focus after delay to make it work in Safari...
 										setTimeout(() => nextItem.focus(), 100)
 									}
 								}
