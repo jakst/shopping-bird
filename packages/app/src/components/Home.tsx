@@ -6,21 +6,22 @@ import {
 	SortableProvider,
 	closestCenter,
 } from "@thisbeyond/solid-dnd"
-import { type ShoppingListItem, trimAndUppercase } from "lib"
+import type { ShoppingListItem } from "lib"
 import { animate } from "motion/mini"
-import { For, type JSX, Show, createSignal, onCleanup, onMount } from "solid-js"
+import { For, type JSX, Show, createSignal } from "solid-js"
 import { Motion, Presence } from "solid-motionone"
 import { TransitionGroup } from "solid-transition-group"
 import { ItemRow } from "~/components/ItemRow"
 import { isConnected, myShoppingList, shopping } from "~/lib/shopping-list"
 import { isInputField } from "~/lib/type-guards"
+import IconPlus from "~icons/ci/plus"
 import IconCaretRight from "~icons/radix-icons/caret-right"
 import { ConnectionWarning } from "./ConnectionWarning"
 
 const ITEM_HEIGHT = 40
 const ITEM_HEIGHT_PX = `${ITEM_HEIGHT}px`
 
-export function Home(props: { softwareKeyboardShown: boolean }) {
+export function Home() {
 	const sortedList = () => myShoppingList.toSorted((a, b) => a.position - b.position)
 
 	const activeList = () => sortedList().filter((item) => !item.checked)
@@ -56,41 +57,34 @@ export function Home(props: { softwareKeyboardShown: boolean }) {
 
 	const ids = () => activeList().map((item) => item.id)
 
-	const [scrollRef, setScrollRef] = createSignal<HTMLElement | null>(null)
-
-	onMount(() => {
-		let prevHeight = scrollRef()!.clientHeight
-
-		const resizeObserver = new ResizeObserver((entries) => {
-			const ref = scrollRef()
-			if (!ref) return
-
-			const newHeight = entries[0].contentRect.height
-			ref.scrollTo({ top: ref.scrollTop + prevHeight - newHeight, behavior: "instant" })
-			prevHeight = newHeight
-		})
-
-		resizeObserver.observe(scrollRef()!)
-
-		onCleanup(() => resizeObserver.disconnect())
-	})
-
 	return (
 		<>
-			<div style={props.softwareKeyboardShown ? { display: "none" } : {}}>
-				<ConnectionWarning isConnected={isConnected()} />
-			</div>
+			<ConnectionWarning isConnected={isConnected()} />
 
-			<div ref={setScrollRef} class="text-lg flex-1 overflow-auto">
+			<div class="text-lg flex-1 overflow-auto">
 				<DragDropProvider onDragStart={onDragStart} onDragEnd={onDragEnd} collisionDetector={closestCenter}>
 					<DragDropSensors />
 
-					<ul class="flex flex-col">
+					<ul class="flex flex-col pb-2">
 						<SortableProvider ids={ids()}>
 							<RowAnimator>
 								<For each={activeList()}>{(item) => <ItemRow item={item} />}</For>
 							</RowAnimator>
 						</SortableProvider>
+
+						<button
+							type="button"
+							onClick={() => {
+								shopping.addItem("")
+
+								const inputs = document.querySelectorAll<HTMLInputElement>("input[data-item=true]")
+								const item = Array.from(inputs.entries()).at(-1)?.[1]
+								item?.focus()
+							}}
+							class="text-color10 font-light flex flex-row gap-2 items-center px-3 cursor-text h-10"
+						>
+							<IconPlus /> Add item
+						</button>
 					</ul>
 
 					<Presence>
@@ -147,8 +141,6 @@ export function Home(props: { softwareKeyboardShown: boolean }) {
 					</Show>
 				</Presence>
 			</div>
-
-			<NewItem onCreate={(name) => shopping.addItem(name)} />
 		</>
 	)
 }
@@ -183,42 +175,5 @@ function RowAnimator(props: { children: JSX.Element }) {
 		>
 			{props.children}
 		</TransitionGroup>
-	)
-}
-
-function NewItem(props: { onCreate: (name: string) => void }) {
-	let inputField: HTMLInputElement | undefined
-	const [value, setValue] = createSignal("")
-
-	function submit() {
-		const parsedValue = trimAndUppercase(value())
-		if (parsedValue.length) props.onCreate(parsedValue)
-
-		setValue("")
-		inputField?.focus()
-	}
-
-	return (
-		<form
-			class="backdrop-blur bg-color1/40 px-2 pb-5 pt-1 border-t-4 border-opacity-10 border-color7 max-w-lg w-full flex flex-row"
-			onSubmit={(event) => {
-				event.preventDefault()
-				submit()
-			}}
-		>
-			<input
-				ref={inputField}
-				class="bg-color7/30 backdrop-blur max-w-lg h-14 pl-4 pr-20 rounded-xl flex-1 text-color12 placeholder:text-color11 focus:outline-none focus:ring-2 focus:ring-color5 transition-shadow ease-in-out duration-200"
-				placeholder="Add new item..."
-				value={value()}
-				onInput={(event) => setValue(event.currentTarget.value)}
-			/>
-
-			<input
-				type="submit"
-				value="Add"
-				class="bg-transparent px-4 h-14 rounded-r-xl text-color11 right-2 absolute focus:outline-none focus:ring-2 focus:ring-color5 transition-shadow ease-in-out duration-200"
-			/>
-		</form>
 	)
 }

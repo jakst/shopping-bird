@@ -1,5 +1,5 @@
 import { createSortable, transformStyle, useDragDropContext } from "@thisbeyond/solid-dnd"
-import type { ShoppingListItem } from "lib"
+import { type ShoppingListItem, trimAndUppercase } from "lib"
 import { Show, batch, createSignal } from "solid-js"
 import { shopping } from "~/lib/shopping-list"
 import IconPadding from "~icons/ci/drag-vertical"
@@ -90,6 +90,7 @@ export function ItemRow(props: { item: ShoppingListItem }) {
 						}}
 					>
 						<input
+							data-item="true"
 							ref={nameInputField}
 							value={props.item.name}
 							style={{ "-webkit-tap-highlight-color": "transparent" }}
@@ -98,7 +99,30 @@ export function ItemRow(props: { item: ShoppingListItem }) {
 							classList={{
 								"line-through": props.item.checked,
 							}}
-							onInput={(event) => setNewName(event.currentTarget.value)}
+							onInput={(event) => setNewName(trimAndUppercase(event.currentTarget.value))}
+							onKeyDown={(event) => {
+								if (event.currentTarget.value === "" && event.key === "Backspace") {
+									const inputs = document.querySelectorAll<HTMLInputElement>("input[data-item=true]")
+									const currentItemIndex = Array.from(inputs).indexOf(event.currentTarget)
+									if (currentItemIndex > 0) {
+										const previousItem = inputs[currentItemIndex - 1]
+										setTimeout(() => previousItem.focus(), 100)
+									}
+
+									shopping.removeItem(props.item.id)
+								}
+							}}
+							onKeyPress={(event) => {
+								if (event.key === "Enter") {
+									shopping.addItemAfter(props.item.position)
+									const inputs = document.querySelectorAll<HTMLInputElement>("input[data-item=true]")
+									const currentItemIndex = Array.from(inputs).indexOf(event.currentTarget)
+									if (currentItemIndex >= 0) {
+										const nextItem = inputs[currentItemIndex + 1]
+										setTimeout(() => nextItem.focus(), 100)
+									}
+								}
+							}}
 						/>
 					</form>
 				</div>

@@ -67,5 +67,19 @@ export function createTinybaseClient(tinybase: MergeableStore) {
 		updateTimestamp()
 	}
 
-	return { addItem, removeItem, setItemChecked, renameItem, clearCheckedItems, moveItem }
+	function addItemAfter(position: number) {
+		tinybase.transaction(() => {
+			const items = Object.values(tinybase.getTable("items") as Record<string, ShoppingListItem>)
+			items
+				.filter((item) => item.position > position)
+				.forEach((item) => {
+					tinybase.setPartialRow("items", item.id, { position: item.position + 1 })
+				})
+
+			const id = createId()
+			tinybase.setRow("items", id, { id, name: "", checked: false, position: position + 1 })
+		})
+	}
+
+	return { addItem, removeItem, setItemChecked, renameItem, clearCheckedItems, moveItem, addItemAfter }
 }
