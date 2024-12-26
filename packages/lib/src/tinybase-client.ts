@@ -11,7 +11,7 @@ export function createTinybaseClient(tinybase: MergeableStore) {
 		const id = forcedId ?? createId()
 		const position =
 			Object.values(tinybase.getTable("items") as Record<string, ShoppingListItem>).reduce(
-				(prev, curr) => Math.max(prev, curr.position),
+				(prev, curr) => Math.max(prev, curr.position ?? 0),
 				0,
 			) + 1
 
