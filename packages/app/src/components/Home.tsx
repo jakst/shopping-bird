@@ -12,7 +12,7 @@ import { For, type JSX, Show, createSignal } from "solid-js"
 import { Motion, Presence } from "solid-motionone"
 import { TransitionGroup } from "solid-transition-group"
 import { ItemRow } from "~/components/ItemRow"
-import { isConnected, myShoppingList, shopping } from "~/lib/shopping-list"
+import { myShoppingList, shopping } from "~/lib/shopping-list"
 import { isInputField } from "~/lib/type-guards"
 import IconPlus from "~icons/ci/plus"
 import IconCaretRight from "~icons/radix-icons/caret-right"
@@ -59,7 +59,7 @@ export function Home() {
 
 	return (
 		<>
-			<ConnectionWarning isConnected={isConnected()} />
+			<ConnectionWarning />
 
 			<div class="text-lg flex-1 overflow-auto">
 				<DragDropProvider onDragStart={onDragStart} onDragEnd={onDragEnd} collisionDetector={closestCenter}>

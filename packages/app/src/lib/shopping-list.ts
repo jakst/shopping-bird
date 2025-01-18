@@ -8,9 +8,9 @@ import { createLocalPersister } from "tinybase/persisters/persister-browser"
 import { createWsSynchronizer } from "tinybase/synchronizers/synchronizer-ws-client"
 import { env } from "./env"
 
-const [isConnected, setIsConnected] = createSignal(true)
+const [failedToConnect, setFailedToConnect] = createSignal(false)
 const [myShoppingList, setShoppingList] = createStore<ShoppingListItem[]>([])
-export { myShoppingList, isConnected }
+export { myShoppingList, failedToConnect }
 
 const store = createMergeableStore()
 
@@ -34,8 +34,13 @@ async function init() {
 
 	const ws = new ReconnectingWebSocket(WS_ENDPOINT)
 
-	ws.addEventListener("open", () => void setIsConnected(true))
-	ws.addEventListener("close", () => void setIsConnected(false))
+	ws.addEventListener("open", () => void setFailedToConnect(false))
+	ws.addEventListener("close", () => void setFailedToConnect(true))
+	ws.addEventListener("error", () => void setFailedToConnect(true))
+
+	document.addEventListener("visibilitychange", () => {
+		setFailedToConnect(false)
+	})
 
 	const synchronizer = await createWsSynchronizer(store, ws, 1)
 	await synchronizer.startSync()

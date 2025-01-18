@@ -26,7 +26,6 @@
 		"@radix-ui/colors": "3.0.0",
 		"@solid-mediakit/auth": "3.1.2",
 		"@solid-primitives/connectivity": "0.3.20",
-		"@solid-primitives/page-visibility": "2.0.17",
 		"@solidjs/meta": "0.29.4",
 		"@solidjs/router": "0.15.2",
 		"@solidjs/start": "1.0.11",
