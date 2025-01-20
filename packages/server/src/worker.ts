@@ -8,31 +8,44 @@ import {
 import type { Env } from "./Env"
 import { GoogleKeepBot } from "./google-keep-bot"
 
-const SYNC_INTERVAL = 10_000
+const SHORT_SYNC_INTERVAL = 1000 * 10 // Every 10 seconds
+const LONG_SYNC_INTERVAL = 1000 * 60 * 3 // Every 3 minutes
 
 export class TinyDO extends WsServerDurableObject<Env> {
 	tinybaseStore = createMergeableStore()
 	shoppingList = createTinybaseClient(this.tinybaseStore)
-	interval: ReturnType<typeof setInterval> | undefined
 
-	onPathId(pathId: Id, addedOrRemoved: IdAddedOrRemoved) {
-		if (this.interval) {
-			clearInterval(this.interval)
-			this.interval = undefined
-		}
-
-		// Enable syncing on an interval when there are clients connectect
-		if (addedOrRemoved > 0) {
-			this.interval = setInterval(() => this.sync(), SYNC_INTERVAL)
-			this.sync()
-		}
+	hasConnectedClients = false
+	get currentInterval() {
+		return this.hasConnectedClients ? SHORT_SYNC_INTERVAL : LONG_SYNC_INTERVAL
 	}
 
 	createPersister() {
 		return createDurableObjectStoragePersister(this.tinybaseStore, this.ctx.storage)
 	}
 
+	onPathId(pathId: Id, addedOrRemoved: IdAddedOrRemoved) {
+		if (addedOrRemoved > 0 !== this.hasConnectedClients) {
+			this.hasConnectedClients = addedOrRemoved > 0
+
+			const { shouldSyncImmediate, logLine } = this.hasConnectedClients
+				? { shouldSyncImmediate: true, logLine: "Client connected" }
+				: { shouldSyncImmediate: false, logLine: "All clients disconnected" }
+
+			console.log(`${logLine}. Setting sync interval to ${this.currentInterval / 1000}s`)
+			this.ctx.storage.setAlarm(Date.now() + this.currentInterval)
+
+			if (shouldSyncImmediate) this.sync()
+		}
+	}
+
+	async alarm(alarmInfo?: AlarmInvocationInfo) {
+		this.ctx.storage.setAlarm(Date.now() + this.currentInterval)
+		await this.sync()
+	}
+
 	async sync() {
+		console.log("Sync initiated")
 		const keepBot = new GoogleKeepBot(this.env.KEEP_SHOPPING_LIST_ID)
 		await keepBot.authenticate({ email: this.env.KEEP_EMAIL, masterKey: this.env.KEEP_MASTER_KEY })
 
