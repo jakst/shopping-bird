@@ -13,10 +13,6 @@ enabled = true
 [durable_objects]
 bindings = [{ name = "TinyDO", class_name = "TinyDO" }]
 
-[triggers]
-# Every 2 minutes between 05:00 and 20:00 UTC (i.e. 07:00 and 22:00 GMT+2 )
-crons = ["*/2 5-20 * * *"]
-
 [[migrations]]
 tag = "v1"
 new_classes = ["TheShoppingBird"]
