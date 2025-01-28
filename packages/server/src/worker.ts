@@ -40,7 +40,25 @@ export class TinyDO extends WsServerDurableObject<Env> {
 	}
 
 	async alarm(alarmInfo?: AlarmInvocationInfo) {
-		this.ctx.storage.setAlarm(Date.now() + this.currentInterval)
+		const currentHour = new Date().getUTCHours()
+		let nextAlarm = Date.now() + this.currentInterval
+
+		// If it's no longer daytime, set the alarm for 06:00 UTC
+		if (currentHour < 6 || currentHour > 21) {
+			const nextAlarmDate = new Date()
+			nextAlarmDate.setUTCHours(6, 0, 0, 0)
+			nextAlarm = nextAlarmDate.getTime()
+
+			if (currentHour > 21) {
+				console.log("It's too late in the evening. Setting alarm for tomorrow", nextAlarmDate.toISOString())
+				nextAlarmDate.setUTCDate(nextAlarmDate.getUTCDate() + 1)
+				nextAlarm = nextAlarmDate.getTime()
+			} else {
+				console.log("It's too early in the morning. Setting alarm for 06:00 UTC", nextAlarmDate.toISOString())
+			}
+		}
+
+		this.ctx.storage.setAlarm(nextAlarm)
 		await this.sync()
 	}
 
