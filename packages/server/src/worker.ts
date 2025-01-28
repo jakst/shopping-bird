@@ -8,8 +8,8 @@ import {
 import type { Env } from "./Env"
 import { GoogleKeepBot } from "./google-keep-bot"
 
-const SHORT_SYNC_INTERVAL = 1000 * 10 // Every 10 seconds
-const LONG_SYNC_INTERVAL = 1000 * 60 * 3 // Every 3 minutes
+const SHORT_SYNC_INTERVAL = 1000 * 30 // Every 30 seconds
+const LONG_SYNC_INTERVAL = 1000 * 60 * 30 // Every 30 minutes
 
 export class TinyDO extends WsServerDurableObject<Env> {
 	tinybaseStore = createMergeableStore()
