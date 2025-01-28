@@ -53,6 +53,9 @@ async function init() {
 	await persister.save()
 }
 
-if (!isServer) init()
+if (!isServer) {
+	init()
+	;(window as any).tb = store
+}
 
 export const shopping = createTinybaseClient(store)
