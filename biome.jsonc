@@ -23,6 +23,7 @@
 			"recommended": true,
 			"complexity": {
 				"noForEach": "off",
+				"noUselessConstructor": "off",
 				"useLiteralKeys": "off"
 			},
 			"style": {
