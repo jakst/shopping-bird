@@ -50,12 +50,20 @@ export class TinyDO extends WsServerDurableObject<Env> {
 			nextAlarm = nextAlarmDate.getTime()
 
 			if (currentHour > 21) {
-				console.log("It's too late in the evening. Setting alarm for tomorrow", nextAlarmDate.toISOString())
+				console.log(
+					"[Alarm] It's too late in the evening. Setting next alarm for tomorrow",
+					nextAlarmDate.toISOString(),
+				)
 				nextAlarmDate.setUTCDate(nextAlarmDate.getUTCDate() + 1)
 				nextAlarm = nextAlarmDate.getTime()
 			} else {
-				console.log("It's too early in the morning. Setting alarm for 06:00 UTC", nextAlarmDate.toISOString())
+				console.log(
+					"[Alarm] It's too early in the morning. Setting next alarm for 06:00 UTC",
+					nextAlarmDate.toISOString(),
+				)
 			}
+		} else {
+			console.log(`[Alarm] Setting next alarm in ${this.currentInterval / 1000}s`, new Date(nextAlarm).toISOString())
 		}
 
 		this.ctx.storage.setAlarm(nextAlarm)
