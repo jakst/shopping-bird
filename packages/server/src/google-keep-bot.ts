@@ -52,6 +52,8 @@ async function getToken(options: { email: string; masterKey: string }) {
 
 	const result = await response.text()
 
+	console.log("[GoogleKeepBot.getToken] result", result)
+
 	const token = result
 		.split("\n")
 		.find((x) => x.startsWith("Auth="))
@@ -98,6 +100,7 @@ export class GoogleKeepBot {
 
 	async authenticate(options: { email: string; masterKey: string }) {
 		const token = await getToken(options)
+		console.log("[GoogleKeepBot.authenticate] token", token)
 		if (token) this.token = token
 		return Boolean(token)
 	}
@@ -185,6 +188,8 @@ export class GoogleKeepBot {
 		})
 
 		const result: { nodes: Node[] } = await response.json()
+
+		console.log("[GoogleKeepBot.#getNodes] result", JSON.stringify(result, null, 2))
 		return result.nodes
 	}
 
