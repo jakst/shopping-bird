@@ -5,7 +5,7 @@ compatibility_flags = ["nodejs_compat"]
 
 logpush = true
 
-vars = { KEEP_EMAIL = "jakob.stahl91@gmail.com", KEEP_SHOPPING_LIST_ID = "1cT_A1zlW4UkVQPdiQxOy1GyqobwBktgbt3dThQ7p7sHCsKJmb3izdzA_6mq7GQ" }
+vars = { KEEP_EMAIL = "jakob.stahl91@gmail.com", KEEP_SHOPPING_LIST_ID = "15M6ZkkL46WunGsfI-VZyY6Jbp1IKpnRKLJog-1s7YcaNvoVNVmM4X8jDR15j" }
 
 [observability.logs]
 enabled = true
