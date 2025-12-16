@@ -1,6 +1,6 @@
 import { type ShoppingListItem, createTinybaseClient } from "lib"
 import { type Id, type IdAddedOrRemoved, createMergeableStore } from "tinybase"
-import { createDurableObjectStoragePersister } from "tinybase/persisters/persister-durable-object-storage"
+import { createDurableObjectSqlStoragePersister } from "tinybase/persisters/persister-durable-object-sql-storage"
 import {
 	WsServerDurableObject,
 	getWsServerDurableObjectFetch,
@@ -11,7 +11,7 @@ import { GoogleKeepBot } from "./google-keep-bot"
 const SHORT_SYNC_INTERVAL = 1000 * 30 // Every 30 seconds
 const LONG_SYNC_INTERVAL = 1000 * 60 * 30 // Every 30 minutes
 
-export class TinyDO extends WsServerDurableObject<Env> {
+export class ShoppingBirdDO extends WsServerDurableObject<Env> {
 	tinybaseStore = createMergeableStore()
 	shoppingList = createTinybaseClient(this.tinybaseStore)
 
@@ -21,7 +21,7 @@ export class TinyDO extends WsServerDurableObject<Env> {
 	}
 
 	createPersister() {
-		return createDurableObjectStoragePersister(this.tinybaseStore, this.ctx.storage)
+		return createDurableObjectSqlStoragePersister(this.tinybaseStore, this.ctx.storage.sql)
 	}
 
 	onPathId(pathId: Id, addedOrRemoved: IdAddedOrRemoved) {
@@ -216,7 +216,7 @@ export class TinyDO extends WsServerDurableObject<Env> {
 
 export default {
 	async fetch(request, env) {
-		const req = getWsServerDurableObjectFetch("TinyDO")(request, env)
+		const req = getWsServerDurableObjectFetch("ShoppingBirdDO")(request, env)
 		return req
 	},
 } satisfies ExportedHandler<Env>

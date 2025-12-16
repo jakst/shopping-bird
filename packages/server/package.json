@@ -7,12 +7,12 @@
 		"dev": "wrangler dev"
 	},
 	"devDependencies": {
-		"@cloudflare/workers-types": "4.20241218.0",
+		"@cloudflare/workers-types": "4.20251216.0",
 		"typescript": "5.7.2",
 		"wrangler": "3.99.0"
 	},
 	"dependencies": {
 		"lib": "workspace:^",
-		"tinybase": "^5.4.4"
+		"tinybase": "^7.3.0"
 	}
 }

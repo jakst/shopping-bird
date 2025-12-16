@@ -11,7 +11,7 @@ vars = { KEEP_EMAIL = "jakob.stahl91@gmail.com", KEEP_SHOPPING_LIST_ID = "1cT_A1
 enabled = true
 
 [durable_objects]
-bindings = [{ name = "TinyDO", class_name = "TinyDO" }]
+bindings = [{ name = "ShoppingBirdDO", class_name = "ShoppingBirdDO" }]
 
 [[migrations]]
 tag = "v1"
@@ -20,3 +20,8 @@ new_classes = ["TheShoppingBird"]
 [[migrations]]
 tag = "v2"
 renamed_classes = [{ from = "TheShoppingBird", to = "TinyDO" }]
+
+[[migrations]]
+tag = "v3"
+deleted_classes = ["TinyDO"]
+new_sqlite_classes = ["ShoppingBirdDO"]
