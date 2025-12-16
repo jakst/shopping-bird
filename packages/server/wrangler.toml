@@ -20,3 +20,7 @@ new_classes = ["TheShoppingBird"]
 [[migrations]]
 tag = "v2"
 renamed_classes = [{ from = "TheShoppingBird", to = "TinyDO" }]
+
+[[migrations]]
+tag = "v3"
+new_sqlite_classes = ["TinyDO"]

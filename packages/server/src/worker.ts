@@ -1,6 +1,6 @@
 import { type ShoppingListItem, createTinybaseClient } from "lib"
 import { type Id, type IdAddedOrRemoved, createMergeableStore } from "tinybase"
-import { createDurableObjectStoragePersister } from "tinybase/persisters/persister-durable-object-storage"
+import { createDurableObjectSqlStoragePersister } from "tinybase/persisters/persister-durable-object-sql-storage"
 import {
 	WsServerDurableObject,
 	getWsServerDurableObjectFetch,
@@ -21,7 +21,7 @@ export class TinyDO extends WsServerDurableObject<Env> {
 	}
 
 	createPersister() {
-		return createDurableObjectStoragePersister(this.tinybaseStore, this.ctx.storage)
+		return createDurableObjectSqlStoragePersister(this.tinybaseStore, this.ctx.storage.sql)
 	}
 
 	onPathId(pathId: Id, addedOrRemoved: IdAddedOrRemoved) {
