@@ -71,68 +71,74 @@ export class ShoppingBirdDO extends WsServerDurableObject<Env> {
 	}
 
 	async sync() {
-		console.log("Sync initiated")
-		const keepBot = new GoogleKeepBot(this.env.KEEP_SHOPPING_LIST_ID)
-		await keepBot.authenticate({ email: this.env.KEEP_EMAIL, masterKey: this.env.KEEP_MASTER_KEY })
+		// Use blockConcurrencyWhile to prevent overlapping sync runs.
+		// This ensures we don't have two syncs interleaving and stomping cached baselines.
+		await this.ctx.blockConcurrencyWhile(async () => {
+			console.log("Sync initiated")
+			const keepBot = new GoogleKeepBot(this.env.KEEP_SHOPPING_LIST_ID)
+			await keepBot.authenticate({ email: this.env.KEEP_EMAIL, masterKey: this.env.KEEP_MASTER_KEY })
 
-		type DiffItem = {
-			id: string
-			name: string
-			checked: boolean
-		}
+			type DiffItem = {
+				id: string
+				name: string
+				checked: boolean
+			}
 
-		type DiffStore = {
-			lastChangedAt: string
-			items: DiffItem[]
-		}
+			type DiffStore = {
+				lastChangedAt: string
+				items: DiffItem[]
+			}
 
-		const prevKeepStore = (await this.ctx.storage.get<DiffStore>("keep-list")) ?? { lastChangedAt: "", items: [] }
-		const newKeepList = await keepBot.getList()
-
-		// If changes have been made in Keep since last time we checked, sync them back to the server.
-		if (newKeepList.lastChangedAt !== prevKeepStore.lastChangedAt) {
-			console.log("[KEEP] List changed. Syncing changes back to the shopping list...")
-
-			await keepBot.refreshList()
-
-			const oldIds = new Set(prevKeepStore.items.map((item) => item.id))
-			const newIds = new Set(newKeepList.items.map((item) => item.id))
-			const removedIds = oldIds.difference(newIds)
-
-			removedIds.forEach((id) => {
-				console.log(`[KEEP] "${prevKeepStore.items.find((item) => item.id === id)?.name}" was removed`)
-				this.shoppingList.removeItem(id)
-			})
-
-			newKeepList.items.forEach((newKeepItem) => {
-				if (this.tinybaseStore.hasRow("items", newKeepItem.id)) {
-					const previousKeepItem = prevKeepStore.items.find((prevKeepItem) => prevKeepItem.id === newKeepItem.id)
-
-					if (previousKeepItem) {
-						if (newKeepItem.name !== previousKeepItem.name) {
-							console.log(`[KEEP] Name changed from "${previousKeepItem.name}" to "${newKeepItem.name}"`)
-							this.shoppingList.renameItem(newKeepItem.id, newKeepItem.name)
-						}
-
-						if (newKeepItem.checked !== previousKeepItem.checked) {
-							console.log(`[KEEP] "${newKeepItem.name}" was ${newKeepItem.checked ? "checked" : "unchecked"}`)
-							this.shoppingList.setItemChecked(newKeepItem.id, newKeepItem.checked)
-						}
-					}
-				} else {
-					console.log(`[KEEP] Found  ${newKeepItem.checked ? "checked" : "unchecked"} new item "${newKeepItem.name}"`)
-					this.shoppingList.addItem(newKeepItem.name, newKeepItem.id)
-					if (newKeepItem.checked) this.shoppingList.setItemChecked(newKeepItem.id, true)
-				}
-			})
-
-			await this.ctx.storage.put<DiffStore>("keep-list", newKeepList)
-		} else {
 			type ServerStore = {
 				lastChangedAt: string
 				items: ShoppingListItem[]
 			}
 
+			const prevKeepStore = (await this.ctx.storage.get<DiffStore>("keep-list")) ?? { lastChangedAt: "", items: [] }
+			const newKeepList = await keepBot.getList()
+
+			// If changes have been made in Keep since last time we checked, sync them back to the server.
+			if (newKeepList.lastChangedAt !== prevKeepStore.lastChangedAt) {
+				console.log("[KEEP] List changed. Syncing changes back to the shopping list...")
+
+				await keepBot.refreshList()
+
+				const oldIds = new Set(prevKeepStore.items.map((item) => item.id))
+				const newIds = new Set(newKeepList.items.map((item) => item.id))
+				const removedIds = oldIds.difference(newIds)
+
+				removedIds.forEach((id) => {
+					console.log(`[KEEP] "${prevKeepStore.items.find((item) => item.id === id)?.name}" was removed`)
+					this.shoppingList.removeItem(id)
+				})
+
+				newKeepList.items.forEach((newKeepItem) => {
+					if (this.tinybaseStore.hasRow("items", newKeepItem.id)) {
+						const previousKeepItem = prevKeepStore.items.find((prevKeepItem) => prevKeepItem.id === newKeepItem.id)
+
+						if (previousKeepItem) {
+							if (newKeepItem.name !== previousKeepItem.name) {
+								console.log(`[KEEP] Name changed from "${previousKeepItem.name}" to "${newKeepItem.name}"`)
+								this.shoppingList.renameItem(newKeepItem.id, newKeepItem.name)
+							}
+
+							if (newKeepItem.checked !== previousKeepItem.checked) {
+								console.log(`[KEEP] "${newKeepItem.name}" was ${newKeepItem.checked ? "checked" : "unchecked"}`)
+								this.shoppingList.setItemChecked(newKeepItem.id, newKeepItem.checked)
+							}
+						}
+					} else {
+						console.log(`[KEEP] Found  ${newKeepItem.checked ? "checked" : "unchecked"} new item "${newKeepItem.name}"`)
+						this.shoppingList.addItem(newKeepItem.name, newKeepItem.id)
+						if (newKeepItem.checked) this.shoppingList.setItemChecked(newKeepItem.id, true)
+					}
+				})
+
+				await this.ctx.storage.put<DiffStore>("keep-list", newKeepList)
+			}
+
+			// Always check for server→Keep sync, even if Keep changed.
+			// This handles the case where both sides changed between sync runs.
 			const prevServerStore = (await this.ctx.storage.get<ServerStore>("server-list")) ?? {
 				lastChangedAt: "",
 				items: [],
@@ -144,19 +150,24 @@ export class ShoppingBirdDO extends WsServerDurableObject<Env> {
 			// If changes have been made on the server since last time we checked, sync them back to Keep.
 			if (prevServerStore.lastChangedAt !== serverLastChangedAt) {
 				console.log("Shopping list changed. Syncing changes to Keep...")
+
+				// Collect all Keep write promises so we can await them before snapshotting.
+				const keepWritePromises: Promise<unknown>[] = []
+
 				const oldIds = new Set(prevServerStore.items.map((item) => item.id))
 				const newIds = new Set(serverList.map((item) => item.id))
 				const removedIds = oldIds.difference(newIds)
 
+				// Re-fetch Keep list to get current state for comparisons
+				const currentKeepList = await keepBot.getList()
+
 				removedIds.forEach((id) => {
-					console.log(`Removing "${prevKeepStore.items.find((item) => item.id === id)?.name}" from Keep`)
-					keepBot.deleteItem(id).catch((error) => {
-						console.error(error)
-					})
+					console.log(`Removing "${prevServerStore.items.find((item) => item.id === id)?.name}" from Keep`)
+					keepWritePromises.push(keepBot.deleteItem(id))
 				})
 
 				serverList.forEach((serverItem) => {
-					const keepItem = newKeepList.items.find((keepItem) => keepItem.id === serverItem.id)
+					const keepItem = currentKeepList.items.find((keepItem) => keepItem.id === serverItem.id)
 
 					if (keepItem) {
 						const previousServerItem = prevServerStore.items.find((item) => item.id === serverItem.id)
@@ -176,41 +187,43 @@ export class ShoppingBirdDO extends WsServerDurableObject<Env> {
 							}
 
 							if (changed) {
-								keepBot.updateItem(serverItem.id, updatedItem).catch((error) => {
-									console.error(error)
-								})
+								keepWritePromises.push(keepBot.updateItem(serverItem.id, updatedItem))
 							}
 						} else {
 							// This is an edge case. The object exists in keep, but doesn't exist in the
 							// server cache. It means we lost some cached data. Use the server values.
 
 							console.warn(`Updating item (edge case) "${serverItem.name}" in keep`, { serverItem, keepItem })
-							keepBot.updateItem(serverItem.id, serverItem).catch((error) => {
-								console.error(error)
-							})
+							keepWritePromises.push(keepBot.updateItem(serverItem.id, serverItem))
 						}
 					} else {
 						console.log(`Adding ${serverItem.checked ? "checked" : "unchecked"} item ${serverItem.name} to Keep`)
-						keepBot
-							.addItem(serverItem.id, serverItem.name)
-							.then(() => {
-								if (serverItem.checked) keepBot.updateItem(serverItem.id, { checked: true })
-							})
-							.catch((error) => {
-								console.error(error)
-							})
+						keepWritePromises.push(
+							keepBot.addItem(serverItem.id, serverItem.name).then(async () => {
+								if (serverItem.checked) await keepBot.updateItem(serverItem.id, { checked: true })
+							}),
+						)
 					}
 				})
+
+				// Wait for all Keep writes to complete before snapshotting.
+				// Use allSettled so one failure doesn't abort the whole sync.
+				const results = await Promise.allSettled(keepWritePromises)
+				const failures = results.filter((r) => r.status === "rejected")
+				if (failures.length > 0) {
+					console.error(`${failures.length} Keep write(s) failed:`, failures)
+				}
+
+				// Now fetch the post-write Keep state and persist both snapshots.
+				const finalKeepList = await keepBot.getList()
+				await this.ctx.storage.put<DiffStore>("keep-list", finalKeepList)
 
 				await this.ctx.storage.put<ServerStore>("server-list", {
 					lastChangedAt: serverLastChangedAt ?? new Date().toISOString(),
 					items: serverList,
 				})
-
-				const diffStore = await keepBot.getList()
-				await this.ctx.storage.put<DiffStore>("keep-list", diffStore)
 			}
-		}
+		})
 	}
 }
 
